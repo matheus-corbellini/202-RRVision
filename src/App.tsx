@@ -1,12 +1,7 @@
-import "./App.css";
+import AppRoutes from "./routes/index";
 
 function App() {
-  return (
-    <div className="App">
-      <h1>RRVision</h1>
-      <p>Projeto iniciado com sucesso!</p>
-    </div>
-  );
+  return <AppRoutes />;
 }
 
 export default App;
