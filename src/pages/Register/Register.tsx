@@ -15,6 +15,7 @@ import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useRegister } from "../../hooks/useRegister";
+import { path } from "../../routes/path";
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -48,7 +49,7 @@ export default function Register() {
     try {
       await handleRegister(formData);
       // On successful registration, navigate to dashboard or welcome page
-      goTo("/dashboard");
+      goTo(path.dashboard);
     } catch (err) {
       // Error is handled by the hook
       console.error("Registration failed:", err);
@@ -168,7 +169,7 @@ export default function Register() {
                     color: "#fbb040",
                     opacity: loading ? 0.6 : 1,
                   }}
-                  onClick={() => !loading && goTo("/terms")}
+                  onClick={() => !loading && goTo(path.terms)}
                 >
                   termos de uso
                 </span>{" "}
@@ -179,7 +180,7 @@ export default function Register() {
                     color: "#fbb040",
                     opacity: loading ? 0.6 : 1,
                   }}
-                  onClick={() => !loading && goTo("/privacy")}
+                  onClick={() => !loading && goTo(path.privacy)}
                 >
                   política de privacidade
                 </span>
@@ -205,7 +206,7 @@ export default function Register() {
                   color: "#fbb040",
                   opacity: loading ? 0.6 : 1,
                 }}
-                onClick={() => !loading && goTo("/login")}
+                onClick={() => !loading && goTo(path.login)}
               >
                 Faça login
               </span>

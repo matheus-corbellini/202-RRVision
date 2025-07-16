@@ -3,6 +3,7 @@ import { useState } from "react";
 import Button from "../Button/Button";
 import { useNavigation } from "../../hooks/useNavigation";
 import { scrollToSection } from "../../hooks/scrollToSection";
+import { path } from "../../routes/path";
 import "./Header.css";
 
 export default function Header() {
@@ -24,7 +25,7 @@ export default function Header() {
           <span
             className="logo"
             style={{ cursor: "pointer" }}
-            onClick={() => handleNav("/")}
+            onClick={() => handleNav(path.landing)}
           >
             <span className="logo-text">RR Vision Brazil</span>
           </span>
@@ -54,10 +55,10 @@ export default function Header() {
           </nav>
 
           <div className="header-actions">
-            <Button variant="outline" onClick={() => handleNav("/login")}>
+            <Button variant="outline" onClick={() => handleNav(path.login)}>
               Entrar
             </Button>
-            <Button variant="primary" onClick={() => handleNav("/register")}>
+            <Button variant="primary" onClick={() => handleNav(path.register)}>
               Cadastrar
             </Button>
           </div>

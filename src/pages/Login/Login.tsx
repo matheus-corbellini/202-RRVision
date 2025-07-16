@@ -9,6 +9,7 @@ import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useLogin } from "../../hooks/useLogin";
+import { path } from "../../routes/path";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -19,7 +20,7 @@ export default function Login() {
   const { handleLogin, loading, error, clearError } = useLogin();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (error) clearError(); // Clear error when user starts typing
+    if (error) clearError();
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -32,7 +33,7 @@ export default function Login() {
     try {
       await handleLogin(formData);
       // On successful login, navigate to dashboard or home
-      goTo("/dashboard");
+      goTo(path.dashboard);
     } catch (err) {
       // Error is handled by the hook
       console.error("Login failed:", err);
@@ -100,7 +101,7 @@ export default function Login() {
                   cursor: loading ? "not-allowed" : "pointer",
                   opacity: loading ? 0.6 : 1,
                 }}
-                onClick={() => !loading && goTo("/forgot-password")}
+                onClick={() => !loading && goTo(path.forgotPassword)}
               >
                 Esqueceu a senha?
               </span>
@@ -125,7 +126,7 @@ export default function Login() {
                   color: "#fbb040",
                   opacity: loading ? 0.6 : 1,
                 }}
-                onClick={() => !loading && goTo("/register")}
+                onClick={() => !loading && goTo(path.register)}
               >
                 Cadastre-se
               </span>
