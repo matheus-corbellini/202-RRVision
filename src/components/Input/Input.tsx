@@ -11,6 +11,7 @@ interface InputProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   required?: boolean;
   disabled?: boolean;
+  icon?: React.ReactNode;
 }
 
 export default function Input({
@@ -21,17 +22,21 @@ export default function Input({
   onChange,
   required = false,
   disabled = false,
+  icon,
 }: InputProps) {
   return (
-    <input
-      type={type}
-      name={name}
-      placeholder={placeholder}
-      value={value}
-      onChange={onChange}
-      required={required}
-      disabled={disabled}
-      className="input"
-    />
+    <div className="input-wrapper">
+      {icon && <div className="input-icon">{icon}</div>}
+      <input
+        type={type}
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        required={required}
+        disabled={disabled}
+        className={`input ${icon ? "input-with-icon" : ""}`}
+      />
+    </div>
   );
 }

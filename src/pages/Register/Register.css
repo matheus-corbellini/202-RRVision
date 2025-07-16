@@ -126,6 +126,14 @@
   transition: all 0.3s ease;
 }
 
+.register-form .input-with-icon {
+  padding: 1rem 1rem 1rem 3.25rem;
+}
+
+.register-form .input-wrapper .input-icon {
+  left: 1.125rem;
+}
+
 .register-form .input:focus {
   border-color: #fbb040;
   box-shadow: 0 0 0 3px rgba(251, 176, 64, 0.1);
