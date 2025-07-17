@@ -1,4 +1,4 @@
-import type { Alert } from "../../types/dashboard";
+import type { Alert } from "../../../../types/dashboard";
 import "./AlertsPanel.css";
 
 interface AlertsPanelProps {

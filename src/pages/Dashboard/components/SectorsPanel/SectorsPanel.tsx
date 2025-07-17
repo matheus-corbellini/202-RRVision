@@ -1,4 +1,4 @@
-import type { Sector } from "../../types/dashboard";
+import type { Sector } from "../../../../types/dashboard";
 import "./SectorsPanel.css";
 
 interface SectorsPanelProps {

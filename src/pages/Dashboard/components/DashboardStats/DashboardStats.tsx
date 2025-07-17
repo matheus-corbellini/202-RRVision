@@ -1,4 +1,4 @@
-import type { DashboardStats as StatsData } from "../../types/dashboard";
+import type { DashboardStats as StatsData } from "../../../../types/dashboard";
 import "./DashboardStats.css";
 
 interface StatCardProps {

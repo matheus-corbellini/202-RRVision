@@ -1,49 +1,25 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigation } from "../../hooks/useNavigation";
 import { path } from "../../routes/path";
-import Button from "../../components/Button/Button";
+import {
+  DashboardHeader,
+  DashboardStats,
+  ImportSection,
+  OrdersSection,
+  AlertsPanel,
+  SectorsPanel,
+} from "./components";
+import type {
+  Order,
+  Alert,
+  Sector,
+  DashboardStats as StatsData,
+  ImportData,
+} from "../../types/dashboard";
 import "./Dashboard.css";
-import { useState, useEffect } from "react";
-
-interface Order {
-  id: string;
-  product: string;
-  quantity: number;
-  status: "pending" | "production" | "completed" | "urgent";
-  progress: number;
-  startDate: string;
-  expectedEnd: string;
-  actualEnd?: string;
-  isOverdue: boolean;
-  isUrgent: boolean;
-  sectors: OrderSector[];
-}
-
-interface OrderSector {
-  name: string;
-  activity: string;
-  estimatedTime: number;
-  actualTime?: number;
-  setupTime: number;
-  status: "pending" | "active" | "completed" | "blocked";
-}
-
-interface Alert {
-  id: string;
-  type: "critical" | "warning" | "info";
-  title: string;
-  message: string;
-  timestamp: string;
-}
-
-interface Sector {
-  name: string;
-  status: "active" | "idle" | "blocked";
-  efficiency: number;
-  activeOrders: number;
-}
 
 export default function Dashboard() {
   const { user, logout, loading } = useAuth();
@@ -267,37 +243,19 @@ export default function Dashboard() {
     setLastSync(new Date());
   };
 
-  const filteredOrders = orders.filter(
-    (order) => filterStatus === "all" || order.status === filterStatus
-  );
-
-  const getStatusBadgeClass = (status: string, isUrgent: boolean) => {
-    if (isUrgent) return "status-badge status-urgent";
-    switch (status) {
-      case "pending":
-        return "status-badge status-pending";
-      case "production":
-        return "status-badge status-production";
-      case "completed":
-        return "status-badge status-completed";
-      default:
-        return "status-badge";
-    }
+  // Calcular estatísticas
+  const dashboardStats: StatsData = {
+    activeOrders: orders.filter((o) => o.status !== "completed").length,
+    averageEfficiency: 84,
+    urgentOrders: orders.filter((o) => o.isUrgent).length,
+    activeSectors: sectors.filter((s) => s.status === "active").length,
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "Pendente";
-      case "production":
-        return "Produção";
-      case "completed":
-        return "Concluído";
-      case "urgent":
-        return "Urgente";
-      default:
-        return status;
-    }
+  const importData: ImportData = {
+    ordersImported: 15,
+    routesLoaded: 12,
+    pendingRoutes: 3,
+    timesCalculated: "100%",
   };
 
   if (loading) {
@@ -313,291 +271,36 @@ export default function Dashboard() {
     return null;
   }
 
+  const userName = user.name || user.displayName || user.email;
+
   return (
     <div className="dashboard-page">
       <div className="dashboard-container">
-        {/* Header */}
-        <div className="dashboard-header">
-          <div className="header-content">
-            <div className="header-info">
-              <h1>Dashboard de Produção</h1>
-              <p>Bem-vindo, {user.name || user.displayName || user.email}</p>
-            </div>
-            <div className="header-actions">
-              <div className="sync-status">
-                <div className="sync-indicator"></div>
-                <span>Última sync: {lastSync.toLocaleTimeString()}</span>
-              </div>
-              <Button variant="primary" onClick={handleImportBling}>
-                Importar Bling
-              </Button>
-              <Button variant="secondary" onClick={handleLogout}>
-                Sair
-              </Button>
-            </div>
-          </div>
-        </div>
+        <DashboardHeader
+          userName={userName}
+          lastSync={lastSync}
+          onImportBling={handleImportBling}
+          onLogout={handleLogout}
+        />
 
-        {/* Stats Cards */}
-        <div className="dashboard-stats">
-          <div className="stat-card">
-            <div className="stat-header">
-              <span className="stat-title">Pedidos Ativos</span>
-              <span className="stat-icon">📋</span>
-            </div>
-            <div className="stat-value">
-              {orders.filter((o) => o.status !== "completed").length}
-            </div>
-            <div className="stat-change positive">+2 hoje</div>
-          </div>
+        <DashboardStats stats={dashboardStats} />
 
-          <div className="stat-card">
-            <div className="stat-header">
-              <span className="stat-title">Eficiência Média</span>
-              <span className="stat-icon">⚡</span>
-            </div>
-            <div className="stat-value">84%</div>
-            <div className="stat-change positive">+3% esta semana</div>
-          </div>
+        <ImportSection
+          importData={importData}
+          importLogs={importLogs}
+          onImportBling={handleImportBling}
+        />
 
-          <div className="stat-card">
-            <div className="stat-header">
-              <span className="stat-title">Pedidos Urgentes</span>
-              <span className="stat-icon">🚨</span>
-            </div>
-            <div className="stat-value">
-              {orders.filter((o) => o.isUrgent).length}
-            </div>
-            <div className="stat-change negative">Atenção necessária</div>
-          </div>
-
-          <div className="stat-card">
-            <div className="stat-header">
-              <span className="stat-title">Setores Ativos</span>
-              <span className="stat-icon">🏭</span>
-            </div>
-            <div className="stat-value">
-              {sectors.filter((s) => s.status === "active").length}
-            </div>
-            <div className="stat-change positive">Operação normal</div>
-          </div>
-        </div>
-
-        {/* Import Section */}
-        <div className="import-section">
-          <div className="import-header">
-            <h3>Importação e Preparação - Bling ERP</h3>
-            <Button variant="outline" onClick={handleImportBling}>
-              Sincronizar Agora
-            </Button>
-          </div>
-
-          <div className="import-stats">
-            <div className="import-stat">
-              <div className="import-stat-value">15</div>
-              <div className="import-stat-label">Pedidos Importados</div>
-            </div>
-            <div className="import-stat">
-              <div className="import-stat-value">12</div>
-              <div className="import-stat-label">Roteiros Carregados</div>
-            </div>
-            <div className="import-stat">
-              <div className="import-stat-value">3</div>
-              <div className="import-stat-label">Pendentes Roteiro</div>
-            </div>
-            <div className="import-stat">
-              <div className="import-stat-value">100%</div>
-              <div className="import-stat-label">Tempos Calculados</div>
-            </div>
-          </div>
-
-          <div className="import-log">
-            {importLogs.map((log, index) => (
-              <div key={index} className="log-entry">
-                <span className="log-timestamp">{log.split(" ")[0]}</span>
-                <span
-                  className={`log-message ${
-                    log.includes("[SUCCESS]")
-                      ? "log-success"
-                      : log.includes("[ERROR]")
-                      ? "log-error"
-                      : log.includes("[WARNING]")
-                      ? "log-warning"
-                      : ""
-                  }`}
-                >
-                  {log.substring(log.indexOf(" ") + 1)}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Main Content */}
         <div className="dashboard-content">
-          {/* Orders Section */}
-          <div className="orders-section">
-            <div className="section-header">
-              <h3 className="section-title">Ordens de Produção</h3>
-              <div className="section-actions">
-                <button className="btn-icon" title="Atualizar">
-                  🔄
-                </button>
-                <button className="btn-icon" title="Exportar">
-                  📊
-                </button>
-                <button className="btn-icon" title="Configurações">
-                  ⚙️
-                </button>
-              </div>
-            </div>
+          <OrdersSection
+            orders={orders}
+            filterStatus={filterStatus}
+            onFilterChange={setFilterStatus}
+          />
 
-            <div className="orders-filters">
-              <div className="filter-group">
-                <label>Status:</label>
-                <select
-                  className="filter-select"
-                  value={filterStatus}
-                  onChange={(e) => setFilterStatus(e.target.value)}
-                >
-                  <option value="all">Todos</option>
-                  <option value="pending">Pendente</option>
-                  <option value="production">Em Produção</option>
-                  <option value="completed">Concluído</option>
-                  <option value="urgent">Urgente</option>
-                </select>
-              </div>
-              <div className="filter-group">
-                <label>Período:</label>
-                <select className="filter-select">
-                  <option>Hoje</option>
-                  <option>Esta Semana</option>
-                  <option>Este Mês</option>
-                </select>
-              </div>
-            </div>
-
-            <table className="orders-table">
-              <thead>
-                <tr>
-                  <th>OP</th>
-                  <th>Produto</th>
-                  <th>Qtd</th>
-                  <th>Status</th>
-                  <th>Progresso</th>
-                  <th>Previsão</th>
-                  <th>Alertas</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOrders.map((order) => (
-                  <tr key={order.id} className="order-row">
-                    <td>
-                      <div className="order-id">{order.id}</div>
-                    </td>
-                    <td>
-                      <div className="order-product">{order.product}</div>
-                    </td>
-                    <td>{order.quantity}</td>
-                    <td>
-                      <span
-                        className={getStatusBadgeClass(
-                          order.status,
-                          order.isUrgent
-                        )}
-                      >
-                        {getStatusText(order.status)}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="progress-container">
-                        <div
-                          className="progress-bar"
-                          style={{ width: `${order.progress}%` }}
-                        ></div>
-                      </div>
-                      <div className="progress-text">{order.progress}%</div>
-                    </td>
-                    <td>
-                      <div
-                        className={`date-cell ${
-                          order.isOverdue ? "date-overdue" : ""
-                        }`}
-                      >
-                        {new Date(order.expectedEnd).toLocaleDateString(
-                          "pt-BR"
-                        )}
-                      </div>
-                    </td>
-                    <td>
-                      {order.isOverdue && (
-                        <span className="alert-icon">⚠️</span>
-                      )}
-                      {order.isUrgent && <span className="alert-icon">🚨</span>}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Sidebar */}
           <div className="sidebar-section">
-            {/* Alerts Panel */}
-            <div className="alerts-panel">
-              <div className="panel-header">
-                <h4 className="panel-title">Alertas e Notificações</h4>
-              </div>
-              <div className="panel-content">
-                {alerts.map((alert) => (
-                  <div key={alert.id} className={`alert-item ${alert.type}`}>
-                    <div className="alert-content">
-                      <h4>{alert.title}</h4>
-                      <p>{alert.message}</p>
-                    </div>
-                    <span style={{ fontSize: "0.8rem", color: "#4a5568" }}>
-                      {alert.timestamp}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="sectors-panel">
-              <div className="panel-header">
-                <h4 className="panel-title">Status dos Setores</h4>
-              </div>
-              <div className="panel-content">
-                {sectors.map((sector, index) => (
-                  <div key={index} className="sector-item">
-                    <div className="sector-info">
-                      <h4>{sector.name}</h4>
-                      <p>
-                        Eficiência: {sector.efficiency}% | Pedidos:{" "}
-                        {sector.activeOrders}
-                      </p>
-                    </div>
-                    <div className="sector-status">
-                      <div
-                        className={`status-indicator status-${sector.status}`}
-                      ></div>
-                      <span
-                        style={{
-                          fontSize: "0.8rem",
-                          textTransform: "capitalize",
-                        }}
-                      >
-                        {sector.status === "active"
-                          ? "Ativo"
-                          : sector.status === "idle"
-                          ? "Ocioso"
-                          : "Bloqueado"}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <AlertsPanel alerts={alerts} />
+            <SectorsPanel sectors={sectors} />
           </div>
         </div>
       </div>

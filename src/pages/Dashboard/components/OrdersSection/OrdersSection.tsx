@@ -1,4 +1,4 @@
-import type { Order } from "../../types/dashboard";
+import type { Order } from "../../../../types/dashboard";
 import "./OrdersSection.css";
 
 interface OrdersSectionProps {

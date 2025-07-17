@@ -1,5 +1,5 @@
-import Button from "../Button/Button";
-import type { ImportData } from "../../types/dashboard";
+import Button from "../../../../components/Button/Button";
+import type { ImportData } from "../../../../types/dashboard";
 import "./ImportSection.css";
 
 interface ImportSectionProps {
