@@ -1,0 +1,36 @@
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f7fafc;
+}
+
+.dashboard-main {
+  flex: 1;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.dashboard-layout:has(.sidebar-collapsed) .dashboard-main {
+  margin-left: 70px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-main {
+    margin-left: 0;
+  }
+
+  .dashboard-layout:has(.sidebar:not(.sidebar-collapsed)) .dashboard-main {
+    margin-left: 0;
+  }
+}
+
+.dashboard-main > * {
+  transition: all 0.3s ease;
+}
+
+.dashboard-main {
+  position: relative;
+  z-index: 1;
+}
