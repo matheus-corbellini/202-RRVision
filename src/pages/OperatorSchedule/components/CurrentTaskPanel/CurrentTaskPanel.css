@@ -1,0 +1,196 @@
+.current-task-panel {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border-left: 4px solid #fbb040;
+}
+
+.panel-header {
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.task-timer {
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+
+.current-task-content {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.task-info h4 {
+  font-size: 1.4rem;
+  color: #1a365d;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.task-product {
+  color: #4a5568;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.task-description {
+  color: #4a5568;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.task-progress {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.progress-bar-container {
+  flex: 1;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #fbb040 0%, #f6ad55 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  font-weight: 600;
+  color: #1a365d;
+  min-width: 40px;
+}
+
+.task-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.break-controls h5 {
+  margin: 0 0 1rem 0;
+  color: #1a365d;
+  font-size: 1rem;
+}
+
+.break-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.break-btn {
+  padding: 0.5rem;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s;
+}
+
+.break-btn:hover {
+  border-color: #fbb040;
+  background: #fef5e7;
+}
+
+.break-btn.coffee:hover {
+  border-color: #8b4513;
+  background: #f4f1eb;
+}
+.break-btn.lunch:hover {
+  border-color: #48bb78;
+  background: #f0fff4;
+}
+.break-btn.bathroom:hover {
+  border-color: #4299e1;
+  background: #ebf8ff;
+}
+.break-btn.other:hover {
+  border-color: #9f7aea;
+  background: #faf5ff;
+}
+
+.active-break {
+  background: #fef5e7;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 2px solid #fbb040;
+  text-align: center;
+}
+
+.end-break-btn {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #fbb040;
+  color: #1a365d;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.task-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.action-btn.pause {
+  background: #fbb040;
+  color: #1a365d;
+}
+
+.action-btn.nonconformity {
+  background: #f56565;
+  color: white;
+}
+
+.action-btn.complete {
+  background: #48bb78;
+  color: white;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 1200px) {
+  .current-task-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .break-buttons {
+    grid-template-columns: 1fr;
+  }
+}
