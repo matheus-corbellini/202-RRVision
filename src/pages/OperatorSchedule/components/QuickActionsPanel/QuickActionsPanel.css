@@ -1,0 +1,366 @@
+.quick-actions-panel {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 2px solid #e2e8f0;
+}
+
+.quick-actions-panel.collapsed {
+  max-height: 60px;
+}
+
+.panel-header {
+  background: linear-gradient(135deg, #fbb040 0%, #f6ad55 100%);
+  color: #1a365d;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.panel-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.panel-icon {
+  font-size: 1.2rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.expand-btn {
+  background: none;
+  border: none;
+  color: #1a365d;
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.expand-btn:hover {
+  background: rgba(26, 54, 93, 0.1);
+  transform: scale(1.1);
+}
+
+.panel-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Estatísticas Rápidas */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-radius: 12px;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 0.75rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+  transform: translateY(-2px);
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a365d;
+  margin-bottom: 0.25rem;
+}
+
+.stat-value.pending {
+  color: #fbb040;
+}
+
+.stat-value.completed {
+  color: #48bb78;
+}
+
+.stat-value.urgent {
+  color: #f56565;
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+/* Seções */
+.filter-section,
+.sort-section,
+.actions-section,
+.current-task-info {
+  padding: 1rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fafafa;
+}
+
+.filter-section h4,
+.sort-section h4,
+.actions-section h4,
+.current-task-info h4 {
+  margin: 0 0 1rem 0;
+  color: #1a365d;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Botões de Filtro e Ordenação */
+.filter-buttons,
+.sort-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.filter-btn,
+.sort-btn {
+  padding: 0.6rem 0.8rem;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #4a5568;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+}
+
+.filter-btn:hover,
+.sort-btn:hover {
+  border-color: #fbb040;
+  background: #fef5e7;
+  color: #1a365d;
+  transform: translateY(-1px);
+}
+
+.filter-btn.active,
+.sort-btn.active {
+  border-color: #fbb040;
+  background: linear-gradient(135deg, #fbb040 0%, #f6ad55 100%);
+  color: #1a365d;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(251, 176, 64, 0.3);
+}
+
+/* Botões de Ação */
+.action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.action-btn {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e2e8f0;
+  background: white;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #1a365d;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 70px;
+}
+
+.action-btn:hover:not(.disabled) {
+  border-color: #48bb78;
+  background: #f0fff4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(72, 187, 120, 0.2);
+}
+
+.action-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f7fafc;
+  color: #a0aec0;
+}
+
+.action-icon {
+  font-size: 1.5rem;
+}
+
+.action-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Informações da Tarefa Atual */
+.task-summary {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  border-left: 4px solid #4299e1;
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.task-name {
+  font-weight: 600;
+  color: #1a365d;
+  font-size: 0.9rem;
+}
+
+.task-priority {
+  padding: 0.25rem 0.5rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: white;
+}
+
+.priority-urgent {
+  background: #f56565;
+}
+
+.priority-high {
+  background: #fbb040;
+}
+
+.priority-medium {
+  background: #4299e1;
+}
+
+.priority-low {
+  background: #48bb78;
+}
+
+.task-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  color: #4a5568;
+}
+
+.task-sector {
+  background: #e2e8f0;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.task-duration {
+  font-weight: 600;
+  color: #1a365d;
+}
+
+.task-timeline {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+  .quick-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .panel-content {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .quick-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .stat-item {
+    padding: 0.5rem;
+  }
+
+  .stat-value {
+    font-size: 1.2rem;
+  }
+
+  .filter-buttons,
+  .sort-buttons {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .action-buttons {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    padding: 0.6rem;
+    min-height: 60px;
+  }
+
+  .action-icon {
+    font-size: 1.2rem;
+  }
+
+  .action-label {
+    font-size: 0.75rem;
+  }
+}

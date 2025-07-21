@@ -7,8 +7,11 @@ import {
   OperatorStatsGrid,
   CurrentTaskPanel,
   TasksSection,
+  NotificationPanel,
+  QuickActionsPanel,
 } from "./components";
 import "./OperatorSchedule.css";
+
 interface Task {
   id: string;
   orderId: string;
@@ -52,6 +55,7 @@ export default function OperatorSchedule() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<"day" | "week">("day");
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [filteredTasks, setFilteredTasks] = useState<Task[]>([]);
   const [currentTask, setCurrentTask] = useState<Task | null>(null);
   const [activeBreak, setActiveBreak] = useState<Break | null>(null);
   const [stats, setStats] = useState<OperatorStats>({
@@ -146,8 +150,26 @@ export default function OperatorSchedule() {
         startTime: "15:45",
         endTime: "17:05",
         status: "pending",
-        priority: "low",
+        priority: "urgent",
         requiredSkills: ["Preparação"],
+        breaks: [],
+        nonConformities: [],
+      },
+      {
+        id: "task-005",
+        orderId: "OP-2024-004",
+        productName: "Produto D - Modelo W",
+        activity: "Inspeção Qualidade",
+        sector: "Qualidade",
+        description:
+          "Inspeção final de qualidade conforme especificação técnica.",
+        estimatedTime: 45,
+        setupTime: 10,
+        startTime: "07:30",
+        endTime: "08:30",
+        status: "pending",
+        priority: "low",
+        requiredSkills: ["Qualidade", "Inspeção"],
         breaks: [],
         nonConformities: [],
       },
@@ -163,6 +185,7 @@ export default function OperatorSchedule() {
     };
 
     setTasks(mockTasks);
+    setFilteredTasks(mockTasks);
     setStats(mockStats);
     setCurrentTask(mockTasks.find((t) => t.status === "in_progress") || null);
   }, []);
@@ -175,7 +198,30 @@ export default function OperatorSchedule() {
     return () => clearInterval(timer);
   }, []);
 
+  // Atualizar estatísticas quando tarefas mudarem
+  useEffect(() => {
+    const completedTasks = tasks.filter((t) => t.status === "completed").length;
+    const totalTasks = tasks.length;
+    const onTime = tasks.filter(
+      (t) =>
+        t.status === "completed" &&
+        t.actualTime &&
+        t.actualTime <= t.estimatedTime + t.setupTime
+    ).length;
+
+    setStats((prev) => ({
+      ...prev,
+      tasksCompleted: completedTasks,
+      onTimeCompletion: totalTasks > 0 ? (onTime / totalTasks) * 100 : 0,
+    }));
+  }, [tasks]);
+
   const handleStartTask = (taskId: string) => {
+    // Pausar tarefa atual se existir
+    if (currentTask) {
+      handlePauseTask(currentTask.id);
+    }
+
     setTasks((prev) =>
       prev.map((task) =>
         task.id === taskId
@@ -222,6 +268,9 @@ export default function OperatorSchedule() {
         task.id === taskId ? { ...task, status: "paused" as const } : task
       )
     );
+    if (currentTask?.id === taskId) {
+      setCurrentTask(null);
+    }
   };
 
   const handleStartBreak = (type: Break["type"]) => {
@@ -259,6 +308,35 @@ export default function OperatorSchedule() {
       );
     }
     setActiveBreak(null);
+  };
+
+  // Handler para ações rápidas
+  const handleQuickAction = (action: string) => {
+    switch (action) {
+      case "start-next": {
+        const nextTask = tasks.find((t) => t.status === "pending");
+        if (nextTask) {
+          handleStartTask(nextTask.id);
+        }
+        break;
+      }
+      case "pause-current":
+        if (currentTask) {
+          handlePauseTask(currentTask.id);
+        }
+        break;
+      case "complete-current":
+        if (currentTask) {
+          handleCompleteTask(currentTask.id);
+        }
+        break;
+      case "emergency-break":
+        if (currentTask) {
+          handlePauseTask(currentTask.id);
+          handleStartBreak("other");
+        }
+        break;
+    }
   };
 
   const calculateActualTime = (startTime: string, endTime: string): number => {
@@ -347,6 +425,18 @@ export default function OperatorSchedule() {
           formatTime={formatTime}
         />
 
+        {/* Painel de Ações Rápidas */}
+        <QuickActionsPanel
+          tasks={tasks}
+          currentTask={currentTask}
+          onFilterChange={setFilteredTasks}
+          onSortChange={(sortedTasks) => {
+            setTasks(sortedTasks);
+            setFilteredTasks(sortedTasks);
+          }}
+          onQuickAction={handleQuickAction}
+        />
+
         <div className="schedule-content">
           <CurrentTaskPanel
             currentTask={currentTask}
@@ -361,7 +451,7 @@ export default function OperatorSchedule() {
           />
 
           <TasksSection
-            tasks={tasks}
+            tasks={filteredTasks}
             currentDate={currentDate}
             setCurrentDate={setCurrentDate}
             handleStartTask={handleStartTask}
@@ -372,6 +462,14 @@ export default function OperatorSchedule() {
           />
         </div>
       </div>
+
+      {/* Painel de Notificações */}
+      <NotificationPanel
+        currentTask={currentTask}
+        activeBreak={activeBreak}
+        tasks={tasks}
+        currentTime={currentTime}
+      />
     </div>
   );
 }
