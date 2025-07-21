@@ -1,0 +1,114 @@
+.period-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.overview-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-left: 4px solid #fbb040;
+}
+
+.overview-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+}
+
+.overview-card:nth-child(1) {
+  border-left-color: #48bb78;
+}
+
+.overview-card:nth-child(2) {
+  border-left-color: #4299e1;
+}
+
+.overview-card:nth-child(3) {
+  border-left-color: #fbb040;
+}
+
+.overview-card:nth-child(4) {
+  border-left-color: #9f7aea;
+}
+
+.overview-card:nth-child(5) {
+  border-left-color: #f56565;
+}
+
+.overview-icon {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #fbb040 0%, #f6ad55 100%);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.overview-card:nth-child(1) .overview-icon {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+}
+
+.overview-card:nth-child(2) .overview-icon {
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+}
+
+.overview-card:nth-child(3) .overview-icon {
+  background: linear-gradient(135deg, #fbb040 0%, #f6ad55 100%);
+}
+
+.overview-card:nth-child(4) .overview-icon {
+  background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+}
+
+.overview-card:nth-child(5) .overview-icon {
+  background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+}
+
+.overview-content {
+  flex: 1;
+}
+
+.overview-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a365d;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.overview-label {
+  font-size: 0.9rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .period-overview {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .overview-card {
+    padding: 1.25rem;
+  }
+
+  .overview-value {
+    font-size: 1.5rem;
+  }
+
+  .overview-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+  }
+}

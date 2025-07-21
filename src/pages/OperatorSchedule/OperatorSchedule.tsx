@@ -9,8 +9,6 @@ import {
   TasksSection,
 } from "./components";
 import "./OperatorSchedule.css";
-
-// Interfaces específicas do OperatorSchedule
 interface Task {
   id: string;
   orderId: string;

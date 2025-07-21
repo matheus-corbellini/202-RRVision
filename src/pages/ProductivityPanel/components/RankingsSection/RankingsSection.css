@@ -1,0 +1,205 @@
+.rankings-section {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.rankings-section .section-header {
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+}
+
+.rankings-section .section-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.rankings-grid {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.ranking-card {
+  background: white;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.ranking-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #fbb040;
+}
+
+.ranking-card.podium {
+  border-color: #48bb78;
+  background: linear-gradient(135deg, #ffffff 0%, #f0fff4 100%);
+}
+
+.ranking-card.podium:nth-child(1) {
+  border-color: #ffd700;
+  background: linear-gradient(135deg, #ffffff 0%, #fffbf0 100%);
+}
+
+.ranking-card.podium:nth-child(2) {
+  border-color: #c0c0c0;
+  background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+}
+
+.ranking-card.podium:nth-child(3) {
+  border-color: #cd7f32;
+  background: linear-gradient(135deg, #ffffff 0%, #fef5e7 100%);
+}
+
+.ranking-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.rank-position {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rank-number {
+  background: #1a365d;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.ranking-card.podium:nth-child(1) .rank-number {
+  background: #ffd700;
+  color: #1a365d;
+}
+
+.ranking-card.podium:nth-child(2) .rank-number {
+  background: #c0c0c0;
+  color: #1a365d;
+}
+
+.ranking-card.podium:nth-child(3) .rank-number {
+  background: #cd7f32;
+  color: white;
+}
+
+.medal {
+  font-size: 1.5rem;
+}
+
+.trend {
+  font-size: 1.25rem;
+}
+
+.operator-info {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.operator-avatar.large {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #fbb040 0%, #f6ad55 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #1a365d;
+  font-weight: 700;
+  font-size: 1.2rem;
+  margin: 0 auto 1rem auto;
+  border: 3px solid #e2e8f0;
+}
+
+.ranking-card.podium .operator-avatar.large {
+  border-color: #48bb78;
+}
+
+.ranking-card.podium:nth-child(1) .operator-avatar.large {
+  border-color: #ffd700;
+  background: linear-gradient(135deg, #ffd700 0%, #f6d55c 100%);
+}
+
+.ranking-card.podium:nth-child(2) .operator-avatar.large {
+  border-color: #c0c0c0;
+  background: linear-gradient(135deg, #c0c0c0 0%, #a0aec0 100%);
+}
+
+.ranking-card.podium:nth-child(3) .operator-avatar.large {
+  border-color: #cd7f32;
+  background: linear-gradient(135deg, #cd7f32 0%, #b7791f 100%);
+}
+
+.operator-info h4 {
+  margin: 0;
+  color: #1a365d;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.ranking-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.ranking-metric {
+  text-align: center;
+  padding: 0.75rem;
+  background: #f7fafc;
+  border-radius: 8px;
+}
+
+.ranking-card.podium .ranking-metric {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.ranking-metric .metric-value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a365d;
+  margin-bottom: 0.25rem;
+}
+
+.ranking-metric .metric-label {
+  font-size: 0.8rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .rankings-grid {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+  }
+
+  .ranking-card {
+    padding: 1.25rem;
+  }
+
+  .operator-avatar.large {
+    width: 50px;
+    height: 50px;
+    font-size: 1rem;
+  }
+
+  .ranking-metrics {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}

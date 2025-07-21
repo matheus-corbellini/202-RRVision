@@ -1,0 +1,75 @@
+.productivity-header {
+  background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 16px;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 25px rgba(26, 54, 93, 0.2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-info h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #f7fafc;
+}
+
+.header-info p {
+  color: #e2e8f0;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+}
+
+.period-selector {
+  display: flex;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.period-btn {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  color: #e2e8f0;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s;
+  border-radius: 0;
+}
+
+.period-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.period-btn.active {
+  background: #fbb040;
+  color: #1a365d;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .productivity-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .period-selector {
+    margin-top: 1rem;
+  }
+
+  .period-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}

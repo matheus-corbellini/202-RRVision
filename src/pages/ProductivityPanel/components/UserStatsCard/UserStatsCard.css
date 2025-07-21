@@ -1,0 +1,95 @@
+.user-stats-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  margin-bottom: 2rem;
+  border-left: 4px solid #48bb78;
+}
+
+.user-stats-header {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: white;
+  padding: 1.5rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info h3 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.user-info p {
+  margin: 0;
+  color: #e2f8e8;
+  font-size: 1rem;
+}
+
+.user-rank {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.rank-badge {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.trend-indicator {
+  font-size: 1.5rem;
+}
+
+.user-metrics {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 2rem;
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.metric-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a365d;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.metric-label {
+  font-size: 0.9rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .user-stats-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .user-metrics {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+
+  .metric-value {
+    font-size: 1.5rem;
+  }
+}
