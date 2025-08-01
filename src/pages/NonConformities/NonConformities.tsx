@@ -11,6 +11,14 @@ import {
   NCDetailsModal,
 } from "./components";
 import "./NonConformities.css";
+import {
+  FaSearch,
+  FaExclamationTriangle,
+  FaCog,
+  FaWrench,
+  FaBox,
+  FaClipboardList,
+} from "react-icons/fa";
 
 interface NonConformity {
   id: string;
@@ -588,17 +596,17 @@ export default function NonConformities() {
   const getCategoryIcon = (category: NonConformity["category"]) => {
     switch (category) {
       case "quality":
-        return "🔍";
+        return <FaSearch />;
       case "safety":
-        return "⚠️";
+        return <FaExclamationTriangle />;
       case "process":
-        return "⚙️";
+        return <FaCog />;
       case "equipment":
-        return "🔧";
+        return <FaWrench />;
       case "material":
-        return "📦";
+        return <FaBox />;
       default:
-        return "📋";
+        return <FaClipboardList />;
     }
   };
 

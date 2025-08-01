@@ -1,3 +1,10 @@
+import {
+  FaCheckCircle,
+  FaBolt,
+  FaBullseye,
+  FaClock,
+  FaChartBar,
+} from "react-icons/fa";
 import "./PeriodOverview.css";
 
 interface PeriodStats {
@@ -23,7 +30,9 @@ export default function PeriodOverview({
   return (
     <div className="period-overview">
       <div className="overview-card">
-        <div className="overview-icon">✅</div>
+        <div className="overview-icon">
+          <FaCheckCircle />
+        </div>
         <div className="overview-content">
           <div className="overview-value">
             {currentPeriodStats.tasksCompleted}
@@ -32,7 +41,9 @@ export default function PeriodOverview({
         </div>
       </div>
       <div className="overview-card">
-        <div className="overview-icon">⚡</div>
+        <div className="overview-icon">
+          <FaBolt />
+        </div>
         <div className="overview-content">
           <div
             className="overview-value"
@@ -46,7 +57,9 @@ export default function PeriodOverview({
         </div>
       </div>
       <div className="overview-card">
-        <div className="overview-icon">🎯</div>
+        <div className="overview-icon">
+          <FaBullseye />
+        </div>
         <div className="overview-content">
           <div className="overview-value">
             {currentPeriodStats.productivityScore.toFixed(1)}%
@@ -55,7 +68,9 @@ export default function PeriodOverview({
         </div>
       </div>
       <div className="overview-card">
-        <div className="overview-icon">⏰</div>
+        <div className="overview-icon">
+          <FaClock />
+        </div>
         <div className="overview-content">
           <div className="overview-value">
             {formatTime(currentPeriodStats.totalTime)}
@@ -64,7 +79,9 @@ export default function PeriodOverview({
         </div>
       </div>
       <div className="overview-card">
-        <div className="overview-icon">📊</div>
+        <div className="overview-icon">
+          <FaChartBar />
+        </div>
         <div className="overview-content">
           <div className="overview-value">
             {currentPeriodStats.onTimeRate.toFixed(1)}%

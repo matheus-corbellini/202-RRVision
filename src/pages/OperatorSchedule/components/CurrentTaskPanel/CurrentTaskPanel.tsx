@@ -1,3 +1,11 @@
+import {
+  FaCoffee,
+  FaUtensils,
+  FaRestroom,
+  FaPause,
+  FaExclamationTriangle,
+  FaCheck,
+} from "react-icons/fa";
 import "./CurrentTaskPanel.css";
 
 interface Break {
@@ -116,25 +124,25 @@ export default function CurrentTaskPanel({
                     className="break-btn coffee"
                     onClick={() => handleStartBreak("coffee")}
                   >
-                    ☕ Café
+                    <FaCoffee /> Café
                   </button>
                   <button
                     className="break-btn lunch"
                     onClick={() => handleStartBreak("lunch")}
                   >
-                    🍽️ Almoço
+                    <FaUtensils /> Almoço
                   </button>
                   <button
                     className="break-btn bathroom"
                     onClick={() => handleStartBreak("bathroom")}
                   >
-                    🚻 Banheiro
+                    <FaRestroom /> Banheiro
                   </button>
                   <button
                     className="break-btn other"
                     onClick={() => handleStartBreak("other")}
                   >
-                    ⏸️ Outra
+                    <FaPause /> Outra
                   </button>
                 </>
               ) : (
@@ -155,16 +163,16 @@ export default function CurrentTaskPanel({
               className="action-btn pause"
               onClick={() => handlePauseTask(currentTask.id)}
             >
-              ⏸️ Pausar
+              <FaPause /> Pausar
             </button>
             <button className="action-btn nonconformity">
-              ⚠️ Não Conformidade
+              <FaExclamationTriangle /> Não Conformidade
             </button>
             <button
               className="action-btn complete"
               onClick={() => handleCompleteTask(currentTask.id)}
             >
-              ✅ Finalizar
+              <FaCheck /> Finalizar
             </button>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { FaTimes } from "react-icons/fa";
 import "./NewNCModal.css";
 
 interface NewNC {
@@ -35,7 +36,7 @@ export default function NewNCModal({
         <div className="modal-header">
           <h2>Nova Não Conformidade</h2>
           <button className="modal-close" onClick={onClose}>
-            ✕
+            <FaTimes />
           </button>
         </div>
 

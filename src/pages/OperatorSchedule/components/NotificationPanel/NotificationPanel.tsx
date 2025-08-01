@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
 import "./NotificationPanel.css";
+import {
+  FaExclamationCircle,
+  FaExclamationTriangle,
+  FaCheckCircle,
+  FaInfoCircle,
+  FaBell,
+  FaChartLine,
+  FaChartBar,
+  FaTimes,
+} from "react-icons/fa";
 
 interface Notification {
   id: string;
@@ -96,7 +106,7 @@ export default function NotificationPanel({
         if (now > taskEndTime) {
           addNotification({
             type: "error",
-            title: "⚠️ Tarefa Atrasada",
+            title: "Tarefa Atrasada",
             message: `${currentTask.activity} deveria ter sido concluída às ${currentTask.endTime}`,
             priority: "high",
             autoClose: false,
@@ -106,7 +116,7 @@ export default function NotificationPanel({
         else if (now > new Date(taskEndTime.getTime() - 15 * 60 * 1000)) {
           addNotification({
             type: "warning",
-            title: "⏰ Prazo Próximo",
+            title: "Prazo Próximo",
             message: `${currentTask.activity} deve ser concluída em 15 minutos`,
             priority: "medium",
             autoClose: true,
@@ -129,7 +139,7 @@ export default function NotificationPanel({
         if (breakDuration > 30) {
           addNotification({
             type: "warning",
-            title: "⏸️ Pausa Longa",
+            title: "Pausa Longa",
             message: `Pausa ativa há ${Math.round(breakDuration)} minutos`,
             priority: "medium",
             autoClose: true,
@@ -151,7 +161,7 @@ export default function NotificationPanel({
         if (minutesUntilStart <= 5 && minutesUntilStart > 0) {
           addNotification({
             type: "info",
-            title: "🔜 Próxima Tarefa",
+            title: "Próxima Tarefa",
             message: `${nextTask.activity} deve iniciar em ${Math.round(
               minutesUntilStart
             )} minutos`,
@@ -172,7 +182,7 @@ export default function NotificationPanel({
       if (progress >= 50 && progress < 75 && completedTasks > 0) {
         addNotification({
           type: "success",
-          title: "📈 Boa Performance",
+          title: "Boa Performance",
           message: `${completedTasks} de ${totalTasks} tarefas concluídas (${Math.round(
             progress
           )}%)`,
@@ -193,15 +203,15 @@ export default function NotificationPanel({
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case "error":
-        return "🚨";
+        return <FaExclamationCircle />;
       case "warning":
-        return "⚠️";
+        return <FaExclamationTriangle />;
       case "success":
-        return "✅";
+        return <FaCheckCircle />;
       case "info":
-        return "ℹ️";
+        return <FaInfoCircle />;
       default:
-        return "📢";
+        return <FaBell />;
     }
   };
 
@@ -218,14 +228,16 @@ export default function NotificationPanel({
     <div className={`notification-panel ${isMinimized ? "minimized" : ""}`}>
       <div className="notification-header">
         <div className="notification-title">
-          <span className="notification-icon">🔔</span>
+          <span className="notification-icon">
+            <FaBell />
+          </span>
           <span>Notificações ({notifications.length})</span>
         </div>
         <button
           className="minimize-btn"
           onClick={() => setIsMinimized(!isMinimized)}
         >
-          {isMinimized ? "📈" : "📉"}
+          {isMinimized ? <FaChartLine /> : <FaChartBar />}
         </button>
       </div>
 
@@ -254,7 +266,7 @@ export default function NotificationPanel({
                     className="close-btn"
                     onClick={() => removeNotification(notification.id)}
                   >
-                    ✕
+                    <FaTimes />
                   </button>
                 </div>
               </div>

@@ -1,3 +1,4 @@
+import { FaChartBar } from "react-icons/fa";
 import "./PerformanceTable.css";
 
 interface ProductivityData {
@@ -34,7 +35,9 @@ export default function PerformanceTable({
       <div className="section-header">
         <h3>Performance Detalhada</h3>
         <div className="section-actions">
-          <button className="export-btn">📊 Exportar</button>
+          <button className="export-btn">
+            <FaChartBar /> Exportar
+          </button>
         </div>
       </div>
 

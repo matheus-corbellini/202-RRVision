@@ -1,5 +1,6 @@
 "use client";
 
+import { FaExclamationCircle } from "react-icons/fa";
 import "./AlertsPanel.css";
 
 export default function AlertsPanel() {
@@ -12,7 +13,9 @@ export default function AlertsPanel() {
 
       <div className="page-content">
         <div className="coming-soon">
-          <div className="coming-soon-icon">🚨</div>
+          <div className="coming-soon-icon">
+            <FaExclamationCircle />
+          </div>
           <h2>Alertas e Notificações</h2>
           <p>Esta funcionalidade está em desenvolvimento</p>
         </div>

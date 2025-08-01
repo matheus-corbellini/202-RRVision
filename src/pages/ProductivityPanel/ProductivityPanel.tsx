@@ -12,6 +12,7 @@ import {
   ChartsSection,
 } from "./components";
 import "./ProductivityPanel.css";
+import { FaChartLine, FaChartBar, FaArrowRight } from "react-icons/fa";
 
 export default function ProductivityPanel() {
   const [selectedPeriod, setSelectedPeriod] = useState<
@@ -34,11 +35,11 @@ export default function ProductivityPanel() {
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case "up":
-        return "📈";
+        return <FaChartLine />;
       case "down":
-        return "📉";
+        return <FaChartBar />;
       default:
-        return "➡️";
+        return <FaArrowRight />;
     }
   };
 

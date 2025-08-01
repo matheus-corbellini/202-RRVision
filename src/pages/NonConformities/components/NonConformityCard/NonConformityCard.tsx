@@ -1,3 +1,11 @@
+import {
+  FaEye,
+  FaUser,
+  FaPaperclip,
+  FaCheck,
+  FaClock,
+  FaStop,
+} from "react-icons/fa";
 import "./NonConformityCard.css";
 
 interface Attachment {
@@ -93,13 +101,15 @@ export default function NonConformityCard({
               {nc.status.replace("_", " ").toUpperCase()}
             </span>
             {nc.stopProduction && (
-              <span className="stop-badge">🛑 PRODUÇÃO PARADA</span>
+              <span className="stop-badge">
+                <FaStop /> PRODUÇÃO PARADA
+              </span>
             )}
           </div>
         </div>
         <div className="nc-actions">
           <button className="action-btn view" onClick={() => onViewDetails(nc)}>
-            👁️ Ver Detalhes
+            <FaEye /> Ver Detalhes
           </button>
           {nc.status === "open" && (
             <button
@@ -108,7 +118,7 @@ export default function NonConformityCard({
                 onAssign(nc.id, "resp-001", "Maria Santos", "Coordenador")
               }
             >
-              👤 Atribuir
+              <FaUser /> Atribuir
             </button>
           )}
         </div>
@@ -152,7 +162,7 @@ export default function NonConformityCard({
             <span className="attachments-label">Anexos:</span>
             {nc.attachments.map((att) => (
               <span key={att.id} className="attachment-tag">
-                📎 {att.name}
+                <FaPaperclip /> {att.name}
               </span>
             ))}
           </div>
@@ -167,7 +177,7 @@ export default function NonConformityCard({
                 alert.acknowledged ? "acknowledged" : "pending"
               }`}
             >
-              {alert.recipient} {alert.acknowledged ? "✅" : "⏳"}
+              {alert.recipient} {alert.acknowledged ? <FaCheck /> : <FaClock />}
             </span>
           ))}
         </div>

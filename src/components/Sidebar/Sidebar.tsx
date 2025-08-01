@@ -1,6 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import {
+  FaClipboardList,
+  FaCalendarAlt,
+  FaChartBar,
+  FaExclamationTriangle,
+  FaExclamationCircle,
+  FaCog,
+  FaQuestionCircle,
+  FaSignOutAlt,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useAuth } from "../../hooks/useAuth";
 import { path } from "../../routes/path";
@@ -20,42 +32,42 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
     {
       id: "orders",
       title: "Pedidos",
-      icon: "📋",
+      icon: <FaClipboardList />,
       description: "Ordens de Produção",
       badge: "3",
     },
     {
       id: "schedule",
       title: "Agenda",
-      icon: "📅",
+      icon: <FaCalendarAlt />,
       description: "Agenda do Operador",
       badge: null,
     },
     {
       id: "productivity",
       title: "Produtividade",
-      icon: "📊",
+      icon: <FaChartBar />,
       description: "Painel de Produtividade",
       badge: null,
     },
     {
       id: "nonconformities",
       title: "Não Conformidades",
-      icon: "⚠️",
+      icon: <FaExclamationTriangle />,
       description: "Controle de Qualidade",
       badge: "2",
     },
     {
       id: "alerts",
       title: "Alertas",
-      icon: "🚨",
+      icon: <FaExclamationCircle />,
       description: "Alertas e Notificações",
       badge: "5",
     },
     {
       id: "control",
       title: "Painel de Controle",
-      icon: "⚙️",
+      icon: <FaCog />,
       description: "Configurações do Sistema",
       badge: null,
     },
@@ -88,7 +100,7 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
             onClick={() => setIsCollapsed(!isCollapsed)}
             title={isCollapsed ? "Expandir sidebar" : "Recolher sidebar"}
           >
-            {isCollapsed ? "→" : "←"}
+            {isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
           </button>
         </div>
 
@@ -143,11 +155,15 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
 
         <div className="sidebar-footer">
           <button className="footer-item" title="Configurações">
-            <span className="footer-icon">⚙️</span>
+            <span className="footer-icon">
+              <FaCog />
+            </span>
             {!isCollapsed && <span>Configurações</span>}
           </button>
           <button className="footer-item" title="Ajuda">
-            <span className="footer-icon">❓</span>
+            <span className="footer-icon">
+              <FaQuestionCircle />
+            </span>
             {!isCollapsed && <span>Ajuda</span>}
           </button>
           <button
@@ -155,7 +171,9 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
             onClick={handleLogout}
             title="Sair"
           >
-            <span className="footer-icon">🚪</span>
+            <span className="footer-icon">
+              <FaSignOutAlt />
+            </span>
             {!isCollapsed && <span>Sair</span>}
           </button>
         </div>

@@ -1,3 +1,11 @@
+import {
+  FaTimes,
+  FaCheck,
+  FaClock,
+  FaUser,
+  FaComment,
+  FaCheckCircle,
+} from "react-icons/fa";
 import "./NCDetailsModal.css";
 
 interface Attachment {
@@ -118,7 +126,7 @@ export default function NCDetailsModal({
             </div>
           </div>
           <button className="modal-close" onClick={onClose}>
-            ✕
+            <FaTimes />
           </button>
         </div>
 
@@ -239,7 +247,8 @@ export default function NCDetailsModal({
                       <div className="alert-recipient">{alert.recipient}</div>
                       <div className="alert-message">{alert.message}</div>
                       <div className="alert-status">
-                        {alert.acknowledged ? "✅ Confirmado" : "⏳ Pendente"}
+                        {alert.acknowledged ? <FaCheck /> : <FaClock />}
+                        {alert.acknowledged ? " Confirmado" : " Pendente"}
                       </div>
                     </div>
                   ))}
@@ -263,7 +272,7 @@ export default function NCDetailsModal({
                             )
                           }
                         >
-                          👤 Atribuir Responsável
+                          <FaUser /> Atribuir Responsável
                         </button>
                       )}
                       <button
@@ -273,7 +282,7 @@ export default function NCDetailsModal({
                           if (comment) onAddComment(selectedNC.id, comment);
                         }}
                       >
-                        💬 Adicionar Comentário
+                        <FaComment /> Adicionar Comentário
                       </button>
                       <button
                         className="action-btn resolve"
@@ -282,7 +291,7 @@ export default function NCDetailsModal({
                           if (resolution) onResolve(selectedNC.id, resolution);
                         }}
                       >
-                        ✅ Resolver
+                        <FaCheckCircle /> Resolver
                       </button>
                     </div>
                   </div>

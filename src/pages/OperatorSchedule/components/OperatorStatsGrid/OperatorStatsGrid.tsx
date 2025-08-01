@@ -1,3 +1,4 @@
+import { FaCheckCircle, FaBolt, FaClock, FaTrophy } from "react-icons/fa";
 import "./OperatorStatsGrid.css";
 
 interface OperatorStats {
@@ -23,7 +24,9 @@ export default function OperatorStatsGrid({
   return (
     <div className="stats-grid">
       <div className="stat-card">
-        <div className="stat-icon">✅</div>
+        <div className="stat-icon">
+          <FaCheckCircle />
+        </div>
         <div className="stat-content">
           <div className="stat-value">
             {stats.tasksCompleted}/{stats.dailyTarget}
@@ -33,7 +36,9 @@ export default function OperatorStatsGrid({
       </div>
 
       <div className="stat-card">
-        <div className="stat-icon">⚡</div>
+        <div className="stat-icon">
+          <FaBolt />
+        </div>
         <div className="stat-content">
           <div
             className="stat-value"
@@ -46,7 +51,9 @@ export default function OperatorStatsGrid({
       </div>
 
       <div className="stat-card">
-        <div className="stat-icon">🕒</div>
+        <div className="stat-icon">
+          <FaClock />
+        </div>
         <div className="stat-content">
           <div className="stat-value">{formatTime(stats.totalWorkTime)}</div>
           <div className="stat-label">Tempo Trabalhado</div>
@@ -54,7 +61,9 @@ export default function OperatorStatsGrid({
       </div>
 
       <div className="stat-card">
-        <div className="stat-icon">🏆</div>
+        <div className="stat-icon">
+          <FaTrophy />
+        </div>
         <div className="stat-content">
           <div className="stat-value">#{stats.ranking}</div>
           <div className="stat-label">Ranking Equipe</div>

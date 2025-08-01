@@ -1,3 +1,10 @@
+import {
+  FaSync,
+  FaChartBar,
+  FaCog,
+  FaExclamationTriangle,
+  FaExclamationCircle,
+} from "react-icons/fa";
 import type { Order } from "../../../../types/dashboard";
 import "./OrdersSection.css";
 
@@ -12,21 +19,26 @@ export default function OrdersSection({
   filterStatus,
   onFilterChange,
 }: OrdersSectionProps) {
-  const filteredOrders = orders.filter(
-    (order) => filterStatus === "all" || order.status === filterStatus
-  );
+  const filteredOrders = orders.filter((order) => {
+    if (filterStatus === "all") return true;
+    if (filterStatus === "urgent") return order.isUrgent;
+    return order.status === filterStatus;
+  });
 
   const getStatusBadgeClass = (status: string, isUrgent: boolean) => {
-    if (isUrgent) return "status-badge status-urgent";
+    let baseClass = "status-badge";
+    if (isUrgent) baseClass += " urgent";
     switch (status) {
       case "pending":
-        return "status-badge status-pending";
+        return baseClass + " pending";
       case "production":
-        return "status-badge status-production";
+        return baseClass + " production";
       case "completed":
-        return "status-badge status-completed";
+        return baseClass + " completed";
+      case "urgent":
+        return baseClass + " urgent";
       default:
-        return "status-badge";
+        return baseClass;
     }
   };
 
@@ -35,7 +47,7 @@ export default function OrdersSection({
       case "pending":
         return "Pendente";
       case "production":
-        return "Produção";
+        return "Em Produção";
       case "completed":
         return "Concluído";
       case "urgent":
@@ -51,13 +63,13 @@ export default function OrdersSection({
         <h3 className="section-title">Ordens de Produção</h3>
         <div className="section-actions">
           <button className="btn-icon" title="Atualizar">
-            🔄
+            <FaSync />
           </button>
           <button className="btn-icon" title="Exportar">
-            📊
+            <FaChartBar />
           </button>
           <button className="btn-icon" title="Configurações">
-            ⚙️
+            <FaCog />
           </button>
         </div>
       </div>
@@ -135,8 +147,16 @@ export default function OrdersSection({
                 </div>
               </td>
               <td>
-                {order.isOverdue && <span className="alert-icon">⚠️</span>}
-                {order.isUrgent && <span className="alert-icon">🚨</span>}
+                {order.isOverdue && (
+                  <span className="alert-icon">
+                    <FaExclamationCircle />
+                  </span>
+                )}
+                {order.isUrgent && (
+                  <span className="alert-icon">
+                    <FaExclamationTriangle />
+                  </span>
+                )}
               </td>
             </tr>
           ))}

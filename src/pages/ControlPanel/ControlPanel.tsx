@@ -1,5 +1,6 @@
 "use client";
 
+import { FaCog } from "react-icons/fa";
 import "./ControlPanel.css";
 
 export default function ControlPanel() {
@@ -12,7 +13,9 @@ export default function ControlPanel() {
 
       <div className="page-content">
         <div className="coming-soon">
-          <div className="coming-soon-icon">⚙️</div>
+          <div className="coming-soon-icon">
+            <FaCog />
+          </div>
           <h2>Painel de Controle</h2>
           <p>Esta funcionalidade está em desenvolvimento</p>
         </div>

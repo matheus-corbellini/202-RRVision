@@ -1,3 +1,4 @@
+import { FaPlay } from "react-icons/fa";
 import "./TaskCard.css";
 
 interface Break {
@@ -131,7 +132,7 @@ export default function TaskCard({
               className="start-btn"
               onClick={() => handleStartTask(task.id)}
             >
-              ▶️ Iniciar Tarefa
+              <FaPlay /> Iniciar Tarefa
             </button>
           </div>
         )}

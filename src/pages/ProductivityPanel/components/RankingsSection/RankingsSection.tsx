@@ -1,3 +1,4 @@
+import { FaTrophy, FaMedal, FaAward } from "react-icons/fa";
 import "./RankingsSection.css";
 
 interface OperatorRanking {
@@ -37,9 +38,21 @@ export default function RankingsSection({
             <div className="ranking-header">
               <div className="rank-position">
                 <span className="rank-number">#{operator.rank}</span>
-                {index === 0 && <span className="medal">🥇</span>}
-                {index === 1 && <span className="medal">🥈</span>}
-                {index === 2 && <span className="medal">🥉</span>}
+                {index === 0 && (
+                  <span className="medal">
+                    <FaTrophy />
+                  </span>
+                )}
+                {index === 1 && (
+                  <span className="medal">
+                    <FaMedal />
+                  </span>
+                )}
+                {index === 2 && (
+                  <span className="medal">
+                    <FaAward />
+                  </span>
+                )}
               </div>
               <div className="trend">{getTrendIcon(operator.trend)}</div>
             </div>

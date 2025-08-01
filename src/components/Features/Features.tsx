@@ -1,38 +1,46 @@
+import {
+  FaSync,
+  FaUsers,
+  FaChartBar,
+  FaBolt,
+  FaSearch,
+  FaBell,
+} from "react-icons/fa";
 import "./Features.css";
 
 export default function Features() {
   const features = [
     {
-      icon: "🔄",
+      icon: <FaSync />,
       title: "Integração ERP Bling",
       description:
         "Sincronização automática de dados do ERP para otimizar o planejamento de produção",
     },
     {
-      icon: "👥",
+      icon: <FaUsers />,
       title: "Alocação Inteligente",
       description:
         "Distribuição de operadores baseada em habilidades e disponibilidade",
     },
     {
-      icon: "📊",
+      icon: <FaChartBar />,
       title: "Dashboards em Tempo Real",
       description:
         "Monitoramento da eficiência e produtividade com métricas atualizadas",
     },
     {
-      icon: "⚡",
+      icon: <FaBolt />,
       title: "Execução Assistida",
       description:
         "Roteiros detalhados para guiar operadores durante a produção",
     },
     {
-      icon: "🔍",
+      icon: <FaSearch />,
       title: "Controle de Qualidade",
       description: "Registro e acompanhamento de não conformidades",
     },
     {
-      icon: "📱",
+      icon: <FaBell />,
       title: "Alertas Automáticos",
       description: "Notificações inteligentes para otimizar o fluxo produtivo",
     },

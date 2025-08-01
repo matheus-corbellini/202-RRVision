@@ -1,5 +1,18 @@
 import { useState } from "react";
 import "./QuickActionsPanel.css";
+import {
+  FaCheck,
+  FaExclamationTriangle,
+  FaBolt,
+  FaSearch,
+  FaFire,
+  FaClock,
+  FaArrowRight,
+  FaMinus,
+  FaPlus,
+  FaStar,
+  FaIndustry,
+} from "react-icons/fa";
 
 interface Task {
   id: string;
@@ -144,28 +157,28 @@ export default function QuickActionsPanel({
   const quickActions = [
     {
       id: "start-next",
-      icon: "▶️",
+      icon: <FaArrowRight />,
       label: "Iniciar Próxima",
       action: () => onQuickAction("start-next"),
       disabled: !tasks.find((t) => t.status === "pending") || !!currentTask,
     },
     {
       id: "pause-current",
-      icon: "⏸️",
+      icon: <FaClock />,
       label: "Pausar Atual",
       action: () => onQuickAction("pause-current"),
       disabled: !currentTask || currentTask.status !== "in_progress",
     },
     {
       id: "complete-current",
-      icon: "✅",
+      icon: <FaCheck />,
       label: "Finalizar Atual",
       action: () => onQuickAction("complete-current"),
       disabled: !currentTask,
     },
     {
       id: "emergency-break",
-      icon: "🚨",
+      icon: <FaExclamationTriangle />,
       label: "Pausa Emergência",
       action: () => onQuickAction("emergency-break"),
       disabled: false,
@@ -184,14 +197,16 @@ export default function QuickActionsPanel({
     >
       <div className="panel-header">
         <div className="panel-title">
-          <span className="panel-icon">⚡</span>
+          <span className="panel-icon">
+            <FaBolt />
+          </span>
           <span>Ações Rápidas</span>
         </div>
         <button
           className="expand-btn"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          {isExpanded ? "−" : "+"}
+          {isExpanded ? <FaMinus /> : <FaPlus />}
         </button>
       </div>
 
@@ -227,7 +242,7 @@ export default function QuickActionsPanel({
                 }`}
                 onClick={() => applyFilter("all")}
               >
-                🔍 Todas
+                <FaSearch /> Todas
               </button>
               <button
                 className={`filter-btn ${
@@ -235,7 +250,7 @@ export default function QuickActionsPanel({
                 }`}
                 onClick={() => applyFilter("priority")}
               >
-                🔥 Prioridade
+                <FaFire /> Prioridade
               </button>
               <button
                 className={`filter-btn ${
@@ -243,7 +258,7 @@ export default function QuickActionsPanel({
                 }`}
                 onClick={() => applyFilter("status")}
               >
-                ⏳ Ativas
+                <FaClock /> Ativas
               </button>
               <button
                 className={`filter-btn ${
@@ -251,7 +266,7 @@ export default function QuickActionsPanel({
                 }`}
                 onClick={() => applyFilter("upcoming")}
               >
-                🔜 Próximas
+                <FaArrowRight /> Próximas
               </button>
             </div>
           </div>
@@ -266,7 +281,7 @@ export default function QuickActionsPanel({
                 }`}
                 onClick={() => applySort("time")}
               >
-                🕐 Horário
+                <FaClock /> Horário
               </button>
               <button
                 className={`sort-btn ${
@@ -274,7 +289,7 @@ export default function QuickActionsPanel({
                 }`}
                 onClick={() => applySort("priority")}
               >
-                ⭐ Prioridade
+                <FaStar /> Prioridade
               </button>
               <button
                 className={`sort-btn ${
@@ -282,7 +297,7 @@ export default function QuickActionsPanel({
                 }`}
                 onClick={() => applySort("duration")}
               >
-                ⏱️ Duração
+                <FaClock /> Duração
               </button>
               <button
                 className={`sort-btn ${
@@ -290,7 +305,7 @@ export default function QuickActionsPanel({
                 }`}
                 onClick={() => applySort("sector")}
               >
-                🏭 Setor
+                <FaIndustry /> Setor
               </button>
             </div>
           </div>
