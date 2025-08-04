@@ -210,18 +210,22 @@ export default function AlertDetailsModal({
                 </div>
               </div>
 
-              {alert.tags.length > 0 && (
-                <div className="info-section">
-                  <h4>Tags</h4>
-                  <div className="tags-list">
-                    {alert.tags.map((tag, index) => (
+              <div className="info-section">
+                <h4>Tags</h4>
+                <div className="tags-list">
+                  {alert.tags && alert.tags.length > 0 ? (
+                    alert.tags.map((tag, index) => (
                       <span key={index} className="tag">
                         {tag}
                       </span>
-                    ))}
-                  </div>
+                    ))
+                  ) : (
+                    <span style={{ color: "#999", fontStyle: "italic" }}>
+                      Nenhuma tag disponível
+                    </span>
+                  )}
                 </div>
-              )}
+              </div>
 
               {alert.status !== "resolved" && alert.status !== "dismissed" && (
                 <div className="info-section">
@@ -255,11 +259,11 @@ export default function AlertDetailsModal({
             </div>
           </div>
 
-          {alert.comments.length > 0 && (
-            <div className="alert-timeline">
-              <h4>Histórico de Comentários</h4>
-              <div className="timeline">
-                {alert.comments.map((comment) => (
+          <div className="alert-timeline">
+            <h4>Histórico de Comentários</h4>
+            <div className="timeline">
+              {alert.comments && alert.comments.length > 0 ? (
+                alert.comments.map((comment) => (
                   <div key={comment.id} className="timeline-item">
                     <div className="timeline-marker"></div>
                     <div className="timeline-content">
@@ -283,10 +287,22 @@ export default function AlertDetailsModal({
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="timeline-item">
+                  <div className="timeline-marker"></div>
+                  <div className="timeline-content">
+                    <div
+                      className="timeline-description"
+                      style={{ color: "#999", fontStyle: "italic" }}
+                    >
+                      Nenhum comentário disponível
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </div>

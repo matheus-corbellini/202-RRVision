@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import type { ProductionAlert } from "../../types";
+import type { ProductionAlert, AlertStats } from "../../types";
 import {
   AlertsHeader,
   AlertsStats,
@@ -470,7 +470,7 @@ export default function AlertsPanel() {
     );
   };
 
-  const getAlertStats = () => {
+  const getAlertStats = (): AlertStats => {
     const active = alerts.filter((a) => a.status === "active").length;
     const critical = alerts.filter((a) => a.severity === "critical").length;
     const urgent = alerts.filter((a) => a.priority === "urgent").length;

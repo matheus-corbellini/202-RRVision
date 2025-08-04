@@ -9,13 +9,7 @@ import {
 import type { AlertStats } from "../../../../types";
 
 interface AlertStatsProps {
-  stats: {
-    active: number;
-    critical: number;
-    urgent: number;
-    unacknowledged: number;
-    total: number;
-  };
+  stats: AlertStats;
 }
 
 export default function AlertsStats({ stats }: AlertStatsProps) {
