@@ -207,14 +207,12 @@ export default function AlertsList({
               {alert.status === "active" && (
                 <div className="status-indicator active">
                   <FaExclamationTriangle />
-                  <span>ATIVO</span>
                 </div>
               )}
 
               {alert.status === "acknowledged" && (
                 <div className="status-indicator acknowledged">
                   <FaClock />
-                  <span>RECONHECIDO</span>
                 </div>
               )}
             </div>
