@@ -7,7 +7,6 @@ import {
   OperatorStatsGrid,
   CurrentTaskPanel,
   TasksSection,
-  NotificationPanel,
   QuickActionsPanel,
 } from "./components";
 import "./OperatorSchedule.css";
@@ -462,14 +461,6 @@ export default function OperatorSchedule() {
           />
         </div>
       </div>
-
-      {/* Painel de Notificações */}
-      <NotificationPanel
-        currentTask={currentTask}
-        activeBreak={activeBreak}
-        tasks={tasks}
-        currentTime={currentTime}
-      />
     </div>
   );
 }
