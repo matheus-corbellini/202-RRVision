@@ -1,7 +1,6 @@
 "use client";
 
 import "./AlertFilters.css";
-import type { AlertFilters } from "../../../../types";
 
 interface AlertFiltersProps {
   filterType: string;
@@ -29,7 +28,7 @@ export default function AlertsFilters({
   setShowOnlyMyAlerts,
 }: AlertFiltersProps) {
   return (
-    <div className="alert-filters">
+    <div className="alerts-filters">
       <div className="filter-group">
         <label>Tipo: </label>
         <select
