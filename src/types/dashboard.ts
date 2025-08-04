@@ -21,7 +21,7 @@ export interface Order {
   sectors: OrderSector[];
 }
 
-export interface Alert {
+export interface DashboardAlert {
   id: string;
   type: "critical" | "warning" | "info";
   title: string;
