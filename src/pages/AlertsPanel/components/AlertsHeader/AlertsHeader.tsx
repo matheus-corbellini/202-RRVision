@@ -19,7 +19,6 @@ export default function AlertsHeader() {
       <div className="header-status">
         <div className="status-indicator active">
           <FaExclamationTriangle />
-          <span>Sistema Ativo</span>
         </div>
       </div>
     </div>

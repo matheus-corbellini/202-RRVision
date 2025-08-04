@@ -1,6 +1,19 @@
 "use client";
 
-import { FaCheck, FaEye, FaClock, FaExclamationTriangle } from "react-icons/fa";
+import {
+  FaCheck,
+  FaEye,
+  FaClock,
+  FaExclamationTriangle,
+  FaStop,
+  FaExclamationCircle,
+  FaSync,
+  FaClock as FaDelay,
+  FaSearch,
+  FaWrench,
+  FaBox,
+  FaBell,
+} from "react-icons/fa";
 import type { ProductionAlert } from "../../../../types";
 import "./AlertsList.css";
 
@@ -52,21 +65,21 @@ export default function AlertsList({
   const getTypeIcon = (type: string) => {
     switch (type) {
       case "production_stop":
-        return "🛑";
+        return <FaStop />;
       case "non_conformity":
-        return "⚠️";
+        return <FaExclamationCircle />;
       case "priority_change":
-        return "🔄";
+        return <FaSync />;
       case "delay":
-        return "⏰";
+        return <FaDelay />;
       case "quality":
-        return "🔍";
+        return <FaSearch />;
       case "maintenance":
-        return "🔧";
+        return <FaWrench />;
       case "material":
-        return "📦";
+        return <FaBox />;
       default:
-        return "🔔";
+        return <FaBell />;
     }
   };
 
@@ -211,7 +224,9 @@ export default function AlertsList({
 
       {alerts.length === 0 && (
         <div className="empty-state">
-          <div className="empty-icon">🔔</div>
+          <div className="empty-icon">
+            <FaBell />
+          </div>
           <h3>Nenhum alerta encontrado</h3>
           <p>Não há alertas que correspondam aos filtros selecionados.</p>
         </div>
