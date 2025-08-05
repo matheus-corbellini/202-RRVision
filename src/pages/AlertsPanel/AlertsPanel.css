@@ -1,17 +1,16 @@
 .alerts-page {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%);
-    padding: 2rem;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%);
+  padding: 2rem;
+}
+
+.alerts-container {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .alerts-page {
+    padding: 1rem;
   }
-  
-  .alerts-container {
-    max-width: 1600px;
-    margin: 0 auto;
-  }
-  
-  @media (max-width: 768px) {
-    .alerts-page {
-      padding: 1rem;
-    }
-  }
-  
+}

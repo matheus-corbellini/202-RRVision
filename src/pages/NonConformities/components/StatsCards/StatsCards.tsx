@@ -5,19 +5,16 @@ import {
   FaChartBar,
 } from "react-icons/fa";
 import "./StatsCards.css";
+import type { NonConformityStats } from "../../../../types/nonConformities";
 
 interface StatsCardsProps {
-  openCount: number;
-  criticalCount: number;
+  stats: NonConformityStats;
   productionStoppedCount: number;
-  totalCount: number;
 }
 
 export default function StatsCards({
-  openCount,
-  criticalCount,
+  stats,
   productionStoppedCount,
-  totalCount,
 }: StatsCardsProps) {
   return (
     <div className="nc-stats">
@@ -26,7 +23,7 @@ export default function StatsCards({
           <FaExclamationCircle />
         </div>
         <div className="stat-content">
-          <div className="stat-value">{openCount}</div>
+          <div className="stat-value">{stats.open}</div>
           <div className="stat-label">Em Aberto</div>
         </div>
       </div>
@@ -35,7 +32,7 @@ export default function StatsCards({
           <FaExclamationTriangle />
         </div>
         <div className="stat-content">
-          <div className="stat-value">{criticalCount}</div>
+          <div className="stat-value">{stats.critical}</div>
           <div className="stat-label">Críticas/Altas</div>
         </div>
       </div>
@@ -53,7 +50,7 @@ export default function StatsCards({
           <FaChartBar />
         </div>
         <div className="stat-content">
-          <div className="stat-value">{totalCount}</div>
+          <div className="stat-value">{stats.total}</div>
           <div className="stat-label">Total</div>
         </div>
       </div>

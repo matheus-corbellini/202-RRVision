@@ -7,52 +7,11 @@ import {
   FaStop,
 } from "react-icons/fa";
 import "./NonConformityCard.css";
-
-interface Attachment {
-  id: string;
-  name: string;
-  type: "image" | "document" | "video";
-  url: string;
-  uploadedAt: string;
-  uploadedBy: string;
-}
-
-interface Alert {
-  id: string;
-  type: "coordinator" | "quality" | "warehouse" | "engineering" | "admin";
-  recipient: string;
-  message: string;
-  sentAt: string;
-  acknowledged: boolean;
-}
-
-interface NonConformity {
-  id: string;
-  title: string;
-  description: string;
-  category: "quality" | "safety" | "process" | "equipment" | "material";
-  severity: "low" | "medium" | "high" | "critical";
-  status: "open" | "in_progress" | "resolved" | "closed";
-  stopProduction: boolean;
-  location: {
-    sector: string;
-    station: string;
-    equipment?: string;
-  };
-  reporter: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  assignedTo?: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  createdAt: string;
-  attachments: Attachment[];
-  alerts: Alert[];
-}
+import type {
+  NonConformity,
+  Attachment,
+  NonConformityAlert,
+} from "../../../../types/nonConformities";
 
 interface NonConformityCardProps {
   nc: NonConformity;
@@ -100,27 +59,17 @@ export default function NonConformityCard({
             >
               {nc.status.replace("_", " ").toUpperCase()}
             </span>
-            {nc.stopProduction && (
-              <span className="stop-badge">
-                <FaStop /> PRODUÇÃO PARADA
-              </span>
-            )}
           </div>
         </div>
+
         <div className="nc-actions">
-          <button className="action-btn view" onClick={() => onViewDetails(nc)}>
-            <FaEye /> Ver Detalhes
+          <button
+            className="action-btn view-btn"
+            onClick={() => onViewDetails(nc)}
+            title="Ver detalhes"
+          >
+            <FaEye />
           </button>
-          {nc.status === "open" && (
-            <button
-              className="action-btn assign"
-              onClick={() =>
-                onAssign(nc.id, "resp-001", "Maria Santos", "Coordenador")
-              }
-            >
-              <FaUser /> Atribuir
-            </button>
-          )}
         </div>
       </div>
 
@@ -128,59 +77,54 @@ export default function NonConformityCard({
         <p className="nc-description">{nc.description}</p>
 
         <div className="nc-details">
-          <div className="detail-item">
-            <span className="detail-label">Local:</span>
-            <span className="detail-value">
-              {nc.location.sector} - {nc.location.station}
-              {nc.location.equipment && ` (${nc.location.equipment})`}
+          <div className="nc-location">
+            <strong>Localização:</strong> {nc.location.sector} -{" "}
+            {nc.location.station}
+            {nc.location.equipment && ` (${nc.location.equipment})`}
+          </div>
+
+          <div className="nc-reporter">
+            <FaUser />
+            <span>
+              <strong>Reportado por:</strong> {nc.reporter.name} (
+              {nc.reporter.role})
             </span>
           </div>
-          <div className="detail-item">
-            <span className="detail-label">Reportado por:</span>
-            <span className="detail-value">
-              {nc.reporter.name} ({nc.reporter.role})
-            </span>
-          </div>
-          <div className="detail-item">
-            <span className="detail-label">Data:</span>
-            <span className="detail-value">
-              {new Date(nc.createdAt).toLocaleString("pt-BR")}
-            </span>
-          </div>
+
           {nc.assignedTo && (
-            <div className="detail-item">
-              <span className="detail-label">Responsável:</span>
-              <span className="detail-value">
-                {nc.assignedTo.name} ({nc.assignedTo.role})
+            <div className="nc-assigned">
+              <FaUser />
+              <span>
+                <strong>Atribuído a:</strong> {nc.assignedTo.name} (
+                {nc.assignedTo.role})
               </span>
             </div>
           )}
         </div>
 
-        {nc.attachments.length > 0 && (
+        <div className="nc-meta">
           <div className="nc-attachments">
-            <span className="attachments-label">Anexos:</span>
-            {nc.attachments.map((att) => (
-              <span key={att.id} className="attachment-tag">
-                <FaPaperclip /> {att.name}
-              </span>
-            ))}
+            <FaPaperclip />
+            <span>{nc.attachments.length} anexos</span>
+          </div>
+
+          <div className="nc-alerts">
+            <FaStop />
+            <span>{nc.alerts.length} alertas</span>
+          </div>
+
+          <div className="nc-date">
+            <FaClock />
+            <span>{new Date(nc.createdAt).toLocaleDateString("pt-BR")}</span>
+          </div>
+        </div>
+
+        {nc.stopProduction && (
+          <div className="production-stopped-warning">
+            <FaStop />
+            <span>Produção Parada</span>
           </div>
         )}
-
-        <div className="nc-alerts">
-          <span className="alerts-label">Alertas enviados:</span>
-          {nc.alerts.map((alert) => (
-            <span
-              key={alert.id}
-              className={`alert-tag ${
-                alert.acknowledged ? "acknowledged" : "pending"
-              }`}
-            >
-              {alert.recipient} {alert.acknowledged ? <FaCheck /> : <FaClock />}
-            </span>
-          ))}
-        </div>
       </div>
     </div>
   );

@@ -1,0 +1,248 @@
+.quick-actions {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  height: fit-content;
+}
+
+.panel-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.panel-header h2 {
+  color: #1a365d;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem 0;
+}
+
+.panel-header p {
+  color: #4a5568;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.action-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.action-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Color variants */
+.action-card.blue {
+  background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+  border-color: #3182ce;
+}
+
+.action-card.blue:hover {
+  background: linear-gradient(135deg, #bee3f8 0%, #90cdf4 100%);
+}
+
+.action-card.green {
+  background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+  border-color: #48bb78;
+}
+
+.action-card.green:hover {
+  background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+}
+
+.action-card.gray {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-color: #a0aec0;
+}
+
+.action-card.gray:hover {
+  background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+}
+
+.action-card.purple {
+  background: linear-gradient(135deg, #faf5ff 0%, #e9d8fd 100%);
+  border-color: #805ad5;
+}
+
+.action-card.purple:hover {
+  background: linear-gradient(135deg, #e9d8fd 0%, #d6bcfa 100%);
+}
+
+.action-card.red {
+  background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+  border-color: #e53e3e;
+}
+
+.action-card.red:hover {
+  background: linear-gradient(135deg, #feb2b2 0%, #fc8181 100%);
+}
+
+.action-card.orange {
+  background: linear-gradient(135deg, #fef5e7 0%, #fbd38d 100%);
+  border-color: #ed8936;
+}
+
+.action-card.orange:hover {
+  background: linear-gradient(135deg, #fbd38d 0%, #f6ad55 100%);
+}
+
+.action-card.teal {
+  background: linear-gradient(135deg, #e6fffa 0%, #b2f5ea 100%);
+  border-color: #38b2ac;
+}
+
+.action-card.teal:hover {
+  background: linear-gradient(135deg, #b2f5ea 0%, #81e6d9 100%);
+}
+
+.action-card.indigo {
+  background: linear-gradient(135deg, #ebf4ff 0%, #c3dafe 100%);
+  border-color: #5a67d8;
+}
+
+.action-card.indigo:hover {
+  background: linear-gradient(135deg, #c3dafe 0%, #a3bffa 100%);
+}
+
+.action-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+  color: inherit;
+}
+
+.action-card.blue .action-icon {
+  color: #3182ce;
+}
+.action-card.green .action-icon {
+  color: #48bb78;
+}
+.action-card.gray .action-icon {
+  color: #a0aec0;
+}
+.action-card.purple .action-icon {
+  color: #805ad5;
+}
+.action-card.red .action-icon {
+  color: #e53e3e;
+}
+.action-card.orange .action-icon {
+  color: #ed8936;
+}
+.action-card.teal .action-icon {
+  color: #38b2ac;
+}
+.action-card.indigo .action-icon {
+  color: #5a67d8;
+}
+
+.action-content h3 {
+  color: #1a365d;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 0.25rem 0;
+}
+
+.action-content p {
+  color: #4a5568;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.emergency-section {
+  border-top: 2px solid #e2e8f0;
+  padding-top: 1.5rem;
+}
+
+.emergency-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e53e3e;
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+.emergency-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.emergency-btn {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.emergency-btn.stop {
+  background: #e53e3e;
+  color: white;
+}
+
+.emergency-btn.stop:hover {
+  background: #c53030;
+  transform: translateY(-2px);
+}
+
+.emergency-btn.alert {
+  background: #ed8936;
+  color: white;
+}
+
+.emergency-btn.alert:hover {
+  background: #dd6b20;
+  transform: translateY(-2px);
+}
+
+@media (max-width: 768px) {
+  .actions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .action-card {
+    padding: 0.75rem;
+  }
+
+  .action-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .action-content h3 {
+    font-size: 0.8rem;
+  }
+
+  .action-content p {
+    font-size: 0.7rem;
+  }
+
+  .emergency-actions {
+    flex-direction: column;
+  }
+}

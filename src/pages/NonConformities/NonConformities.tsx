@@ -11,77 +11,11 @@ import {
   NCDetailsModal,
 } from "./components";
 import "./NonConformities.css";
-import {
-  FaSearch,
-  FaExclamationTriangle,
-  FaCog,
-  FaWrench,
-  FaBox,
-  FaClipboardList,
-} from "react-icons/fa";
-
-interface NonConformity {
-  id: string;
-  title: string;
-  description: string;
-  category: "quality" | "safety" | "process" | "equipment" | "material";
-  severity: "low" | "medium" | "high" | "critical";
-  status: "open" | "in_progress" | "resolved" | "closed";
-  stopProduction: boolean;
-  location: {
-    sector: string;
-    station: string;
-    equipment?: string;
-  };
-  reporter: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  assignedTo?: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  relatedTask?: {
-    taskId: string;
-    taskName: string;
-    orderId: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-  resolvedAt?: string;
-  attachments: Attachment[];
-  actions: NonConformityAction[];
-  alerts: Alert[];
-}
-
-interface Attachment {
-  id: string;
-  name: string;
-  type: "image" | "document" | "video";
-  url: string;
-  uploadedAt: string;
-  uploadedBy: string;
-}
-
-interface NonConformityAction {
-  id: string;
-  type:
-    | "comment"
-    | "status_change"
-    | "assignment"
-    | "attachment"
-    | "resolution";
-  description: string;
-  performedBy: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  timestamp: string;
-  details?: Record<string, unknown>;
-}
+import type {
+  NonConformity,
+  NonConformityStats,
+  NonConformityFilters,
+} from "../../types/nonConformities";
 
 interface Alert {
   id: string;
@@ -97,9 +31,14 @@ export default function NonConformities() {
   const [nonConformities, setNonConformities] = useState<NonConformity[]>([]);
   const [selectedNC, setSelectedNC] = useState<NonConformity | null>(null);
   const [showNewNCModal, setShowNewNCModal] = useState(false);
-  const [filterStatus, setFilterStatus] = useState<string>("all");
-  const [filterSeverity, setFilterSeverity] = useState<string>("all");
-  const [filterCategory, setFilterCategory] = useState<string>("all");
+  const [filters, setFilters] = useState<NonConformityFilters>({
+    filterStatus: "all",
+    filterCategory: "all",
+    filterSeverity: "all",
+    filterLocation: "all",
+    showOnlyMyNCs: false,
+    showOnlyCritical: false,
+  });
   const [newNC, setNewNC] = useState({
     title: "",
     description: "",
@@ -596,38 +535,51 @@ export default function NonConformities() {
   const getCategoryIcon = (category: NonConformity["category"]) => {
     switch (category) {
       case "quality":
-        return <FaSearch />;
+        return "🔍";
       case "safety":
-        return <FaExclamationTriangle />;
+        return "⚠️";
       case "process":
-        return <FaCog />;
+        return "⚙️";
       case "equipment":
-        return <FaWrench />;
+        return "🔧";
       case "material":
-        return <FaBox />;
+        return "📦";
       default:
-        return <FaClipboardList />;
+        return "📋";
     }
   };
 
   const filteredNCs = nonConformities.filter((nc) => {
-    if (filterStatus !== "all" && nc.status !== filterStatus) return false;
-    if (filterSeverity !== "all" && nc.severity !== filterSeverity)
+    if (filters.filterStatus !== "all" && nc.status !== filters.filterStatus)
       return false;
-    if (filterCategory !== "all" && nc.category !== filterCategory)
+    if (
+      filters.filterSeverity !== "all" &&
+      nc.severity !== filters.filterSeverity
+    )
+      return false;
+    if (
+      filters.filterCategory !== "all" &&
+      nc.category !== filters.filterCategory
+    )
       return false;
     return true;
   });
 
-  const openNCs = nonConformities.filter(
-    (nc) => nc.status === "open" || nc.status === "in_progress"
-  );
-  const criticalNCs = nonConformities.filter(
-    (nc) => nc.severity === "critical" || nc.severity === "high"
-  );
-  const productionStoppedNCs = nonConformities.filter(
+  // Calcular estatísticas
+  const stats: NonConformityStats = {
+    open: nonConformities.filter((nc) => nc.status === "open").length,
+    inProgress: nonConformities.filter((nc) => nc.status === "in_progress")
+      .length,
+    resolved: nonConformities.filter((nc) => nc.status === "resolved").length,
+    critical: nonConformities.filter(
+      (nc) => nc.severity === "critical" || nc.severity === "high"
+    ).length,
+    total: nonConformities.length,
+  };
+
+  const productionStoppedCount = nonConformities.filter(
     (nc) => nc.stopProduction && nc.status !== "resolved"
-  );
+  ).length;
 
   return (
     <div className="nc-page">
@@ -635,21 +587,12 @@ export default function NonConformities() {
         <NonConformityHeader onNewNCClick={() => setShowNewNCModal(true)} />
 
         <StatsCards
-          openCount={openNCs.length}
-          criticalCount={criticalNCs.length}
-          productionStoppedCount={productionStoppedNCs.length}
-          totalCount={nonConformities.length}
+          stats={stats}
+          productionStoppedCount={productionStoppedCount}
         />
 
         <div className="nc-content">
-          <FiltersSection
-            filterStatus={filterStatus}
-            setFilterStatus={setFilterStatus}
-            filterSeverity={filterSeverity}
-            setFilterSeverity={setFilterSeverity}
-            filterCategory={filterCategory}
-            setFilterCategory={setFilterCategory}
-          />
+          <FiltersSection filters={filters} setFilters={setFilters} />
 
           <div className="nc-list">
             {filteredNCs.map((nc) => (
