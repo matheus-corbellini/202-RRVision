@@ -92,7 +92,6 @@ export default function Login() {
             <div className="form-options">
               <label className="checkbox-container">
                 <input type="checkbox" disabled={loading} />
-                <span className="checkmark"></span>
                 Lembrar de mim
               </label>
               <span
