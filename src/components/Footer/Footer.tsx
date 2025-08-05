@@ -1,8 +1,9 @@
 import { useNavigation } from "../../hooks/useNavigation";
 import { scrollToSection } from "../../hooks/scrollToSection";
 import "./Footer.css";
+import { Footer } from "borderless";
 
-export default function Footer() {
+export default function FooterNew() {
   const { goTo } = useNavigation();
   const handleNav = (path: string) => {
     if (path.startsWith("#")) {
@@ -107,6 +108,8 @@ export default function Footer() {
             </span>
           </div>
         </div>
+
+        <Footer backgroundColor="transparent" theme="dark" />
       </div>
     </footer>
   );
