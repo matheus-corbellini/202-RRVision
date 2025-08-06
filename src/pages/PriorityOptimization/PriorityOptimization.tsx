@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useEffect } from "react";
 import { usePriorityOptimization } from "../../hooks/usePriorityOptimization";
 import {
   FaExclamationTriangle,
@@ -9,47 +8,13 @@ import {
   FaUsers,
   FaChartLine,
   FaCog,
-  FaPlay,
-  FaPause,
-  FaStop,
   FaBell,
   FaCheckCircle,
   FaTimesCircle,
-  FaArrowUp,
   FaArrowDown,
   FaSync,
 } from "react-icons/fa";
 import "./PriorityOptimization.css";
-
-interface UrgentOrder {
-  id: string;
-  productName: string;
-  quantity: number;
-  priority: "urgent" | "critical";
-  originalDeadline: string;
-  newDeadline: string;
-  affectedTasks: number;
-  affectedOperators: number;
-  estimatedDelay: number; // em minutos
-  status: "pending" | "processing" | "completed" | "failed";
-  createdAt: string;
-  processedAt?: string;
-}
-
-interface ScheduleChange {
-  id: string;
-  orderId: string;
-  taskId: string;
-  operatorId: string;
-  operatorName: string;
-  originalStartTime: string;
-  newStartTime: string;
-  originalEndTime: string;
-  newEndTime: string;
-  reason: string;
-  impact: "low" | "medium" | "high";
-  notified: boolean;
-}
 
 interface OptimizationConfig {
   autoRecalculation: boolean;
@@ -61,7 +26,6 @@ interface OptimizationConfig {
 }
 
 export default function PriorityOptimization() {
-  const { user } = useAuth();
   const {
     urgentOrders,
     scheduleChanges,
@@ -90,47 +54,11 @@ export default function PriorityOptimization() {
     updateConfig({ autoRecalculation: !config.autoRecalculation });
   };
 
-  const handleConfigChange = (key: keyof OptimizationConfig, value: any) => {
+  const handleConfigChange = (
+    key: keyof OptimizationConfig,
+    value: string | number | boolean
+  ) => {
     updateConfig({ [key]: value });
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "urgent":
-        return "#f56565";
-      case "critical":
-        return "#e53e3e";
-      default:
-        return "#4a5568";
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "#fbb040";
-      case "processing":
-        return "#bee3f8";
-      case "completed":
-        return "#48bb78";
-      case "failed":
-        return "#f56565";
-      default:
-        return "#4a5568";
-    }
-  };
-
-  const getImpactColor = (impact: string) => {
-    switch (impact) {
-      case "low":
-        return "#48bb78";
-      case "medium":
-        return "#fbb040";
-      case "high":
-        return "#f56565";
-      default:
-        return "#4a5568";
-    }
   };
 
   const formatTime = (minutes: number): string => {
