@@ -12,6 +12,7 @@ import {
   FaSignOutAlt,
   FaChevronLeft,
   FaChevronRight,
+  FaSync,
 } from "react-icons/fa";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useAuth } from "../../hooks/useAuth";
@@ -70,6 +71,13 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
       icon: <FaCog />,
       description: "Configurações do Sistema",
       badge: null,
+    },
+    {
+      id: "priority-optimization",
+      title: "Otimização",
+      icon: <FaSync />,
+      description: "Otimização de Prioridades",
+      badge: "1",
     },
   ];
 

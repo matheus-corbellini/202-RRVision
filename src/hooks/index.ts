@@ -4,3 +4,4 @@ export * from "./useRegister";
 export * from "./useNavigation";
 export * from "./scrollToSection";
 export { useProductivityData } from "./useProductivityData";
+export { usePriorityOptimization } from "./usePriorityOptimization";
