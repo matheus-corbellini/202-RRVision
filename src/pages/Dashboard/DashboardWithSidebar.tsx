@@ -9,6 +9,7 @@ import NonConformities from "../NonConformities/NonConformities";
 import AlertsPanel from "../AlertsPanel/AlertsPanel";
 import ControlPanel from "../ControlPanel/ControlPanel";
 import PriorityOptimization from "../PriorityOptimization/PriorityOptimization";
+import Settings from "../Settings/Settings";
 import "./DashboardWithSidebar.css";
 
 export default function DashboardWithSidebar() {
@@ -30,6 +31,8 @@ export default function DashboardWithSidebar() {
         return <ControlPanel />;
       case "priority-optimization":
         return <PriorityOptimization />;
+      case "settings":
+        return <Settings />;
       default:
         return <Dashboard />;
     }

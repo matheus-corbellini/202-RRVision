@@ -69,7 +69,7 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
       id: "control",
       title: "Painel de Controle",
       icon: <FaCog />,
-      description: "Configurações do Sistema",
+      description: "Monitoramento do Sistema",
       badge: null,
     },
     {
@@ -162,7 +162,11 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
         </nav>
 
         <div className="sidebar-footer">
-          <button className="footer-item" title="Configurações">
+          <button
+            className="footer-item"
+            title="Configurações"
+            onClick={() => onPageChange("settings")}
+          >
             <span className="footer-icon">
               <FaCog />
             </span>

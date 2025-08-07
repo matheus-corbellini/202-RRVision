@@ -3,6 +3,7 @@ import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import DashboardWithSidebar from "../pages/Dashboard/DashboardWithSidebar";
 import PriorityOptimization from "../pages/PriorityOptimization/PriorityOptimization";
+import Settings from "../pages/Settings/Settings";
 import { Routes, Route } from "react-router-dom";
 import { path } from "./path";
 
@@ -17,6 +18,7 @@ export default function AppRoutes() {
         path={path.priorityOptimization}
         element={<PriorityOptimization />}
       />
+      <Route path={path.settings} element={<Settings />} />
     </Routes>
   );
 }
