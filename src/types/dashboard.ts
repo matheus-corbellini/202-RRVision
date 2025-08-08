@@ -28,6 +28,7 @@ export interface DashboardAlert {
   message: string;
   timestamp: string;
 }
+export type Alert = DashboardAlert;
 
 export interface Sector {
   name: string;
@@ -71,7 +72,13 @@ export interface ControlPanelData {
     timestamp: string;
     status: "open" | "inProgress" | "resolved";
     priority: "low" | "medium" | "high" | "urgent";
-    category: "maintenance" | "quality" | "safety" | "process" | "material" | "equipment";
+    category:
+      | "maintenance"
+      | "quality"
+      | "safety"
+      | "process"
+      | "material"
+      | "equipment";
     location: {
       sector: string;
       station?: string;
@@ -100,7 +107,14 @@ export interface ControlPanelData {
   }>;
   alerts: Array<{
     id: string;
-    type: "production_stop" | "non_conformity" | "priority_change" | "delay" | "quality" | "maintenance" | "material";
+    type:
+      | "production_stop"
+      | "non_conformity"
+      | "priority_change"
+      | "delay"
+      | "quality"
+      | "maintenance"
+      | "material";
     severity: "low" | "medium" | "high" | "critical";
     title: string;
     message: string;
@@ -123,13 +137,24 @@ export interface ControlPanelData {
     recipients: Array<{
       id: string;
       name: string;
-      role: "coordinator" | "quality" | "warehouse" | "engineering" | "admin" | "operator";
+      role:
+        | "coordinator"
+        | "quality"
+        | "warehouse"
+        | "engineering"
+        | "admin"
+        | "operator";
       department: string;
       notificationMethods: ("email" | "sms" | "push" | "dashboard")[];
       acknowledged: boolean;
       acknowledgedAt?: string;
     }>;
-    status: "active" | "acknowledged" | "in_progress" | "resolved" | "dismissed";
+    status:
+      | "active"
+      | "acknowledged"
+      | "in_progress"
+      | "resolved"
+      | "dismissed";
     priority: "low" | "medium" | "high" | "urgent";
     createdAt: string;
     updatedAt: string;

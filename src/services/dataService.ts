@@ -1,4 +1,6 @@
 import {
+  addDoc,
+  setDoc,
   collection,
   query,
   where,
@@ -8,6 +10,9 @@ import {
   startAfter,
   type DocumentSnapshot,
   type QueryConstraint,
+  deleteDoc,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
 import type { User } from "../types";
@@ -195,4 +200,54 @@ export const searchData = async <T>(
     console.error(`Error searching ${collectionName}:`, error);
     throw error;
   }
+};
+
+// Admin: list all users
+export const listAllUsers = async (): Promise<User[]> => {
+  const usersRef = collection(db, "users");
+  const snapshot = await getDocs(usersRef);
+  return snapshot.docs.map((d) => ({
+    uid: d.id,
+    ...(d.data() as any),
+  })) as User[];
+};
+
+// Admin: create user document (does not create auth account)
+export const createUserRecord = async (
+  user: Omit<User, "uid" | "createdAt" | "updatedAt"> & { uid?: string }
+): Promise<string> => {
+  if (user.uid) {
+    const ref = doc(db, "users", user.uid);
+    await setDoc(ref, {
+      ...user,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    return user.uid;
+  }
+  const usersRef = collection(db, "users");
+  const docRef = await addDoc(usersRef, {
+    ...user,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  });
+  return docRef.id;
+};
+
+// Admin: update user document
+export const updateUserRecord = async (
+  uid: string,
+  updates: Partial<User>
+): Promise<void> => {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, {
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  });
+};
+
+// Admin: delete user document
+export const deleteUserRecord = async (uid: string): Promise<void> => {
+  const userRef = doc(db, "users", uid);
+  await deleteDoc(userRef);
 };

@@ -1,3 +1,5 @@
+export type UserRole = "admin" | "user";
+
 export interface User {
   uid: string;
   email: string;
@@ -9,6 +11,7 @@ export interface User {
   emailVerified: boolean;
   createdAt?: string;
   updatedAt?: string;
+  role?: UserRole;
 }
 
 export interface AuthUser extends User {

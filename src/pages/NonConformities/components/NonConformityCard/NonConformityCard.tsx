@@ -1,17 +1,6 @@
-import {
-  FaEye,
-  FaUser,
-  FaPaperclip,
-  FaCheck,
-  FaClock,
-  FaStop,
-} from "react-icons/fa";
+import { FaEye, FaUser, FaPaperclip, FaClock, FaStop } from "react-icons/fa";
 import "./NonConformityCard.css";
-import type {
-  NonConformity,
-  Attachment,
-  NonConformityAlert,
-} from "../../../../types/nonConformities";
+import type { NonConformity } from "../../../../types/nonConformities";
 
 interface NonConformityCardProps {
   nc: NonConformity;
@@ -30,7 +19,6 @@ interface NonConformityCardProps {
 export default function NonConformityCard({
   nc,
   onViewDetails,
-  onAssign,
   getSeverityColor,
   getStatusColor,
   getCategoryIcon,

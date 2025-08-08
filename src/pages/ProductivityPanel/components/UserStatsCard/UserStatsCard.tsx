@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import "./UserStatsCard.css";
 
 interface OperatorRanking {
@@ -14,7 +15,7 @@ interface OperatorRanking {
 interface UserStatsCardProps {
   currentUserStats: OperatorRanking;
   getEfficiencyColor: (efficiency: number) => string;
-  getTrendIcon: (trend: string) => string;
+  getTrendIcon: (trend: string) => ReactNode;
 }
 
 export default function UserStatsCard({

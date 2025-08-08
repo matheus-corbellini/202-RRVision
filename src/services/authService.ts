@@ -34,6 +34,7 @@ export const convertFirebaseUser = async (
     phone: userDoc?.phone,
     createdAt: userDoc?.createdAt,
     updatedAt: userDoc?.updatedAt,
+    role: userDoc?.role || "user",
     accessToken: await firebaseUser.getIdToken(),
   };
 };
@@ -67,6 +68,7 @@ export const createUserDocument = async (
       name: userData.name,
       company: userData.company,
       phone: userData.phone,
+      role: "user",
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
     });

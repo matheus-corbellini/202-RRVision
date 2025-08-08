@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { FaTrophy, FaMedal, FaAward } from "react-icons/fa";
 import "./RankingsSection.css";
 
@@ -15,7 +16,7 @@ interface OperatorRanking {
 interface RankingsSectionProps {
   operatorRankings: OperatorRanking[];
   getEfficiencyColor: (efficiency: number) => string;
-  getTrendIcon: (trend: string) => string;
+  getTrendIcon: (trend: string) => ReactNode;
 }
 
 export default function RankingsSection({

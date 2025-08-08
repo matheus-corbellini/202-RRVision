@@ -1,0 +1,162 @@
+.admin-page {
+  padding: 1.5rem;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-search {
+  min-width: 320px;
+}
+
+.admin-error {
+  background: #fed7d7;
+  color: #c53030;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.admin-loading {
+  padding: 2rem 0;
+}
+
+.users-table {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.table-header,
+.table-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.4fr 1fr 1fr 0.8fr 0.8fr;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  align-items: center;
+}
+
+.table-header {
+  background: #f7fafc;
+  color: #4a5568;
+  font-weight: 600;
+}
+
+.table-row:nth-child(odd) {
+  background: #ffffff;
+}
+
+.table-row:nth-child(even) {
+  background: #fdfdfd;
+}
+
+.table-empty {
+  padding: 1rem;
+  color: #718096;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.row-actions .link {
+  background: none;
+  border: none;
+  color: #3182ce;
+  cursor: pointer;
+  padding: 0;
+}
+
+.row-actions .link.danger {
+  color: #e53e3e;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+}
+
+.modal {
+  width: 640px;
+  max-width: calc(100% - 2rem);
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.modal-body {
+  padding: 1rem 1.25rem;
+}
+
+.modal-footer {
+  padding: 1rem 1.25rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  border-top: 1px solid #edf2f7;
+}
+
+.close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.select-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.select-wrapper select {
+  height: 42px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  padding: 0 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-actions {
+    flex-wrap: wrap;
+  }
+  .admin-search {
+    min-width: unset;
+    flex: 1;
+  }
+}

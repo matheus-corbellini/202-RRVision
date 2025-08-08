@@ -3,6 +3,7 @@ export const path = {
   login: "/login",
   register: "/register",
   dashboard: "/dashboard",
+  admin: "/admin",
   priorityOptimization: "/priority-optimization",
   settings: "/settings",
   forgotPassword: "/forgot-password",

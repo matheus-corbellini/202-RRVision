@@ -9,6 +9,7 @@ import Input from "../../components/Input/Input";
 import Button from "../../components/Button/Button";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useLogin } from "../../hooks/useLogin";
+import { useAuth } from "../../hooks/useAuth";
 import { path } from "../../routes/path";
 
 export default function Login() {
@@ -18,6 +19,7 @@ export default function Login() {
   });
   const { goTo } = useNavigation();
   const { handleLogin, loading, error, clearError } = useLogin();
+  useAuth();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (error) clearError();
@@ -31,9 +33,10 @@ export default function Login() {
     e.preventDefault();
 
     try {
-      await handleLogin(formData);
-      // On successful login, navigate to dashboard or home
-      goTo(path.dashboard);
+      const loggedUser = await handleLogin(formData);
+      const target =
+        (loggedUser.role || "user") === "admin" ? path.admin : path.dashboard;
+      goTo(target);
     } catch (err) {
       // Error is handled by the hook
       console.error("Login failed:", err);

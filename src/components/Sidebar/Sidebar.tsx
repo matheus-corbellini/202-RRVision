@@ -13,6 +13,7 @@ import {
   FaChevronLeft,
   FaChevronRight,
   FaSync,
+  FaUsersCog,
 } from "react-icons/fa";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useAuth } from "../../hooks/useAuth";
@@ -22,14 +23,19 @@ import "./Sidebar.css";
 interface SidebarProps {
   currentPage: string;
   onPageChange: (page: string) => void;
+  variant?: "default" | "admin";
 }
 
-export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
+export default function Sidebar({
+  currentPage,
+  onPageChange,
+  variant = "default",
+}: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { user, logout } = useAuth();
   const { goTo } = useNavigation();
 
-  const menuItems = [
+  const baseMenuItems = [
     {
       id: "orders",
       title: "Pedidos",
@@ -81,6 +87,21 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
     },
   ];
 
+  const adminOnlyItems = [
+    {
+      id: "admin-users",
+      title: "Gerenciar Usuários",
+      icon: <FaUsersCog />,
+      description: "Administração do Sistema",
+      badge: null,
+    },
+  ];
+
+  const menuItems =
+    variant === "admin"
+      ? adminOnlyItems
+      : [...baseMenuItems, ...(user?.role === "admin" ? adminOnlyItems : [])];
+
   const handleLogout = async () => {
     try {
       await logout();
@@ -123,7 +144,9 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
               <div className="user-name">
                 {user?.name || user?.displayName || "Usuário"}
               </div>
-              <div className="user-role">Operador</div>
+              <div className="user-role">
+                {user?.role === "admin" ? "Administrador" : "Operador"}
+              </div>
             </div>
           )}
         </div>
@@ -162,22 +185,26 @@ export default function Sidebar({ currentPage, onPageChange }: SidebarProps) {
         </nav>
 
         <div className="sidebar-footer">
-          <button
-            className="footer-item"
-            title="Configurações"
-            onClick={() => onPageChange("settings")}
-          >
-            <span className="footer-icon">
-              <FaCog />
-            </span>
-            {!isCollapsed && <span>Configurações</span>}
-          </button>
-          <button className="footer-item" title="Ajuda">
-            <span className="footer-icon">
-              <FaQuestionCircle />
-            </span>
-            {!isCollapsed && <span>Ajuda</span>}
-          </button>
+          {variant !== "admin" && (
+            <>
+              <button
+                className="footer-item"
+                title="Configurações"
+                onClick={() => onPageChange("settings")}
+              >
+                <span className="footer-icon">
+                  <FaCog />
+                </span>
+                {!isCollapsed && <span>Configurações</span>}
+              </button>
+              <button className="footer-item" title="Ajuda">
+                <span className="footer-icon">
+                  <FaQuestionCircle />
+                </span>
+                {!isCollapsed && <span>Ajuda</span>}
+              </button>
+            </>
+          )}
           <button
             className="footer-item logout-btn"
             onClick={handleLogout}
