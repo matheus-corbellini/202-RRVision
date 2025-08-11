@@ -160,3 +160,84 @@
     flex: 1;
   }
 }
+
+/* Virtualized viewport */
+.users-viewport {
+  max-height: 60vh;
+  overflow: auto;
+}
+
+/* Skeletons */
+.skeleton-row .skeleton {
+  background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 37%, #f3f4f6 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: 6px;
+  height: 16px;
+}
+.skeleton-text {
+  width: 90%;
+  height: 16px;
+}
+.skeleton-text.short {
+  width: 60%;
+}
+.skeleton-badge {
+  width: 70px;
+  height: 24px;
+  border-radius: 12px;
+}
+.skeleton-actions {
+  width: 120px;
+  height: 20px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.role-admin {
+  background: rgba(66, 153, 225, 0.15);
+  color: #2b6cb0;
+}
+.role-user {
+  background: rgba(160, 174, 192, 0.2);
+  color: #4a5568;
+}
+
+/* Toasts */
+.toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1002;
+}
+.toast {
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: white;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+.toast-success {
+  background: #2f855a;
+}
+.toast-error {
+  background: #c53030;
+}

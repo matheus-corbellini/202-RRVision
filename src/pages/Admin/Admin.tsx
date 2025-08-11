@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import Button from "../../components/Button/Button";
 import Input from "../../components/Input/Input";
@@ -22,6 +22,29 @@ export default function Admin() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<User | null>(null);
 
+  // Toasts
+  const [toasts, setToasts] = useState<
+    Array<{ id: number; type: "success" | "error"; message: string }>
+  >([]);
+  const showToast = (
+    message: string,
+    type: "success" | "error" = "success"
+  ) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, type, message }]);
+    setTimeout(
+      () => setToasts((prev) => prev.filter((t) => t.id !== id)),
+      3000
+    );
+  };
+
+  // Virtualization
+  const rowHeight = 56; // px
+  const overscan = 6;
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [viewportHeight, setViewportHeight] = useState(480);
+
   const filtered = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return users;
@@ -32,6 +55,15 @@ export default function Admin() {
         (u.company || "").toLowerCase().includes(term)
     );
   }, [users, search]);
+
+  const totalRows = filtered.length;
+  const startIndex = Math.max(0, Math.floor(scrollTop / rowHeight) - overscan);
+  const endIndex = Math.min(
+    totalRows,
+    Math.ceil((scrollTop + viewportHeight) / rowHeight) + overscan
+  );
+  const visibleRows = filtered.slice(startIndex, endIndex);
+  const offsetY = startIndex * rowHeight;
 
   const fetchUsers = async () => {
     try {
@@ -47,6 +79,20 @@ export default function Admin() {
 
   useEffect(() => {
     fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    if (!viewportRef.current) return;
+    const el = viewportRef.current;
+    const resize = () => setViewportHeight(el.clientHeight || 480);
+    resize();
+    const onScroll = () => setScrollTop(el.scrollTop);
+    el.addEventListener("scroll", onScroll);
+    window.addEventListener("resize", resize);
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", resize);
+    };
   }, []);
 
   const handleSave = async (data: Partial<User>) => {
@@ -70,8 +116,10 @@ export default function Admin() {
       setModalOpen(false);
       setEditing(null);
       await fetchUsers();
+      showToast("Usuário salvo com sucesso", "success");
     } catch {
       setError("Falha ao salvar usuário");
+      showToast("Falha ao salvar usuário", "error");
     }
   };
 
@@ -80,8 +128,10 @@ export default function Admin() {
     try {
       await deleteUserRecord(uid);
       await fetchUsers();
+      showToast("Usuário removido", "success");
     } catch {
       setError("Falha ao remover usuário");
+      showToast("Falha ao remover usuário", "error");
     }
   };
 
@@ -123,49 +173,82 @@ export default function Admin() {
         </div>
 
         {error && <div className="admin-error">{error}</div>}
-        {loading ? (
-          <div className="admin-loading">Carregando...</div>
-        ) : (
-          <div className="users-table">
-            <div className="table-header">
-              <div>Nome</div>
-              <div>E-mail</div>
-              <div>Empresa</div>
-              <div>Telefone</div>
-              <div>Papel</div>
-              <div>Ações</div>
+        <div className="users-table">
+          <div className="table-header">
+            <div>Nome</div>
+            <div>E-mail</div>
+            <div>Empresa</div>
+            <div>Telefone</div>
+            <div>Papel</div>
+            <div>Ações</div>
+          </div>
+
+          {loading ? (
+            <div className="users-viewport">
+              {Array.from({ length: 8 }).map((_, idx) => (
+                <div key={idx} className="table-row skeleton-row">
+                  <div className="skeleton skeleton-text" />
+                  <div className="skeleton skeleton-text" />
+                  <div className="skeleton skeleton-text short" />
+                  <div className="skeleton skeleton-text short" />
+                  <div className="skeleton skeleton-badge" />
+                  <div className="skeleton skeleton-actions" />
+                </div>
+              ))}
             </div>
-            {filtered.map((u) => (
-              <div key={u.uid} className="table-row">
-                <div>{u.name || u.displayName || "—"}</div>
-                <div>{u.email}</div>
-                <div>{u.company || "—"}</div>
-                <div>{u.phone || "—"}</div>
-                <div>{u.role || "user"}</div>
-                <div className="row-actions">
-                  <button
-                    className="link"
-                    onClick={() => {
-                      setEditing(u);
-                      setModalOpen(true);
-                    }}
-                  >
-                    Editar
-                  </button>
-                  <button
-                    className="link danger"
-                    onClick={() => handleDelete(u.uid)}
-                  >
-                    Remover
-                  </button>
+          ) : (
+            <div className="users-viewport" ref={viewportRef}>
+              <div
+                style={{ height: totalRows * rowHeight, position: "relative" }}
+              >
+                <div style={{ transform: `translateY(${offsetY}px)` }}>
+                  {visibleRows.map((u) => (
+                    <div key={u.uid} className="table-row">
+                      <div>{u.name || u.displayName || "—"}</div>
+                      <div>{u.email}</div>
+                      <div>{u.company || "—"}</div>
+                      <div>{u.phone || "—"}</div>
+                      <div>
+                        <span className={`badge role-${u.role || "user"}`}>
+                          {u.role || "user"}
+                        </span>
+                      </div>
+                      <div className="row-actions">
+                        <button
+                          className="link"
+                          onClick={() => {
+                            setEditing(u);
+                            setModalOpen(true);
+                          }}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          className="link danger"
+                          onClick={() => handleDelete(u.uid)}
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            ))}
-            {filtered.length === 0 && (
-              <div className="table-empty">Nenhum usuário encontrado.</div>
-            )}
-          </div>
-        )}
+              {filtered.length === 0 && (
+                <div className="table-empty">Nenhum usuário encontrado.</div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Toasts */}
+        <div className="toasts">
+          {toasts.map((t) => (
+            <div key={t.id} className={`toast toast-${t.type}`}>
+              {t.message}
+            </div>
+          ))}
+        </div>
 
         {modalOpen && (
           <UserModal

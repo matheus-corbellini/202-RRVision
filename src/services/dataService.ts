@@ -13,6 +13,7 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  type DocumentData,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
 import type { User } from "../types";
@@ -30,6 +31,15 @@ export interface SearchResult<T> {
   data: T[];
   lastDoc?: DocumentSnapshot;
   hasMore: boolean;
+}
+
+function removeUndefined<T extends Record<string, unknown>>(obj: T): T {
+  const cleaned: Record<string, unknown> = {};
+  Object.keys(obj).forEach((key) => {
+    const value = (obj as Record<string, unknown>)[key];
+    if (value !== undefined) cleaned[key] = value;
+  });
+  return cleaned as T;
 }
 
 // Search users by various criteria
@@ -79,8 +89,12 @@ export const searchUsers = async (
     const hasMore = docs.length > limitCount;
     const dataToReturn = hasMore ? docs.slice(0, -1) : docs;
 
-    dataToReturn.forEach((doc) => {
-      users.push({ uid: doc.id, ...doc.data() } as User);
+    dataToReturn.forEach((docSnap) => {
+      const data = docSnap.data() as DocumentData;
+      users.push({
+        ...(data as unknown as Partial<User>),
+        uid: docSnap.id,
+      } as User);
     });
 
     return {
@@ -207,8 +221,8 @@ export const listAllUsers = async (): Promise<User[]> => {
   const usersRef = collection(db, "users");
   const snapshot = await getDocs(usersRef);
   return snapshot.docs.map((d) => ({
+    ...(d.data() as Record<string, unknown>),
     uid: d.id,
-    ...(d.data() as any),
   })) as User[];
 };
 
@@ -216,21 +230,37 @@ export const listAllUsers = async (): Promise<User[]> => {
 export const createUserRecord = async (
   user: Omit<User, "uid" | "createdAt" | "updatedAt"> & { uid?: string }
 ): Promise<string> => {
-  if (user.uid) {
-    const ref = doc(db, "users", user.uid);
-    await setDoc(ref, {
-      ...user,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    });
-    return user.uid;
+  if (!user.email) {
+    throw new Error("E-mail é obrigatório");
+  }
+  const normalized = removeUndefined({
+    ...user,
+    email: user.email.trim().toLowerCase(),
+  });
+
+  if (normalized.uid) {
+    const ref = doc(db, "users", normalized.uid);
+    await setDoc(
+      ref,
+      removeUndefined({
+        ...(normalized as Record<string, unknown>),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      })
+    );
+    return normalized.uid;
   }
   const usersRef = collection(db, "users");
-  const docRef = await addDoc(usersRef, {
-    ...user,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  });
+  const docRef = await addDoc(
+    usersRef,
+    removeUndefined({
+      ...(normalized as Record<string, unknown>),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })
+  );
+  // ensure 'uid' field exists in the document for consistency
+  await updateDoc(docRef, { uid: docRef.id });
   return docRef.id;
 };
 
@@ -240,10 +270,13 @@ export const updateUserRecord = async (
   updates: Partial<User>
 ): Promise<void> => {
   const userRef = doc(db, "users", uid);
-  await updateDoc(userRef, {
-    ...updates,
-    updatedAt: new Date().toISOString(),
-  });
+  await updateDoc(
+    userRef,
+    removeUndefined({
+      ...updates,
+      updatedAt: new Date().toISOString(),
+    })
+  );
 };
 
 // Admin: delete user document
