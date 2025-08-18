@@ -9,7 +9,7 @@ import {
   AlertsFilters,
   AlertsList,
   AlertDetailsModal,
-} from "./components";
+} from "../../components/AlertsPanelComponents/index";
 
 import "./AlertsPanel.css";
 

@@ -10,7 +10,7 @@ import {
   PerformanceTable,
   RankingsSection,
   ChartsSection,
-} from "./components";
+} from "../../components/ProductivityPanelComponents/index";
 import "./ProductivityPanel.css";
 import { FaChartLine, FaChartBar, FaArrowRight } from "react-icons/fa";
 

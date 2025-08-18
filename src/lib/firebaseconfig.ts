@@ -4,12 +4,12 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+	apiKey: "AIzaSyD4C8cE_DX6dWL89w_gwR2M3sjAtKK3GHU",
+	authDomain: "rrvision-99414.firebaseapp.com",
+	projectId: "rrvision-99414",
+	storageBucket: "rrvision-99414.firebasestorage.app",
+	messagingSenderId: "808020762931",
+	appId: "1:808020762931:web:c8b68d4bad3352b037de46",
 };
 
 // Initialize Firebase

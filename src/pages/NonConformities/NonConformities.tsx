@@ -9,7 +9,7 @@ import {
   NonConformityCard,
   NewNCModal,
   NCDetailsModal,
-} from "./components";
+} from "../../components/NonConformitiesComponents/index";
 import "./NonConformities.css";
 import type {
   NonConformity,

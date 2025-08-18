@@ -8,7 +8,7 @@ import {
   AlertsOverview,
   NonConformity,
   QuickActions,
-} from "./components";
+} from "../../components/ControlPanelComponents/index";
 import "./ControlPanel.css";
 import type { ControlPanelData } from "../../types/dashboard";
 import type { ProductionAlert } from "../../types/alerts";

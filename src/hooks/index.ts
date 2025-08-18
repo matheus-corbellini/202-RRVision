@@ -5,3 +5,4 @@ export * from "./useNavigation";
 export * from "./scrollToSection";
 export { useProductivityData } from "./useProductivityData";
 export { usePriorityOptimization } from "./usePriorityOptimization";
+export { useBling } from "./useBling";

@@ -17,7 +17,7 @@ import {
   AppearanceSettings,
   SecuritySettings,
   SystemSettings,
-} from "./components";
+} from "../../components/SettingsComponents/index";
 import "./Settings.css";
 
 interface SettingsConfig {
