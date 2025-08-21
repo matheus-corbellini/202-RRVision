@@ -1,8 +1,8 @@
-import type { User } from "../../../../types/user";
+import type { AuthUser } from "../../../types";
 import "./OperatorScheduleHeader.css";
 
 interface OperatorScheduleHeaderProps {
-  user: User | null;
+  user: AuthUser | null;
   viewMode: "day" | "week";
   setViewMode: (mode: "day" | "week") => void;
   currentTime: Date;

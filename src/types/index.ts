@@ -9,7 +9,7 @@ export interface User {
 	photoURL?: string | null;
 	emailVerified: boolean;
 	userType: string;
-	role: string;
+	role: UserRoleType;
 	createdAt: string;
 	updatedAt: string;
 	operatorData?: {
@@ -102,7 +102,7 @@ export interface AuthUser {
 	phone?: string;
 	createdAt?: string;
 	updatedAt?: string;
-	role: string;
+	role: UserRoleType;
 	userType: string;
 	accessToken: string;
 }
@@ -112,6 +112,8 @@ export interface UserRole {
 	name: string;
 	permissions: string[];
 }
+
+export type UserRoleType = "admin" | "manager" | "supervisor" | "operator" | "user";
 
 export interface ProductionAlert {
 	id: string;

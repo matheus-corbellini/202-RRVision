@@ -6,7 +6,7 @@ import {
   FaBell,
   FaChartBar,
 } from "react-icons/fa";
-import type { AlertStats } from "../../../../types";
+import type { AlertStats } from "../../../types/alerts";
 
 interface AlertStatsProps {
   stats: AlertStats;
@@ -30,7 +30,7 @@ export default function AlertsStats({ stats }: AlertStatsProps) {
           <FaExclamationTriangle />
         </div>
         <div className="stat-content">
-          <div className="stat-value">{stats.critical}</div>
+          <div className="stat-value">{stats.bySeverity.critical}</div>
           <div className="stat-label">Críticos</div>
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function AlertsStats({ stats }: AlertStatsProps) {
           <FaFire />
         </div>
         <div className="stat-content">
-          <div className="stat-value">{stats.urgent}</div>
+          <div className="stat-value">{stats.byPriority.urgent}</div>
           <div className="stat-label">Urgentes</div>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default function AlertsStats({ stats }: AlertStatsProps) {
           <FaBell />
         </div>
         <div className="stat-content">
-          <div className="stat-value">{stats.unacknowledged}</div>
+          <div className="stat-value">{stats.active - stats.acknowledged}</div>
           <div className="stat-label">Não Reconhecidos</div>
         </div>
       </div>

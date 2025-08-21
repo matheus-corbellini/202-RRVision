@@ -14,10 +14,11 @@ import {
 	doc,
 	updateDoc,
 	type DocumentData,
+	getDoc,
 } from "firebase/firestore";
 import { db } from "../lib/firebaseconfig";
 import type { User } from "../types";
-import type { Operator, OperatorWithDetails } from "../types";
+import type { Operator } from "../types";
 
 export interface SearchOptions {
 	searchTerm?: string;
@@ -221,10 +222,24 @@ export const searchData = async <T>(
 export const listAllUsers = async (): Promise<User[]> => {
 	const usersRef = collection(db, "users");
 	const snapshot = await getDocs(usersRef);
-	return snapshot.docs.map((d) => ({
-		...(d.data() as Record<string, unknown>),
-		uid: d.id,
-	})) as User[];
+	return snapshot.docs.map((d) => {
+		const data = d.data() as Record<string, unknown>;
+		return {
+			id: d.id,
+			email: data.email as string || "",
+			name: data.name as string || "",
+			displayName: data.displayName as string,
+			company: data.company as string,
+			phone: data.phone as string,
+			photoURL: data.photoURL as string | null,
+			emailVerified: data.emailVerified as boolean || false,
+			userType: data.userType as string || "user",
+			role: data.role as string || "user",
+			createdAt: data.createdAt as string || new Date().toISOString(),
+			updatedAt: data.updatedAt as string || new Date().toISOString(),
+			operatorData: data.operatorData as User["operatorData"],
+		} as User;
+	});
 };
 
 // Admin: create user document (does not create auth account)
@@ -355,7 +370,7 @@ export const deleteOperatorRecord = async (id: string): Promise<void> => {
 export const getOperatorById = async (id: string): Promise<Operator | null> => {
 	try {
 		const operatorRef = doc(db, "operators", id);
-		const operatorSnap = await getDocs(operatorRef);
+		const operatorSnap = await getDoc(operatorRef);
 
 		if (operatorSnap.exists()) {
 			return { id: operatorSnap.id, ...operatorSnap.data() } as Operator;

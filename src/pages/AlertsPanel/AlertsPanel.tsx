@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import type { ProductionAlert, AlertStats } from "../../types";
+import type { ProductionAlert } from "../../types/alerts";
 import {
   AlertsHeader,
   AlertsStats,
@@ -12,6 +12,26 @@ import {
 } from "../../components/AlertsPanelComponents/index";
 
 import "./AlertsPanel.css";
+
+interface AlertStats {
+  total: number;
+  active: number;
+  acknowledged: number;
+  resolved: number;
+  dismissed: number;
+  bySeverity: {
+    low: number;
+    medium: number;
+    high: number;
+    critical: number;
+  };
+  byPriority: {
+    low: number;
+    medium: number;
+    high: number;
+    urgent: number;
+  };
+}
 
 export default function AlertsPanel() {
   const { user } = useAuth();
@@ -31,27 +51,23 @@ export default function AlertsPanel() {
     const mockAlerts: ProductionAlert[] = [
       {
         id: "alert-001",
-        type: "production_stop",
-        severity: "critical",
         title: "PRODUÇÃO PARADA - Não Conformidade Crítica",
-        message:
-          "Produção interrompida devido a não conformidade crítica no setor de Corte",
         description:
           "Peças com dimensão fora do padrão detectadas. Produção foi interrompida conforme procedimento. Aguardando análise da qualidade para liberação.",
-        source: {
-          type: "operator",
-          id: "op-001",
-          name: "João Silva",
-        },
+        severity: "critical",
+        priority: "urgent",
         location: {
           sector: "Corte",
           station: "Estação 02",
           equipment: "Serra CNC-001",
         },
         relatedEntity: {
-          type: "order",
           id: "OP-2024-001",
           name: "Produto A - Modelo X",
+        },
+        source: {
+          id: "op-001",
+          name: "João Silva",
         },
         recipients: [
           {
@@ -59,42 +75,32 @@ export default function AlertsPanel() {
             name: "Pedro Costa",
             role: "coordinator",
             department: "Produção",
-            notificationMethods: ["push", "sms", "email"],
             acknowledged: true,
-            acknowledgedAt: "2024-01-20T10:45:00",
           },
           {
             id: "qc-001",
             name: "Maria Santos",
             role: "quality",
             department: "Qualidade",
-            notificationMethods: ["push", "email"],
             acknowledged: true,
-            acknowledgedAt: "2024-01-20T10:47:00",
           },
           {
             id: "eng-001",
             name: "Carlos Oliveira",
             role: "engineering",
             department: "Engenharia",
-            notificationMethods: ["push", "email"],
             acknowledged: false,
           },
         ],
-        status: "in_progress",
-        priority: "urgent",
+        status: "active",
         createdAt: "2024-01-20T10:30:00",
-        updatedAt: "2024-01-20T11:15:00",
         acknowledgedAt: "2024-01-20T10:45:00",
         acknowledgedBy: "Pedro Costa",
-        escalationLevel: 1,
-        autoEscalation: true,
         tags: ["produção", "qualidade", "crítico"],
         attachments: ["foto_peca_defeituosa.jpg", "medicao_dimensional.pdf"],
         comments: [
           {
             id: "comment-001",
-            userId: "op-001",
             userName: "João Silva",
             message:
               "Produção interrompida. 5 peças com problema identificadas.",
@@ -121,14 +127,13 @@ export default function AlertsPanel() {
       },
       {
         id: "alert-002",
-        type: "priority_change",
-        severity: "high",
         title: "Mudança de Prioridade - Pedido Urgente",
-        message: "Pedido OP-2024-005 alterado para prioridade URGENTE",
         description:
           "Cliente solicitou antecipação do prazo de entrega. Pedido deve ser priorizado na programação de produção.",
+        severity: "medium",
+        priority: "high",
+        status: "acknowledged",
         source: {
-          type: "system",
           id: "system",
           name: "Sistema ERP",
         },
@@ -136,7 +141,6 @@ export default function AlertsPanel() {
           sector: "Planejamento",
         },
         relatedEntity: {
-          type: "order",
           id: "OP-2024-005",
           name: "Produto E - Modelo V",
         },
@@ -146,33 +150,25 @@ export default function AlertsPanel() {
             name: "Pedro Costa",
             role: "coordinator",
             department: "Produção",
-            notificationMethods: ["push", "email"],
             acknowledged: true,
-            acknowledgedAt: "2024-01-20T14:20:00",
           },
           {
             id: "plan-001",
             name: "Ana Oliveira",
             role: "admin",
             department: "Planejamento",
-            notificationMethods: ["push", "email"],
             acknowledged: false,
           },
         ],
-        status: "acknowledged",
-        priority: "high",
         createdAt: "2024-01-20T14:15:00",
-        updatedAt: "2024-01-20T14:20:00",
         acknowledgedAt: "2024-01-20T14:20:00",
         acknowledgedBy: "Pedro Costa",
-        escalationLevel: 0,
-        autoEscalation: false,
         tags: ["prioridade", "planejamento"],
         attachments: [],
         comments: [
           {
             id: "comment-004",
-            userId: "plan-001",
+
             userName: "Ana Oliveira",
             message:
               "Alteração solicitada pelo cliente. Prazo reduzido em 2 dias.",
@@ -183,14 +179,13 @@ export default function AlertsPanel() {
       },
       {
         id: "alert-003",
-        type: "delay",
-        severity: "medium",
         title: "Atraso na Produção",
-        message: "Tarefa de montagem está 30 minutos atrasada",
         description:
           "A tarefa de montagem do OP-2024-002 está com atraso de 30 minutos em relação ao planejado. Pode impactar o prazo final do pedido.",
+        severity: "medium",
+        priority: "medium",
+        status: "active",
         source: {
-          type: "system",
           id: "system",
           name: "Sistema de Monitoramento",
         },
@@ -199,7 +194,6 @@ export default function AlertsPanel() {
           station: "Linha 03",
         },
         relatedEntity: {
-          type: "task",
           id: "task-002",
           name: "Montagem Principal",
         },
@@ -209,30 +203,23 @@ export default function AlertsPanel() {
             name: "Pedro Costa",
             role: "coordinator",
             department: "Produção",
-            notificationMethods: ["push"],
             acknowledged: false,
           },
         ],
-        status: "active",
-        priority: "medium",
         createdAt: "2024-01-20T15:30:00",
-        updatedAt: "2024-01-20T15:30:00",
-        escalationLevel: 0,
-        autoEscalation: true,
         tags: ["atraso", "montagem"],
         attachments: [],
         comments: [],
       },
       {
         id: "alert-004",
-        type: "material",
-        severity: "high",
         title: "Material em Falta",
-        message: "Estoque baixo de componente crítico",
         description:
           "Componente XYZ-123 está com estoque abaixo do mínimo. Pode impactar a produção dos próximos pedidos se não for reposto.",
+        severity: "high",
+        priority: "high",
+        status: "acknowledged",
         source: {
-          type: "system",
           id: "system",
           name: "Sistema de Estoque",
         },
@@ -240,7 +227,6 @@ export default function AlertsPanel() {
           sector: "Almoxarifado",
         },
         relatedEntity: {
-          type: "material",
           id: "mat-123",
           name: "Componente XYZ-123",
         },
@@ -250,27 +236,21 @@ export default function AlertsPanel() {
             name: "Roberto Lima",
             role: "warehouse",
             department: "Almoxarifado",
-            notificationMethods: ["push", "email"],
+
             acknowledged: true,
-            acknowledgedAt: "2024-01-20T09:15:00",
+
           },
           {
             id: "coord-001",
             name: "Pedro Costa",
             role: "coordinator",
             department: "Produção",
-            notificationMethods: ["push"],
             acknowledged: false,
           },
         ],
-        status: "acknowledged",
-        priority: "high",
         createdAt: "2024-01-20T09:00:00",
-        updatedAt: "2024-01-20T09:15:00",
         acknowledgedAt: "2024-01-20T09:15:00",
         acknowledgedBy: "Roberto Lima",
-        escalationLevel: 0,
-        autoEscalation: true,
         tags: ["material", "estoque"],
         attachments: [],
         comments: [
@@ -287,14 +267,13 @@ export default function AlertsPanel() {
       },
       {
         id: "alert-005",
-        type: "maintenance",
-        severity: "medium",
         title: "Manutenção Preventiva Agendada",
-        message: "Equipamento CNC-002 agendado para manutenção",
         description:
           "Manutenção preventiva do equipamento CNC-002 agendada para amanhã às 08:00. Produção deve ser reprogramada.",
+        severity: "medium",
+        priority: "medium",
+        status: "active",
         source: {
-          type: "system",
           id: "system",
           name: "Sistema de Manutenção",
         },
@@ -303,7 +282,6 @@ export default function AlertsPanel() {
           equipment: "CNC-002",
         },
         relatedEntity: {
-          type: "equipment",
           id: "eq-002",
           name: "Serra CNC-002",
         },
@@ -313,7 +291,7 @@ export default function AlertsPanel() {
             name: "Pedro Costa",
             role: "coordinator",
             department: "Produção",
-            notificationMethods: ["push", "email"],
+
             acknowledged: false,
           },
           {
@@ -321,19 +299,13 @@ export default function AlertsPanel() {
             name: "José Santos",
             role: "engineering",
             department: "Manutenção",
-            notificationMethods: ["push", "email"],
+
             acknowledged: true,
-            acknowledgedAt: "2024-01-20T16:00:00",
           },
         ],
-        status: "acknowledged",
-        priority: "medium",
         createdAt: "2024-01-20T16:00:00",
-        updatedAt: "2024-01-20T16:00:00",
         acknowledgedAt: "2024-01-20T16:00:00",
         acknowledgedBy: "José Santos",
-        escalationLevel: 0,
-        autoEscalation: false,
         tags: ["manutenção", "preventiva"],
         attachments: [],
         comments: [],
@@ -349,7 +321,7 @@ export default function AlertsPanel() {
     let filtered = [...alerts];
 
     if (filterType !== "all") {
-      filtered = filtered.filter((alert) => alert.type === filterType);
+      filtered = filtered.filter((alert) => alert.severity === filterType);
     }
 
     if (filterStatus !== "all") {
@@ -367,8 +339,8 @@ export default function AlertsPanel() {
     if (showOnlyMyAlerts && user) {
       filtered = filtered.filter(
         (alert) =>
-          alert.recipients.some((recipient) => recipient.id === user.uid) ||
-          alert.source.id === user.uid
+          alert.recipients.some((recipient) => recipient.id === user.id) ||
+          alert.source.id === user.id
       );
     }
 
@@ -403,13 +375,11 @@ export default function AlertsPanel() {
               acknowledgedAt: new Date().toISOString(),
               acknowledgedBy:
                 user?.name || user?.displayName || "Usuário Atual",
-              updatedAt: new Date().toISOString(),
               recipients: alert.recipients.map((recipient) =>
-                recipient.id === user?.uid
+                recipient.id === user?.id
                   ? {
                       ...recipient,
                       acknowledged: true,
-                      acknowledgedAt: new Date().toISOString(),
                     }
                   : recipient
               ),
@@ -428,12 +398,11 @@ export default function AlertsPanel() {
               status: "resolved" as const,
               resolvedAt: new Date().toISOString(),
               resolvedBy: user?.name || user?.displayName || "Usuário Atual",
-              updatedAt: new Date().toISOString(),
               comments: [
-                ...alert.comments,
+                ...(alert.comments || []),
                 {
                   id: `comment-${Date.now()}`,
-                  userId: user?.uid || "current-user",
+                  userId: user?.id || "current-user",
                   userName: user?.name || user?.displayName || "Usuário Atual",
                   message: `Alerta resolvido: ${resolution}`,
                   timestamp: new Date().toISOString(),
@@ -452,12 +421,11 @@ export default function AlertsPanel() {
         alert.id === alertId
           ? {
               ...alert,
-              updatedAt: new Date().toISOString(),
               comments: [
-                ...alert.comments,
+                ...(alert.comments || []),
                 {
                   id: `comment-${Date.now()}`,
-                  userId: user?.uid || "current-user",
+                  userId: user?.id || "current-user",
                   userName: user?.name || user?.displayName || "Usuário Atual",
                   message: comment,
                   timestamp: new Date().toISOString(),
@@ -471,16 +439,35 @@ export default function AlertsPanel() {
   };
 
   const getAlertStats = (): AlertStats => {
+    const total = alerts.length;
     const active = alerts.filter((a) => a.status === "active").length;
-    const critical = alerts.filter((a) => a.severity === "critical").length;
-    const urgent = alerts.filter((a) => a.priority === "urgent").length;
-    const unacknowledged = alerts.filter(
-      (a) =>
-        a.status === "active" &&
-        a.recipients.some((r) => r.id === user?.uid && !r.acknowledged)
-    ).length;
+    const acknowledged = alerts.filter((a) => a.status === "acknowledged").length;
+    const resolved = alerts.filter((a) => a.status === "resolved").length;
+    const dismissed = alerts.filter((a) => a.status === "dismissed").length;
+    
+    const bySeverity = {
+      low: alerts.filter((a) => a.severity === "low").length,
+      medium: alerts.filter((a) => a.severity === "medium").length,
+      high: alerts.filter((a) => a.severity === "high").length,
+      critical: alerts.filter((a) => a.severity === "critical").length,
+    };
+    
+    const byPriority = {
+      low: alerts.filter((a) => a.priority === "low").length,
+      medium: alerts.filter((a) => a.priority === "medium").length,
+      high: alerts.filter((a) => a.priority === "high").length,
+      urgent: alerts.filter((a) => a.priority === "urgent").length,
+    };
 
-    return { active, critical, urgent, unacknowledged, total: alerts.length };
+    return { 
+      total, 
+      active, 
+      acknowledged, 
+      resolved, 
+      dismissed, 
+      bySeverity, 
+      byPriority 
+    };
   };
 
   return (
@@ -507,7 +494,7 @@ export default function AlertsPanel() {
           alerts={filteredAlerts}
           onSelectAlert={setSelectedAlert}
           onAcknowledgeAlert={handleAcknowledgeAlert}
-          currentUserId={user?.uid}
+          currentUserId={user?.id}
         />
 
         <AlertDetailsModal
@@ -516,7 +503,7 @@ export default function AlertsPanel() {
           onAcknowledge={handleAcknowledgeAlert}
           onResolve={handleResolveAlert}
           onAddComment={handleAddComment}
-          currentUserId={user?.uid}
+          currentUserId={user?.id}
         />
       </div>
     </div>

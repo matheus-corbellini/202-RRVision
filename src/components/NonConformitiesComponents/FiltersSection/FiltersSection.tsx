@@ -1,5 +1,5 @@
 import "./FiltersSection.css";
-import type { NonConformityFilters } from "../../../../types/nonConformities";
+import type { NonConformityFilters } from "../../../types/nonConformities";
 
 interface FiltersSectionProps {
   filters: NonConformityFilters;
@@ -12,7 +12,7 @@ export default function FiltersSection({
 }: FiltersSectionProps) {
   const updateFilter = (
     key: keyof NonConformityFilters,
-    value: string | boolean
+    value: string | boolean | string[] | undefined
   ) => {
     setFilters({
       ...filters,
@@ -25,12 +25,12 @@ export default function FiltersSection({
       <div className="filter-group">
         <label>Status:</label>
         <select
-          value={filters.filterStatus}
-          onChange={(e) => updateFilter("filterStatus", e.target.value)}
+          value={filters.status?.[0] || "all"}
+          onChange={(e) => updateFilter("status", e.target.value === "all" ? undefined : [e.target.value])}
         >
           <option value="all">Todos</option>
           <option value="open">Aberto</option>
-          <option value="in_progress">Em Andamento</option>
+          <option value="investigating">Em Andamento</option>
           <option value="resolved">Resolvido</option>
           <option value="closed">Fechado</option>
         </select>
@@ -38,8 +38,8 @@ export default function FiltersSection({
       <div className="filter-group">
         <label>Severidade:</label>
         <select
-          value={filters.filterSeverity}
-          onChange={(e) => updateFilter("filterSeverity", e.target.value)}
+          value={filters.severity?.[0] || "all"}
+          onChange={(e) => updateFilter("severity", e.target.value === "all" ? undefined : [e.target.value])}
         >
           <option value="all">Todas</option>
           <option value="critical">Crítica</option>
@@ -51,8 +51,8 @@ export default function FiltersSection({
       <div className="filter-group">
         <label>Categoria:</label>
         <select
-          value={filters.filterCategory}
-          onChange={(e) => updateFilter("filterCategory", e.target.value)}
+          value={filters.category?.[0] || "all"}
+          onChange={(e) => updateFilter("category", e.target.value === "all" ? undefined : [e.target.value])}
         >
           <option value="all">Todas</option>
           <option value="quality">Qualidade</option>
@@ -63,23 +63,23 @@ export default function FiltersSection({
         </select>
       </div>
       <div className="filter-group">
-        <label>Localização:</label>
+        <label>Setor:</label>
         <select
-          value={filters.filterLocation}
-          onChange={(e) => updateFilter("filterLocation", e.target.value)}
+          value={filters.sector?.[0] || "all"}
+          onChange={(e) => updateFilter("sector", e.target.value === "all" ? undefined : [e.target.value])}
         >
-          <option value="all">Todas</option>
-          <option value="sector1">Setor 1</option>
-          <option value="sector2">Setor 2</option>
-          <option value="sector3">Setor 3</option>
+          <option value="all">Todos</option>
+          <option value="Corte">Corte</option>
+          <option value="Montagem">Montagem</option>
+          <option value="Acabamento">Acabamento</option>
         </select>
       </div>
       <div className="filter-group checkbox">
         <label>
           <input
             type="checkbox"
-            checked={filters.showOnlyMyNCs}
-            onChange={(e) => updateFilter("showOnlyMyNCs", e.target.checked)}
+            checked={!!filters.assignedTo}
+            onChange={(e) => updateFilter("assignedTo", e.target.checked ? "current-user" : undefined)}
           />
           Apenas minhas NCs
         </label>
@@ -88,8 +88,8 @@ export default function FiltersSection({
         <label>
           <input
             type="checkbox"
-            checked={filters.showOnlyCritical}
-            onChange={(e) => updateFilter("showOnlyCritical", e.target.checked)}
+            checked={filters.severity?.includes("critical") || false}
+            onChange={(e) => updateFilter("severity", e.target.checked ? ["critical"] : undefined)}
           />
           Apenas críticas
         </label>

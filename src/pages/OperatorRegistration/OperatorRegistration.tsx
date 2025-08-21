@@ -7,9 +7,6 @@ import {
 	FaIndustry,
 	FaGraduationCap,
 	FaClock,
-	FaUsers,
-	FaEdit,
-	FaTrash,
 	FaPlus,
 	FaTimes,
 } from "react-icons/fa";
@@ -19,12 +16,7 @@ import {
 	isCodeAlreadyUsed,
 	isEmailAlreadyUsed,
 	getAllOperatorsWithUsers,
-	updateOperator,
-	deleteOperatorAndUser,
-	getUserByOperatorId,
 	type OperatorRegistrationData,
-	type Operator,
-	type User,
 } from "../../services/authService";
 import "./OperatorRegistration.css";
 
@@ -85,10 +77,6 @@ export default function OperatorRegistration() {
 		notes: "",
 	});
 
-	const [operators, setOperators] = useState<Operator[]>([]);
-	const [operatorsWithUsers, setOperatorsWithUsers] = useState<
-		Array<{ operator: Operator; user: User }>
-	>([]);
 	const [sectors, setSectors] = useState<Sector[]>([]);
 	const [teams, setTeams] = useState<Team[]>([]);
 	const [newSkill, setNewSkill] = useState("");
@@ -184,14 +172,12 @@ export default function OperatorRegistration() {
 
 		// Carregar operadores existentes usando o serviço
 		const loadOperators = async () => {
-			try {
-				const operatorsWithUsersData = await getAllOperatorsWithUsers();
-				setOperatorsWithUsers(operatorsWithUsersData);
-				setOperators(operatorsWithUsersData.map((item) => item.operator));
-			} catch (error) {
+					try {
+			await getAllOperatorsWithUsers();
+		} catch (error) {
 				console.log("Nenhum operador encontrado, iniciando com lista vazia");
-				setOperators([]);
-				setOperatorsWithUsers([]);
+				// setOperators([]); // This line was removed
+				// setOperatorsWithUsers([]); // This line was removed
 			}
 		};
 
@@ -258,25 +244,25 @@ export default function OperatorRegistration() {
 
 		if (isEditing && editingId) {
 			// Editar operador existente
-			setOperators((prev) =>
-				prev.map((op) =>
-					op.id === editingId
-						? { ...op, ...formData, updatedAt: new Date().toISOString() }
-						: op
-				)
-			);
+			// setOperators((prev) => // This line was removed
+			// 	prev.map((op) => // This line was removed
+			// 		op.id === editingId // This line was removed
+			// 			? { ...op, ...formData, updatedAt: new Date().toISOString() } // This line was removed
+			// 			: op // This line was removed
+			// 	) // This line was removed
+			// ); // This line was removed
 			setIsEditing(false);
 			setEditingId(null);
 		} else {
 			try {
 				// Criar novo usuário e operador seguindo a relação 1:1
-				const { user, operator } = await createOperatorWithUser({
+				const { user } = await createOperatorWithUser({
 					...formData,
 					password: formData.password || "senha123", // Usar senha do formulário ou padrão
 				});
 
-				setOperators((prev) => [...prev, operator]);
-				setOperatorsWithUsers((prev) => [...prev, { operator, user }]);
+				// setOperators((prev) => [...prev, operator]); // This line was removed
+				// setOperatorsWithUsers((prev) => [...prev, { operator, user }]); // This line was removed
 
 				// Mostrar mensagem de sucesso
 				alert(
@@ -323,79 +309,7 @@ export default function OperatorRegistration() {
 		});
 	};
 
-	const handleEdit = async (operator: Operator) => {
-		try {
-			// Buscar informações do usuário
-			const user = await getUserByOperatorId(operator.id);
 
-			setIsEditing(true);
-			setEditingId(operator.id);
-			setFormData({
-				// Dados do usuário reais
-				email: user?.email || "",
-				name: user?.name || "",
-				displayName: user?.displayName || "",
-				company: user?.company || "",
-				phone: user?.phone || "",
-				password: "",
-
-				// Dados específicos do operador
-				code: operator.code,
-				primarySectorId: operator.primarySectorId,
-				secondarySectorIds: operator.secondarySectorIds,
-				skills: operator.skills,
-				status: operator.status as
-					| "active"
-					| "inactive"
-					| "suspended"
-					| "on_leave",
-				admissionDate: operator.admissionDate,
-				lastTrainingDate: operator.lastTrainingDate || "",
-				nextTrainingDate: operator.nextTrainingDate || "",
-				contractType: operator.contractType as
-					| "clt"
-					| "pj"
-					| "temporary"
-					| "intern",
-				workSchedule: operator.workSchedule as
-					| "day"
-					| "night"
-					| "rotating"
-					| "flexible",
-				weeklyHours: operator.weeklyHours,
-				supervisorId: operator.supervisorId || "",
-				teamId: operator.teamId || "",
-				notes: "",
-			});
-		} catch (error) {
-			console.error("Erro ao carregar dados para edição:", error);
-			alert("Erro ao carregar dados para edição");
-		}
-	};
-
-	const handleDelete = async (id: string) => {
-		if (
-			window.confirm(
-				"Tem certeza que deseja excluir este operador e seu usuário associado?"
-			)
-		) {
-			try {
-				await deleteOperatorAndUser(id);
-				setOperators((prev) => prev.filter((op) => op.id !== id));
-				setOperatorsWithUsers((prev) =>
-					prev.filter((item) => item.operator.id !== id)
-				);
-				alert("Operador e usuário excluídos com sucesso!");
-			} catch (error) {
-				console.error("Erro ao excluir operador:", error);
-				alert(
-					`Erro ao excluir operador: ${
-						error instanceof Error ? error.message : "Erro desconhecido"
-					}`
-				);
-			}
-		}
-	};
 
 	const addSkill = () => {
 		if (newSkill.trim() && !formData.skills.includes(newSkill.trim())) {
@@ -412,34 +326,6 @@ export default function OperatorRegistration() {
 			...prev,
 			skills: prev.skills.filter((skill) => skill !== skillToRemove),
 		}));
-	};
-
-	const getSectorName = (sectorId: string) => {
-		return sectors.find((s) => s.id === sectorId)?.name || "N/A";
-	};
-
-	const getTeamName = (teamId?: string) => {
-		if (!teamId) return "N/A";
-		return teams.find((t) => t.id === teamId)?.name || "N/A";
-	};
-
-	const getStatusText = (status: string) => {
-		switch (status) {
-			case "active":
-				return "Ativo";
-			case "inactive":
-				return "Inativo";
-			case "suspended":
-				return "Suspenso";
-			case "on_leave":
-				return "Afastado";
-			default:
-				return status;
-		}
-	};
-
-	const getStatusClass = (status: string) => {
-		return `status-${status}`;
 	};
 
 	return (

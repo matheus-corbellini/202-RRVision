@@ -18,6 +18,7 @@ import { auth, db } from "../lib/firebaseconfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { deleteDoc } from "firebase/firestore";
+import type { UserRoleType } from "../types";
 
 // Interface para usuário
 export interface User {
@@ -30,7 +31,7 @@ export interface User {
 	photoURL?: string | null;
 	emailVerified: boolean;
 	userType: string;
-	role: string;
+	role: UserRoleType;
 	createdAt: string;
 	updatedAt: string;
 	operatorData?: {
@@ -63,7 +64,7 @@ export interface AuthUser {
 	phone?: string;
 	createdAt?: string;
 	updatedAt?: string;
-	role: string;
+	role: UserRoleType;
 	userType: string;
 	accessToken: string;
 }
@@ -97,13 +98,6 @@ export interface Operator extends User {
 
 // Mock de dados - Em produção, isso viria de uma API real
 const mockUsers: User[] = [];
-
-// Função auxiliar para obter apenas usuários operadores
-const getMockOperators = (): Operator[] => {
-	return mockUsers.filter(
-		(user) => user.userType === "operator" && user.operatorData
-	) as Operator[];
-};
 
 export interface OperatorRegistrationData extends RegisterData {
 	// Campos adicionais do usuário

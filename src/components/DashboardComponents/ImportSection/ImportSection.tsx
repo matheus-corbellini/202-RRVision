@@ -1,5 +1,5 @@
 import Button from "../../Button/Button";
-import type { ImportData } from "../../types/dashboard";
+import type { ImportData } from "../../../types/dashboard";
 import "./ImportSection.css";
 
 interface ImportSectionProps {
@@ -24,20 +24,20 @@ export default function ImportSection({
 
 			<div className="import-stats">
 				<div className="import-stat">
-					<div className="import-stat-value">{importData.ordersImported}</div>
-					<div className="import-stat-label">Pedidos Importados</div>
+					<div className="import-stat-value">{importData.recordsCount}</div>
+					<div className="import-stat-label">Registros Importados</div>
 				</div>
 				<div className="import-stat">
-					<div className="import-stat-value">{importData.routesLoaded}</div>
-					<div className="import-stat-label">Roteiros Carregados</div>
+					<div className="import-stat-value">{importData.successCount}</div>
+					<div className="import-stat-label">Sucessos</div>
 				</div>
 				<div className="import-stat">
-					<div className="import-stat-value">{importData.pendingRoutes}</div>
-					<div className="import-stat-label">Pendentes Roteiro</div>
+					<div className="import-stat-value">{importData.errorCount}</div>
+					<div className="import-stat-label">Erros</div>
 				</div>
 				<div className="import-stat">
-					<div className="import-stat-value">{importData.timesCalculated}</div>
-					<div className="import-stat-label">Tempos Calculados</div>
+					<div className="import-stat-value">{importData.status}</div>
+					<div className="import-stat-label">Status</div>
 				</div>
 			</div>
 

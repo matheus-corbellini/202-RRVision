@@ -1,6 +1,6 @@
 import { FaEye, FaUser, FaPaperclip, FaClock, FaStop } from "react-icons/fa";
 import "./NonConformityCard.css";
-import type { NonConformity } from "../../../../types/nonConformities";
+import type { NonConformity } from "../../../types/nonConformities";
 
 interface NonConformityCardProps {
   nc: NonConformity;
@@ -24,7 +24,7 @@ export default function NonConformityCard({
   getCategoryIcon,
 }: NonConformityCardProps) {
   return (
-    <div className={`nc-card ${nc.stopProduction ? "production-stopped" : ""}`}>
+    <div className="nc-card">
       <div className="nc-card-header">
         <div className="nc-info">
           <div className="nc-id-title">
@@ -74,8 +74,8 @@ export default function NonConformityCard({
           <div className="nc-reporter">
             <FaUser />
             <span>
-              <strong>Reportado por:</strong> {nc.reporter.name} (
-              {nc.reporter.role})
+              <strong>Reportado por:</strong> {nc.reportedBy.name} (
+              {nc.reportedBy.role})
             </span>
           </div>
 
@@ -98,7 +98,7 @@ export default function NonConformityCard({
 
           <div className="nc-alerts">
             <FaStop />
-            <span>{nc.alerts.length} alertas</span>
+            <span>{nc.attachments.length} anexos</span>
           </div>
 
           <div className="nc-date">
@@ -107,12 +107,7 @@ export default function NonConformityCard({
           </div>
         </div>
 
-        {nc.stopProduction && (
-          <div className="production-stopped-warning">
-            <FaStop />
-            <span>Produção Parada</span>
-          </div>
-        )}
+
       </div>
     </div>
   );

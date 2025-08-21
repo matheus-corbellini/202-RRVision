@@ -3,9 +3,8 @@ import {
   FaChartBar,
   FaCog,
   FaExclamationTriangle,
-  FaExclamationCircle,
 } from "react-icons/fa";
-import type { Order } from "../../../../types/dashboard";
+import type { Order } from "../../../types/dashboard";
 import "./OrdersSection.css";
 
 interface OrdersSectionProps {
@@ -21,22 +20,22 @@ export default function OrdersSection({
 }: OrdersSectionProps) {
   const filteredOrders = orders.filter((order) => {
     if (filterStatus === "all") return true;
-    if (filterStatus === "urgent") return order.isUrgent;
+    if (filterStatus === "urgent") return order.priority === "urgent";
     return order.status === filterStatus;
   });
 
-  const getStatusBadgeClass = (status: string, isUrgent: boolean) => {
+  const getStatusBadgeClass = (status: string, priority: string) => {
     let baseClass = "status-badge";
-    if (isUrgent) baseClass += " urgent";
+    if (priority === "urgent") baseClass += " urgent";
     switch (status) {
       case "pending":
         return baseClass + " pending";
-      case "production":
+      case "in_progress":
         return baseClass + " production";
       case "completed":
         return baseClass + " completed";
-      case "urgent":
-        return baseClass + " urgent";
+      case "cancelled":
+        return baseClass + " cancelled";
       default:
         return baseClass;
     }
@@ -123,7 +122,7 @@ export default function OrdersSection({
               <td>{order.quantity}</td>
               <td>
                 <span
-                  className={getStatusBadgeClass(order.status, order.isUrgent)}
+                  className={getStatusBadgeClass(order.status, order.priority)}
                 >
                   {getStatusText(order.status)}
                 </span>
@@ -132,27 +131,18 @@ export default function OrdersSection({
                 <div className="progress-container">
                   <div
                     className="progress-bar"
-                    style={{ width: `${order.progress}%` }}
+                    style={{ width: "0%" }}
                   ></div>
                 </div>
-                <div className="progress-text">{order.progress}%</div>
+                <div className="progress-text">0%</div>
               </td>
               <td>
-                <div
-                  className={`date-cell ${
-                    order.isOverdue ? "date-overdue" : ""
-                  }`}
-                >
-                  {new Date(order.expectedEnd).toLocaleDateString("pt-BR")}
+                <div className="date-cell">
+                  {new Date(order.dueDate).toLocaleDateString("pt-BR")}
                 </div>
               </td>
               <td>
-                {order.isOverdue && (
-                  <span className="alert-icon">
-                    <FaExclamationCircle />
-                  </span>
-                )}
-                {order.isUrgent && (
+                {order.priority === "urgent" && (
                   <span className="alert-icon">
                     <FaExclamationTriangle />
                   </span>

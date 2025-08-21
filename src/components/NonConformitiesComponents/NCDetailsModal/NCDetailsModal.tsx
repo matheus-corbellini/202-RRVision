@@ -1,78 +1,11 @@
 import {
   FaTimes,
-  FaCheck,
-  FaClock,
   FaUser,
   FaComment,
   FaCheckCircle,
 } from "react-icons/fa";
+import type { NonConformity } from "../../../types/nonConformities";
 import "./NCDetailsModal.css";
-
-interface Attachment {
-  id: string;
-  name: string;
-  type: "image" | "document" | "video";
-  url: string;
-  uploadedAt: string;
-  uploadedBy: string;
-}
-
-interface NonConformityAction {
-  id: string;
-  type:
-    | "comment"
-    | "status_change"
-    | "assignment"
-    | "attachment"
-    | "resolution";
-  description: string;
-  performedBy: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  timestamp: string;
-  details?: Record<string, unknown>;
-}
-
-interface Alert {
-  id: string;
-  type: "coordinator" | "quality" | "warehouse" | "engineering" | "admin";
-  recipient: string;
-  message: string;
-  sentAt: string;
-  acknowledged: boolean;
-}
-
-interface NonConformity {
-  id: string;
-  title: string;
-  description: string;
-  category: "quality" | "safety" | "process" | "equipment" | "material";
-  severity: "low" | "medium" | "high" | "critical";
-  status: "open" | "in_progress" | "resolved" | "closed";
-  stopProduction: boolean;
-  location: {
-    sector: string;
-    station: string;
-    equipment?: string;
-  };
-  reporter: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  assignedTo?: {
-    id: string;
-    name: string;
-    role: string;
-  };
-  createdAt: string;
-  resolvedAt?: string;
-  attachments: Attachment[];
-  actions: NonConformityAction[];
-  alerts: Alert[];
-}
 
 interface NCDetailsModalProps {
   selectedNC: NonConformity | null;
@@ -156,25 +89,14 @@ export default function NCDetailsModal({
                 </div>
               </div>
 
-              {selectedNC.attachments.length > 0 && (
+              {selectedNC.attachments && selectedNC.attachments.length > 0 && (
                 <div className="info-section">
                   <h4>Anexos</h4>
                   <div className="attachments-grid">
-                    {selectedNC.attachments.map((att) => (
-                      <div key={att.id} className="attachment-item">
-                        {att.type === "image" && (
-                          <img
-                            src={att.url || "/placeholder.svg"}
-                            alt={att.name}
-                            className="attachment-preview"
-                          />
-                        )}
+                    {selectedNC.attachments.map((attName, index) => (
+                      <div key={index} className="attachment-item">
                         <div className="attachment-info">
-                          <span className="attachment-name">{att.name}</span>
-                          <span className="attachment-meta">
-                            Por {att.uploadedBy} em{" "}
-                            {new Date(att.uploadedAt).toLocaleString("pt-BR")}
-                          </span>
+                          <span className="attachment-name">{attName}</span>
                         </div>
                       </div>
                     ))}
@@ -190,13 +112,13 @@ export default function NCDetailsModal({
                   <div className="info-item">
                     <span className="info-label">Reportado por:</span>
                     <span className="info-value">
-                      {selectedNC.reporter.name}
+                      {selectedNC.reportedBy.name}
                     </span>
                   </div>
                   <div className="info-item">
                     <span className="info-label">Função:</span>
                     <span className="info-value">
-                      {selectedNC.reporter.role}
+                      {selectedNC.reportedBy.role}
                     </span>
                   </div>
                   <div className="info-item">
@@ -235,23 +157,23 @@ export default function NCDetailsModal({
               </div>
 
               <div className="info-section">
-                <h4>Alertas Enviados</h4>
-                <div className="alerts-list">
-                  {selectedNC.alerts.map((alert) => (
-                    <div
-                      key={alert.id}
-                      className={`alert-item ${
-                        alert.acknowledged ? "acknowledged" : "pending"
-                      }`}
-                    >
-                      <div className="alert-recipient">{alert.recipient}</div>
-                      <div className="alert-message">{alert.message}</div>
-                      <div className="alert-status">
-                        {alert.acknowledged ? <FaCheck /> : <FaClock />}
-                        {alert.acknowledged ? " Confirmado" : " Pendente"}
+                <h4>Comentários</h4>
+                <div className="comments-list">
+                  {selectedNC.comments && selectedNC.comments.length > 0 ? (
+                    selectedNC.comments.map((comment) => (
+                      <div key={comment.id} className="comment-item">
+                        <div className="comment-header">
+                          <span className="comment-user">{comment.userName}</span>
+                          <span className="comment-time">
+                            {new Date(comment.timestamp).toLocaleString("pt-BR")}
+                          </span>
+                        </div>
+                        <div className="comment-message">{comment.message}</div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <p>Nenhum comentário disponível</p>
+                  )}
                 </div>
               </div>
 
@@ -300,26 +222,42 @@ export default function NCDetailsModal({
           </div>
 
           <div className="nc-timeline">
-            <h4>Histórico de Ações</h4>
+            <h4>Histórico</h4>
             <div className="timeline">
-              {selectedNC.actions.map((action) => (
-                <div key={action.id} className="timeline-item">
+              <div className="timeline-item">
+                <div className="timeline-marker"></div>
+                <div className="timeline-content">
+                  <div className="timeline-header">
+                    <span className="timeline-user">
+                      {selectedNC.reportedBy.name}
+                    </span>
+                    <span className="timeline-time">
+                      {new Date(selectedNC.createdAt).toLocaleString("pt-BR")}
+                    </span>
+                  </div>
+                  <div className="timeline-description">
+                    Não conformidade criada
+                  </div>
+                </div>
+              </div>
+              {selectedNC.resolvedAt && (
+                <div className="timeline-item">
                   <div className="timeline-marker"></div>
                   <div className="timeline-content">
                     <div className="timeline-header">
                       <span className="timeline-user">
-                        {action.performedBy.name}
+                        {selectedNC.resolvedBy || "Sistema"}
                       </span>
                       <span className="timeline-time">
-                        {new Date(action.timestamp).toLocaleString("pt-BR")}
+                        {new Date(selectedNC.resolvedAt).toLocaleString("pt-BR")}
                       </span>
                     </div>
                     <div className="timeline-description">
-                      {action.description}
+                      Não conformidade resolvida
                     </div>
                   </div>
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

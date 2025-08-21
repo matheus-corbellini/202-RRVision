@@ -1,4 +1,4 @@
-import type { Alert } from "../../../../types/dashboard";
+import type { Alert } from "../../../types/dashboard";
 import "./AlertsPanel.css";
 
 interface AlertsPanelProps {
@@ -13,12 +13,12 @@ export default function AlertsPanel({ alerts }: AlertsPanelProps) {
       </div>
       <div className="panel-content">
         {alerts.map((alert) => (
-          <div key={alert.id} className={`alert-item ${alert.type}`}>
+          <div key={alert.id} className={`alert-item ${alert.severity}`}>
             <div className="alert-content">
               <h4>{alert.title}</h4>
-              <p>{alert.message}</p>
+              <p>{alert.description}</p>
             </div>
-            <span className="alert-timestamp">{alert.timestamp}</span>
+            <span className="alert-timestamp">{alert.createdAt}</span>
           </div>
         ))}
       </div>

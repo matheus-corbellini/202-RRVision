@@ -17,32 +17,24 @@ import type {
   NonConformityFilters,
 } from "../../types/nonConformities";
 
-interface Alert {
-  id: string;
-  type: "coordinator" | "quality" | "warehouse" | "engineering" | "admin";
-  recipient: string;
-  message: string;
-  sentAt: string;
-  acknowledged: boolean;
-}
-
 export default function NonConformities() {
   const { user } = useAuth();
   const [nonConformities, setNonConformities] = useState<NonConformity[]>([]);
   const [selectedNC, setSelectedNC] = useState<NonConformity | null>(null);
   const [showNewNCModal, setShowNewNCModal] = useState(false);
   const [filters, setFilters] = useState<NonConformityFilters>({
-    filterStatus: "all",
-    filterCategory: "all",
-    filterSeverity: "all",
-    filterLocation: "all",
-    showOnlyMyNCs: false,
-    showOnlyCritical: false,
+    status: [],
+    severity: [],
+    priority: [],
+    category: [],
+    sector: [],
+    assignedTo: undefined,
+    dateRange: undefined,
   });
   const [newNC, setNewNC] = useState({
     title: "",
     description: "",
-    category: "quality" as NonConformity["category"],
+    category: "quality" as "quality" | "safety" | "process" | "equipment" | "material",
     severity: "medium" as NonConformity["severity"],
     stopProduction: false,
     sector: "",
@@ -61,14 +53,14 @@ export default function NonConformities() {
           "Durante a inspeção de qualidade, foi identificado que 5 peças estão com dimensões 2mm acima do especificado no desenho técnico. Possível problema no setup da máquina de corte.",
         category: "quality",
         severity: "high",
-        status: "in_progress",
-        stopProduction: true,
+        priority: "high",
+        status: "investigating",
         location: {
           sector: "Corte",
           station: "Estação 02",
           equipment: "Serra CNC-001",
         },
-        reporter: {
+        reportedBy: {
           id: "op-001",
           name: "João Silva",
           role: "Operador",
@@ -78,93 +70,12 @@ export default function NonConformities() {
           name: "Maria Santos",
           role: "Coordenador Qualidade",
         },
-        relatedTask: {
-          taskId: "task-001",
-          taskName: "Corte de Peças",
-          orderId: "OP-2024-001",
-        },
+
         createdAt: "2024-01-20T10:30:00",
         updatedAt: "2024-01-20T11:15:00",
         attachments: [
-          {
-            id: "att-001",
-            name: "peca_defeituosa.jpg",
-            type: "image",
-            url: "/placeholder.svg?height=200&width=300",
-            uploadedAt: "2024-01-20T10:35:00",
-            uploadedBy: "João Silva",
-          },
-          {
-            id: "att-002",
-            name: "medicao_dimensional.pdf",
-            type: "document",
-            url: "#",
-            uploadedAt: "2024-01-20T10:40:00",
-            uploadedBy: "João Silva",
-          },
-        ],
-        actions: [
-          {
-            id: "act-001",
-            type: "comment",
-            description:
-              "Produção interrompida conforme procedimento. Aguardando análise da qualidade.",
-            performedBy: {
-              id: "op-001",
-              name: "João Silva",
-              role: "Operador",
-            },
-            timestamp: "2024-01-20T10:30:00",
-          },
-          {
-            id: "act-002",
-            type: "assignment",
-            description: "Não conformidade atribuída para análise",
-            performedBy: {
-              id: "coord-001",
-              name: "Pedro Costa",
-              role: "Coordenador Produção",
-            },
-            timestamp: "2024-01-20T10:45:00",
-          },
-          {
-            id: "act-003",
-            type: "comment",
-            description:
-              "Verificando calibração da máquina. Setup será refeito.",
-            performedBy: {
-              id: "qc-001",
-              name: "Maria Santos",
-              role: "Coordenador Qualidade",
-            },
-            timestamp: "2024-01-20T11:15:00",
-          },
-        ],
-        alerts: [
-          {
-            id: "alert-001",
-            type: "coordinator",
-            recipient: "Pedro Costa",
-            message: "Nova não conformidade crítica - Produção parada",
-            sentAt: "2024-01-20T10:30:00",
-            acknowledged: true,
-          },
-          {
-            id: "alert-002",
-            type: "quality",
-            recipient: "Maria Santos",
-            message: "Não conformidade de qualidade requer análise imediata",
-            sentAt: "2024-01-20T10:31:00",
-            acknowledged: true,
-          },
-          {
-            id: "alert-003",
-            type: "engineering",
-            recipient: "Carlos Oliveira",
-            message: "Possível problema técnico no equipamento CNC-001",
-            sentAt: "2024-01-20T10:32:00",
-            acknowledged: false,
-          },
+          "peca_defeituosa.jpg",
+          "medicao_dimensional.pdf",
         ],
       },
       {
@@ -174,13 +85,13 @@ export default function NonConformities() {
           "Identificado risco na matéria-prima recebida. Manchas e riscos visíveis que podem comprometer o acabamento final.",
         category: "material",
         severity: "medium",
+        priority: "medium",
         status: "resolved",
-        stopProduction: false,
         location: {
           sector: "Recebimento",
           station: "Dock 01",
         },
-        reporter: {
+        reportedBy: {
           id: "op-002",
           name: "Ana Oliveira",
           role: "Operador",
@@ -194,50 +105,7 @@ export default function NonConformities() {
         updatedAt: "2024-01-19T16:45:00",
         resolvedAt: "2024-01-19T16:45:00",
         attachments: [
-          {
-            id: "att-003",
-            name: "material_defeituoso.jpg",
-            type: "image",
-            url: "/placeholder.svg?height=200&width=300",
-            uploadedAt: "2024-01-19T14:25:00",
-            uploadedBy: "Ana Oliveira",
-          },
-        ],
-        actions: [
-          {
-            id: "act-004",
-            type: "comment",
-            description:
-              "Material segregado para análise. Produção continua com estoque reserva.",
-            performedBy: {
-              id: "op-002",
-              name: "Ana Oliveira",
-              role: "Operador",
-            },
-            timestamp: "2024-01-19T14:20:00",
-          },
-          {
-            id: "act-005",
-            type: "resolution",
-            description:
-              "Material devolvido ao fornecedor. Lote substituto aprovado pela qualidade.",
-            performedBy: {
-              id: "wh-001",
-              name: "Roberto Lima",
-              role: "Supervisor Almoxarifado",
-            },
-            timestamp: "2024-01-19T16:45:00",
-          },
-        ],
-        alerts: [
-          {
-            id: "alert-004",
-            type: "warehouse",
-            recipient: "Roberto Lima",
-            message: "Material com não conformidade - Verificar fornecedor",
-            sentAt: "2024-01-19T14:21:00",
-            acknowledged: true,
-          },
+          "material_defeituoso.jpg",
         ],
       },
       {
@@ -247,14 +115,14 @@ export default function NonConformities() {
           "Compressor apresentando ruído excessivo e vibração. Pode indicar problema mecânico que requer manutenção preventiva.",
         category: "equipment",
         severity: "low",
+        priority: "low",
         status: "open",
-        stopProduction: false,
         location: {
           sector: "Montagem",
           station: "Linha 03",
           equipment: "Compressor CP-005",
         },
-        reporter: {
+        reportedBy: {
           id: "op-003",
           name: "Carlos Mendes",
           role: "Operador",
@@ -262,30 +130,6 @@ export default function NonConformities() {
         createdAt: "2024-01-20T08:15:00",
         updatedAt: "2024-01-20T08:15:00",
         attachments: [],
-        actions: [
-          {
-            id: "act-006",
-            type: "comment",
-            description:
-              "Equipamento funcionando mas com ruído anormal. Solicitando verificação da manutenção.",
-            performedBy: {
-              id: "op-003",
-              name: "Carlos Mendes",
-              role: "Operador",
-            },
-            timestamp: "2024-01-20T08:15:00",
-          },
-        ],
-        alerts: [
-          {
-            id: "alert-005",
-            type: "engineering",
-            recipient: "Equipe Manutenção",
-            message: "Equipamento requer verificação - Ruído anormal",
-            sentAt: "2024-01-20T08:16:00",
-            acknowledged: false,
-          },
-        ],
       },
     ];
 
@@ -299,41 +143,21 @@ export default function NonConformities() {
       description: newNC.description,
       category: newNC.category,
       severity: newNC.severity,
+      priority: "medium", // Default priority
       status: "open",
-      stopProduction: newNC.stopProduction,
       location: {
         sector: newNC.sector,
         station: newNC.station,
         equipment: newNC.equipment || undefined,
       },
-      reporter: {
-        id: user?.uid || "current-user",
+      reportedBy: {
+        id: user?.id || "current-user",
         name: user?.name || user?.displayName || "Usuário Atual",
         role: "Operador",
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       attachments: [],
-      actions: [
-        {
-          id: `act-${Date.now()}`,
-          type: "comment",
-          description: `Não conformidade registrada${
-            newNC.stopProduction ? " - Produção interrompida" : ""
-          }`,
-          performedBy: {
-            id: user?.uid || "current-user",
-            name: user?.name || user?.displayName || "Usuário Atual",
-            role: "Operador",
-          },
-          timestamp: new Date().toISOString(),
-        },
-      ],
-      alerts: generateAlerts(
-        newNC.category,
-        newNC.severity,
-        newNC.stopProduction
-      ),
     };
 
     setNonConformities((prev) => [newNonConformity, ...prev]);
@@ -341,7 +165,7 @@ export default function NonConformities() {
     setNewNC({
       title: "",
       description: "",
-      category: "quality",
+      category: "quality" as "quality" | "safety" | "process" | "equipment" | "material",
       severity: "medium",
       stopProduction: false,
       sector: "",
@@ -351,62 +175,7 @@ export default function NonConformities() {
     });
   };
 
-  const generateAlerts = (
-    category: string,
-    severity: string,
-    stopProduction: boolean
-  ): Alert[] => {
-    const alerts: Alert[] = [];
-    const timestamp = new Date().toISOString();
 
-    // Sempre alerta coordenador de produção
-    alerts.push({
-      id: `alert-${Date.now()}-1`,
-      type: "coordinator",
-      recipient: "Coordenador Produção",
-      message: `Nova não conformidade ${severity}${
-        stopProduction ? " - Produção parada" : ""
-      }`,
-      sentAt: timestamp,
-      acknowledged: false,
-    });
-
-    // Alertas específicos por categoria
-    switch (category) {
-      case "quality":
-        alerts.push({
-          id: `alert-${Date.now()}-2`,
-          type: "quality",
-          recipient: "Coordenador Qualidade",
-          message: "Não conformidade de qualidade requer análise",
-          sentAt: timestamp,
-          acknowledged: false,
-        });
-        break;
-      case "material":
-        alerts.push({
-          id: `alert-${Date.now()}-3`,
-          type: "warehouse",
-          recipient: "Supervisor Almoxarifado",
-          message: "Problema com material - Verificar fornecedor",
-          sentAt: timestamp,
-          acknowledged: false,
-        });
-        break;
-      case "equipment":
-        alerts.push({
-          id: `alert-${Date.now()}-4`,
-          type: "engineering",
-          recipient: "Equipe Manutenção",
-          message: "Equipamento com problema - Verificação necessária",
-          sentAt: timestamp,
-          acknowledged: false,
-        });
-        break;
-    }
-
-    return alerts;
-  };
 
   const handleAssignNC = (
     ncId: string,
@@ -424,56 +193,28 @@ export default function NonConformities() {
                 name: assigneeName,
                 role: assigneeRole,
               },
-              status: "in_progress" as const,
+              status: "investigating" as const,
               updatedAt: new Date().toISOString(),
-              actions: [
-                ...nc.actions,
-                {
-                  id: `act-${Date.now()}`,
-                  type: "assignment",
-                  description: `Atribuído para ${assigneeName}`,
-                  performedBy: {
-                    id: user?.uid || "current-user",
-                    name: user?.name || user?.displayName || "Usuário Atual",
-                    role: "Coordenador",
-                  },
-                  timestamp: new Date().toISOString(),
-                },
-              ],
             }
           : nc
       )
     );
   };
 
-  const handleAddComment = (ncId: string, comment: string) => {
+  const handleAddComment = (ncId: string, _comment: string) => {
     setNonConformities((prev) =>
       prev.map((nc) =>
         nc.id === ncId
           ? {
               ...nc,
               updatedAt: new Date().toISOString(),
-              actions: [
-                ...nc.actions,
-                {
-                  id: `act-${Date.now()}`,
-                  type: "comment",
-                  description: comment,
-                  performedBy: {
-                    id: user?.uid || "current-user",
-                    name: user?.name || user?.displayName || "Usuário Atual",
-                    role: "Operador",
-                  },
-                  timestamp: new Date().toISOString(),
-                },
-              ],
             }
           : nc
       )
     );
   };
 
-  const handleResolveNC = (ncId: string, resolution: string) => {
+  const handleResolveNC = (ncId: string, _resolution: string) => {
     setNonConformities((prev) =>
       prev.map((nc) =>
         nc.id === ncId
@@ -482,20 +223,6 @@ export default function NonConformities() {
               status: "resolved" as const,
               resolvedAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
-              actions: [
-                ...nc.actions,
-                {
-                  id: `act-${Date.now()}`,
-                  type: "resolution",
-                  description: resolution,
-                  performedBy: {
-                    id: user?.uid || "current-user",
-                    name: user?.name || user?.displayName || "Usuário Atual",
-                    role: "Responsável",
-                  },
-                  timestamp: new Date().toISOString(),
-                },
-              ],
             }
           : nc
       )
@@ -521,7 +248,7 @@ export default function NonConformities() {
     switch (status) {
       case "open":
         return "#f56565";
-      case "in_progress":
+      case "investigating":
         return "#fbb040";
       case "resolved":
         return "#48bb78";
@@ -550,16 +277,21 @@ export default function NonConformities() {
   };
 
   const filteredNCs = nonConformities.filter((nc) => {
-    if (filters.filterStatus !== "all" && nc.status !== filters.filterStatus)
+    if (filters.status && filters.status.length > 0 && !filters.status.includes(nc.status))
       return false;
     if (
-      filters.filterSeverity !== "all" &&
-      nc.severity !== filters.filterSeverity
+      filters.severity && filters.severity.length > 0 &&
+      !filters.severity.includes(nc.severity)
     )
       return false;
     if (
-      filters.filterCategory !== "all" &&
-      nc.category !== filters.filterCategory
+      filters.category && filters.category.length > 0 &&
+      !filters.category.includes(nc.category)
+    )
+      return false;
+    if (
+      filters.sector && filters.sector.length > 0 &&
+      !filters.sector.includes(nc.location.sector)
     )
       return false;
     return true;
@@ -567,19 +299,26 @@ export default function NonConformities() {
 
   // Calcular estatísticas
   const stats: NonConformityStats = {
-    open: nonConformities.filter((nc) => nc.status === "open").length,
-    inProgress: nonConformities.filter((nc) => nc.status === "in_progress")
-      .length,
-    resolved: nonConformities.filter((nc) => nc.status === "resolved").length,
-    critical: nonConformities.filter(
-      (nc) => nc.severity === "critical" || nc.severity === "high"
-    ).length,
     total: nonConformities.length,
+    open: nonConformities.filter((nc) => nc.status === "open").length,
+    investigating: nonConformities.filter((nc) => nc.status === "investigating").length,
+    resolved: nonConformities.filter((nc) => nc.status === "resolved").length,
+    closed: nonConformities.filter((nc) => nc.status === "closed").length,
+    bySeverity: {
+      low: nonConformities.filter((nc) => nc.severity === "low").length,
+      medium: nonConformities.filter((nc) => nc.severity === "medium").length,
+      high: nonConformities.filter((nc) => nc.severity === "high").length,
+      critical: nonConformities.filter((nc) => nc.severity === "critical").length,
+    },
+    byPriority: {
+      low: nonConformities.filter((nc) => nc.priority === "low").length,
+      medium: nonConformities.filter((nc) => nc.priority === "medium").length,
+      high: nonConformities.filter((nc) => nc.priority === "high").length,
+      urgent: nonConformities.filter((nc) => nc.priority === "urgent").length,
+    },
   };
 
-  const productionStoppedCount = nonConformities.filter(
-    (nc) => nc.stopProduction && nc.status !== "resolved"
-  ).length;
+  const productionStoppedCount = 0; // No stopProduction property in NonConformity type
 
   return (
     <div className="nc-page">

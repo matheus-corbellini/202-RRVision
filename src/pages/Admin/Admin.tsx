@@ -10,7 +10,7 @@ import {
 	deleteUserRecord,
 	createUserRecord,
 } from "../../services/dataService";
-import type { User, UserRole } from "../../types";
+import type { User, UserRoleType } from "../../types";
 import "./Admin.css";
 
 export default function Admin() {
@@ -98,19 +98,21 @@ export default function Admin() {
 	const handleSave = async (data: Partial<User>) => {
 		try {
 			setError(null);
-			if (editing && editing.uid) {
-				await updateUserRecord(editing.uid, data);
+			if (editing && editing.id) {
+				await updateUserRecord(editing.id, data);
 			} else {
 				// cria apenas documento; criação de credencial deve ser feita fora (Firebase Auth)
 				await createUserRecord({
+					id: "", // Será gerado automaticamente
 					email: data.email || "",
-					name: data.name,
+					name: data.name || "",
 					company: data.company,
 					phone: data.phone,
 					displayName: data.displayName,
 					photoURL: data.photoURL,
 					emailVerified: false,
-					role: (data.role as UserRole) || "user",
+					userType: "user",
+					role: (data.role as UserRoleType) || "user",
 				});
 			}
 			setModalOpen(false);
@@ -203,7 +205,7 @@ export default function Admin() {
 							>
 								<div style={{ transform: `translateY(${offsetY}px)` }}>
 									{visibleRows.map((u) => (
-										<div key={u.uid} className="table-row">
+										<div key={u.id} className="table-row">
 											<div>{u.name || u.displayName || "—"}</div>
 											<div>{u.email}</div>
 											<div>{u.company || "—"}</div>
@@ -225,7 +227,7 @@ export default function Admin() {
 												</button>
 												<button
 													className="link danger"
-													onClick={() => handleDelete(u.uid)}
+													onClick={() => handleDelete(u.id)}
 												>
 													Remover
 												</button>

@@ -4,7 +4,7 @@ import {
   FaExclamationTriangle,
   FaIndustry,
 } from "react-icons/fa";
-import type { DashboardStats as StatsData } from "../../../../types/dashboard";
+import type { DashboardStats as StatsData } from "../../../types/dashboard";
 import "./DashboardStats.css";
 
 interface StatCardProps {
@@ -36,30 +36,30 @@ export default function DashboardStats({ stats }: DashboardStatsProps) {
   return (
     <div className="dashboard-stats">
       <StatCard
-        title="Pedidos Ativos"
+        title="Total de Pedidos"
         icon={<FaClipboardList />}
-        value={stats.activeOrders}
+        value={stats.totalOrders}
         change="+2 hoje"
         changeType="positive"
       />
       <StatCard
-        title="Eficiência Média"
+        title="Produtividade"
         icon={<FaBolt />}
-        value={`${stats.averageEfficiency}%`}
+        value={`${stats.productivity}%`}
         change="+3% esta semana"
         changeType="positive"
       />
       <StatCard
-        title="Pedidos Urgentes"
+        title="Pedidos Pendentes"
         icon={<FaExclamationTriangle />}
-        value={stats.urgentOrders}
+        value={stats.pendingOrders}
         change="Atenção necessária"
         changeType="negative"
       />
       <StatCard
-        title="Setores Ativos"
+        title="Eficiência"
         icon={<FaIndustry />}
-        value={stats.activeSectors}
+        value={`${stats.efficiency}%`}
         change="Operação normal"
         changeType="positive"
       />

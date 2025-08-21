@@ -12,27 +12,22 @@ import {
 	loginUser,
 	registerUser,
 	logoutUser,
-	resetPassword,
-	updateUserProfile,
 	convertFirebaseUser,
 } from "../services/authService";
 import type { AuthContextType, AuthUser, RegisterData } from "../types";
 
-// Define AuthState interface locally since it's not exported from types
 interface AuthState {
 	user: AuthUser | null;
 	loading: boolean;
 	error: string | null;
 }
 
-// Initial state
 const initialState: AuthState = {
 	user: null,
 	loading: true,
 	error: null,
 };
 
-// Actions - Using const assertions for better type inference
 const AUTH_ACTIONS = {
 	SET_LOADING: "SET_LOADING",
 	SET_USER: "SET_USER",
@@ -194,45 +189,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		}
 	}, [setLoading, clearError, setUser, setError]);
 
-	// Reset password function - Memoized
-	const handleResetPassword = useCallback(
-		async (email: string): Promise<void> => {
-			clearError();
 
-			try {
-				await resetPassword(email);
-			} catch (error) {
-				const errorMessage =
-					error instanceof Error ? error.message : "Password reset failed";
-				setError(errorMessage);
-				throw error;
-			}
-		},
-		[clearError, setError]
-	);
 
-	// Update profile function - Memoized
-	const updateProfile = useCallback(
-		async (userData: Partial<AuthUser>): Promise<void> => {
-			clearError();
 
-			try {
-				await updateUserProfile(userData);
-
-				// Update the user in context if currently logged in
-				if (state.user) {
-					const updatedUser = { ...state.user, ...userData };
-					setUser(updatedUser);
-				}
-			} catch (error) {
-				const errorMessage =
-					error instanceof Error ? error.message : "Profile update failed";
-				setError(errorMessage);
-				throw error;
-			}
-		},
-		[clearError, setError, setUser, state.user]
-	);
 
 	// Memoized context value to prevent unnecessary re-renders
 	const contextValue = useMemo<AuthContextType>(
@@ -246,10 +205,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 		[state.user, state.loading, login, register, logout]
 	);
 
-	// Memoized utility functions
-	const getCurrentUser = useCallback((): AuthUser | null => {
-		return state.user;
-	}, [state.user]);
+
 
 	const isAuthenticated = useCallback((): boolean => {
 		return state.user !== null;

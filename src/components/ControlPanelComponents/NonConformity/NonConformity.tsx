@@ -7,19 +7,19 @@ import {
   FaCheckCircle,
   FaExclamationTriangle,
 } from "react-icons/fa";
-import type { NonConformityStats } from "../../../../types/nonConformities";
+import type { NonConformityStats } from "../../../types/nonConformities";
 
 interface NonConformityProps {
   data: NonConformityStats;
 }
 
 export default function NonConformity({ data }: NonConformityProps) {
-  const total = data.open + data.inProgress + data.resolved;
-  const criticalPercentage = total > 0 ? (data.critical / total) * 100 : 0;
+  const total = data.open + data.investigating + data.resolved;
+  const criticalPercentage = total > 0 ? (data.bySeverity.critical / total) * 100 : 0;
 
   const getStatusColor = () => {
-    if (data.critical > 5) return "#e53e3e";
-    if (data.critical > 2) return "#ed8936";
+    if (data.bySeverity.critical > 5) return "#e53e3e";
+    if (data.bySeverity.critical > 2) return "#ed8936";
     return "#48bb78";
   };
 
@@ -32,7 +32,7 @@ export default function NonConformity({ data }: NonConformityProps) {
           style={{ backgroundColor: getStatusColor() }}
         >
           <FaExclamationCircle />
-          <span>{data.critical} criticas</span>
+          <span>{data.bySeverity.critical} criticas</span>
         </div>
       </div>
 
@@ -73,7 +73,7 @@ export default function NonConformity({ data }: NonConformityProps) {
             <FaClock />
           </div>
           <div className="card-content">
-            <span className="card-number">{data.inProgress}</span>
+            <span className="card-number">{data.investigating}</span>
             <span className="card-label">Em Andamento</span>
           </div>
         </div>

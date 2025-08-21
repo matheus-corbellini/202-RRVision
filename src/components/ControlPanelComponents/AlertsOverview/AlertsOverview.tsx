@@ -7,11 +7,8 @@ import {
   FaCheck,
   FaStop,
   FaExclamationCircle,
-  FaClock,
-  FaTools,
-  FaBox,
 } from "react-icons/fa";
-import type { ProductionAlert } from "../../../../types/alerts";
+import type { ProductionAlert } from "../../../types/alerts";
 
 interface AlertsOverviewProps {
   alerts: ProductionAlert[];
@@ -22,22 +19,16 @@ export default function AlertsOverview({
   alerts,
   onAcknowledge,
 }: AlertsOverviewProps) {
-  const getIcon = (type: string) => {
-    switch (type) {
-      case "production_stop":
+  const getIcon = (severity: string) => {
+    switch (severity) {
+      case "critical":
         return <FaStop />;
-      case "non_conformity":
+      case "high":
         return <FaExclamationTriangle />;
-      case "priority_change":
+      case "medium":
         return <FaExclamationCircle />;
-      case "delay":
-        return <FaClock />;
-      case "quality":
-        return <FaExclamationTriangle />;
-      case "maintenance":
-        return <FaTools />;
-      case "material":
-        return <FaBox />;
+      case "low":
+        return <FaInfoCircle />;
       default:
         return <FaInfoCircle />;
     }
@@ -121,7 +112,7 @@ export default function AlertsOverview({
                       className={`alert-item ${alert.severity} unacknowledged`}
                       key={alert.id}
                     >
-                      <div className="alert-icon">{getIcon(alert.type)}</div>
+                      <div className="alert-icon">{getIcon(alert.severity)}</div>
                       <div className="alert-content">
                         <div className="alert-header">
                           <h4>{alert.title}</h4>
@@ -130,7 +121,7 @@ export default function AlertsOverview({
                           </span>
                         </div>
 
-                        <p className="alert-message">{alert.message}</p>
+                        <p className="alert-message">{alert.description}</p>
 
                         <div className="alert-details">
                           <span className="alert-location">
@@ -169,7 +160,7 @@ export default function AlertsOverview({
                       key={alert.id}
                       className={`alert-item ${alert.severity} acknowledged`}
                     >
-                      <div className="alert-icon">{getIcon(alert.type)}</div>
+                      <div className="alert-icon">{getIcon(alert.severity)}</div>
 
                       <div className="alert-content">
                         <div className="alert-header">
@@ -179,7 +170,7 @@ export default function AlertsOverview({
                           </span>
                         </div>
 
-                        <p className="alert-message">{alert.message}</p>
+                        <p className="alert-message">{alert.description}</p>
 
                         <div className="alert-details">
                           <span className="alert-location">

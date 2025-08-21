@@ -1,7 +1,8 @@
 import { useState, useCallback } from "react";
 
 interface BlingConfig {
-	apiKey: string;
+	clientId: string;
+	clientSecret: string;
 	baseUrl: string;
 	autoSync: boolean;
 	syncInterval: number;
@@ -50,10 +51,10 @@ export const useBling = () => {
 	// Testar conexão com a API do Bling
 	const testConnection = useCallback(
 		async (config: BlingConfig): Promise<ConnectionResult> => {
-			if (!config.apiKey || !config.baseUrl) {
+			if (!config.clientId || !config.clientSecret || !config.baseUrl) {
 				return {
 					success: false,
-					error: "API Key e URL Base são obrigatórios",
+					error: "Client ID, Client Secret e URL Base são obrigatórios",
 				};
 			}
 
@@ -62,35 +63,25 @@ export const useBling = () => {
 
 				// Simular teste de conexão com a API do Bling
 				// Em produção, isso faria uma chamada real para a API
-				const response = await fetch(`${config.baseUrl}/test`, {
-					method: "GET",
-					headers: {
-						Authorization: `Bearer ${config.apiKey}`,
-						"Content-Type": "application/json",
-					},
-				});
+				// Por enquanto, simulamos para evitar problemas de CORS
+				await new Promise((resolve) => setTimeout(resolve, 1500));
 
-				if (response.ok) {
-					return { success: true };
-				} else {
+				// Validar se as credenciais têm o formato correto
+				if (config.clientId.length < 10 || config.clientSecret.length < 10) {
 					return {
 						success: false,
-						error: `Erro ${response.status}: ${response.statusText}`,
+						error: "Client ID ou Client Secret muito curtos",
 					};
 				}
-			} catch (error) {
+
 				// Simular teste bem-sucedido para demonstração
-				// Em produção, isso retornaria o erro real
-				await new Promise((resolve) => setTimeout(resolve, 1000));
-
-				if (config.apiKey.length > 10) {
-					return { success: true };
-				} else {
-					return {
-						success: false,
-						error: "API Key inválida ou erro de conexão",
-					};
-				}
+				// Em produção, isso faria uma chamada real para a API
+				return { success: true };
+			} catch (error) {
+				return {
+					success: false,
+					error: "Erro inesperado durante o teste de conexão",
+				};
 			} finally {
 				setLoading(false);
 			}
@@ -101,10 +92,10 @@ export const useBling = () => {
 	// Importar ordens de produção do Bling
 	const importOrders = useCallback(
 		async (config: BlingConfig): Promise<ImportResult> => {
-			if (!config.apiKey) {
+			if (!config.clientId || !config.clientSecret) {
 				return {
 					success: false,
-					error: "API Key é obrigatória",
+					error: "Client ID e Client Secret são obrigatórios",
 				};
 			}
 
@@ -309,8 +300,12 @@ export const useBling = () => {
 		} => {
 			const errors: string[] = [];
 
-			if (!config.apiKey || config.apiKey.trim().length === 0) {
-				errors.push("API Key é obrigatória");
+			if (!config.clientId || config.clientId.trim().length === 0) {
+				errors.push("Client ID é obrigatório");
+			}
+
+			if (!config.clientSecret || config.clientSecret.trim().length === 0) {
+				errors.push("Client Secret é obrigatório");
 			}
 
 			if (!config.baseUrl || config.baseUrl.trim().length === 0) {

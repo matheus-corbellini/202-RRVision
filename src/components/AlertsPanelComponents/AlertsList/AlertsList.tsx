@@ -14,7 +14,7 @@ import {
   FaBox,
   FaBell,
 } from "react-icons/fa";
-import type { ProductionAlert } from "../../../../types";
+import type { ProductionAlert } from "../../../types/alerts";
 import "./AlertsList.css";
 
 type Alert = ProductionAlert;
@@ -105,13 +105,13 @@ export default function AlertsList({
   };
 
   const isUserRecipient = (alert: Alert) => {
-    return alert.recipients.some((r) => r.id === currentUserId);
+    return alert.recipients.some((r: { id: string }) => r.id === currentUserId);
   };
 
   const isAcknowledgedByUser = (alert: Alert) => {
     return (
       currentUserId &&
-      alert.recipients.some((r) => r.id === currentUserId && r.acknowledged)
+      alert.recipients.some((r: { id: string; acknowledged: boolean }) => r.id === currentUserId && r.acknowledged)
     );
   };
 
@@ -131,8 +131,8 @@ export default function AlertsList({
           >
             <div className="alert-header">
               <div className="alert-type">
-                <span className="type-icon">{getTypeIcon(alert.type)}</span>
-                <span className="type-label">{getTypeLabel(alert.type)}</span>
+                <span className="type-icon">{getTypeIcon(alert.severity)}</span>
+                <span className="type-label">{getTypeLabel(alert.severity)}</span>
               </div>
               <div className="alert-badges">
                 <span
@@ -152,7 +152,7 @@ export default function AlertsList({
 
             <div className="alert-content">
               <h4 className="alert-title">{alert.title}</h4>
-              <p className="alert-message">{alert.message}</p>
+              <p className="alert-message">{alert.description}</p>
 
               <div className="alert-details">
                 <div className="detail-item">
@@ -174,9 +174,9 @@ export default function AlertsList({
                 </div>
               </div>
 
-              {alert.tags.length > 0 && (
+              {alert.tags && alert.tags.length > 0 && (
                 <div className="alert-tags">
-                  {alert.tags.map((tag, index) => (
+                  {alert.tags.map((tag: string, index: number) => (
                     <span key={index} className="tag">
                       {tag}
                     </span>

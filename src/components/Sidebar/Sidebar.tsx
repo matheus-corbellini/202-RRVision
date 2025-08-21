@@ -16,7 +16,8 @@ import {
 	FaUsersCog,
 	FaUserPlus,
 	FaUsers,
-	FaApi,
+	FaPlug,
+	FaRoute,
 } from "react-icons/fa";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useAuth } from "../../hooks/useAuth";
@@ -119,8 +120,22 @@ export default function Sidebar({
 		{
 			id: "bling-integration",
 			title: "Integração Bling",
-			icon: <FaApi />,
+			icon: <FaPlug />,
 			description: "API e Importação de Ordens",
+			badge: null,
+		},
+		{
+			id: "operational-routes",
+			title: "Roteiros Operacionais",
+			icon: <FaRoute />,
+			description: "Cadastro de Roteiros de Produção",
+			badge: null,
+		},
+		{
+			id: "operational-routes-list",
+			title: "Lista de Roteiros",
+			icon: <FaRoute />,
+			description: "Visualizar Todos os Roteiros",
 			badge: null,
 		},
 	];

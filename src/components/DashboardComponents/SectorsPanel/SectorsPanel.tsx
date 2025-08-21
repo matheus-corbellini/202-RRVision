@@ -1,4 +1,4 @@
-import type { Sector } from "../../../../types/dashboard";
+import type { Sector } from "../../../types/sectors";
 import "./SectorsPanel.css";
 
 interface SectorsPanelProps {
@@ -10,6 +10,8 @@ export default function SectorsPanel({ sectors }: SectorsPanelProps) {
     switch (status) {
       case "active":
         return "Ativo";
+      case "inactive":
+        return "Inativo";
       case "idle":
         return "Ocioso";
       case "blocked":
@@ -30,13 +32,12 @@ export default function SectorsPanel({ sectors }: SectorsPanelProps) {
             <div className="sector-info">
               <h4>{sector.name}</h4>
               <p>
-                Eficiência: {sector.efficiency}% | Pedidos:{" "}
-                {sector.activeOrders}
+                Código: {sector.code} | Descrição: {sector.description}
               </p>
             </div>
             <div className="sector-status">
-              <div className={`status-indicator status-${sector.status}`}></div>
-              <span>{getStatusText(sector.status)}</span>
+              <div className={`status-indicator status-${sector.isActive ? "active" : "inactive"}`}></div>
+              <span>{getStatusText(sector.isActive ? "active" : "inactive")}</span>
             </div>
           </div>
         ))}

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "../../hooks/useAuth";
 import { useBling } from "../../hooks/useBling";
 import Button from "../../components/Button/Button";
 import Input from "../../components/Input/Input";
@@ -12,27 +11,14 @@ import {
 	FaSync,
 	FaCheckCircle,
 	FaExclamationTriangle,
-	FaTimes,
-	FaEye,
 	FaFileAlt,
 	FaDatabase,
-	FaApi,
+	FaPlug,
 	FaClock,
-	FaUser,
 } from "react-icons/fa";
 import "./BlingIntegration.css";
 
-interface BlingOrder {
-	id: string;
-	number: string;
-	customer: string;
-	product: string;
-	quantity: number;
-	status: string;
-	createdAt: string;
-	importedAt?: string;
-	importedBy?: string;
-}
+
 
 interface ImportLog {
 	id: string;
@@ -45,7 +31,8 @@ interface ImportLog {
 }
 
 interface BlingConfig {
-	apiKey: string;
+	clientId: string;
+	clientSecret: string;
 	baseUrl: string;
 	autoSync: boolean;
 	syncInterval: number;
@@ -54,7 +41,6 @@ interface BlingConfig {
 }
 
 export default function BlingIntegration() {
-	const { user } = useAuth();
 	const {
 		testConnection,
 		importOrders,
@@ -64,15 +50,14 @@ export default function BlingIntegration() {
 	} = useBling();
 
 	const [config, setConfig] = useState<BlingConfig>({
-		apiKey: "",
-		baseUrl: "https://bling.com.br/Api/v2",
+		clientId: "bb038bbf8baa2108a9e5c31b409338ef03cc93a0",
+		clientSecret: "5602db5f1ddfccf5894336d514cdfae102111c9cb4cbfc788c8bc4d771f6",
+		baseUrl: "https://www.bling.com.br/Api/v2",
 		autoSync: false,
 		syncInterval: 30,
 	});
 
-	const [orders, setOrders] = useState<BlingOrder[]>([]);
 	const [importLogs, setImportLogs] = useState<ImportLog[]>([]);
-	const [loading, setLoading] = useState(false);
 	const [testing, setTesting] = useState(false);
 	const [importing, setImporting] = useState(false);
 	const [activeTab, setActiveTab] = useState<
@@ -87,11 +72,31 @@ export default function BlingIntegration() {
 		loadInitialData();
 	}, []);
 
+	// Monitorar mudanças na configuração para debug
+	useEffect(() => {
+		console.log("Configuração atualizada:", config);
+		console.log("Botão desabilitado:", !config.clientId || !config.clientSecret);
+		console.log("Client ID:", config.clientId);
+		console.log("Client Secret:", config.clientSecret);
+	}, [config]);
+
 	const loadInitialData = async () => {
 		try {
+			console.log("Carregando dados iniciais...");
+			console.log("Configuração atual:", config);
+			
 			const savedConfig = await getConfiguration();
+			console.log("Configuração salva:", savedConfig);
+			
 			if (savedConfig) {
-				setConfig(savedConfig);
+				// Mesclar configuração salva com valores padrão para garantir que as credenciais não sejam perdidas
+				setConfig(prev => ({
+					...prev,
+					...savedConfig,
+					// Manter as credenciais padrão se não estiverem na configuração salva
+					clientId: savedConfig.clientId || prev.clientId,
+					clientSecret: savedConfig.clientSecret || prev.clientSecret,
+				}));
 			}
 
 			const history = await getImportHistory();
@@ -104,9 +109,16 @@ export default function BlingIntegration() {
 	};
 
 	const handleTestConnection = async () => {
+		console.log("Botão clicado! Função handleTestConnection chamada");
+		console.log("Estado atual - testing:", testing);
+		console.log("Estado atual - config:", config);
+		console.log("Client ID válido:", !!config.clientId);
+		console.log("Client Secret válido:", !!config.clientSecret);
+		
 		setTesting(true);
 		try {
 			const result = await testConnection(config);
+			console.log("Resultado do teste:", result);
 			if (result.success) {
 				setConnectionStatus("connected");
 				alert("Conexão com Bling estabelecida com sucesso!");
@@ -115,6 +127,7 @@ export default function BlingIntegration() {
 				alert(`Falha na conexão: ${result.error}`);
 			}
 		} catch (error) {
+			console.error("Erro no teste de conexão:", error);
 			setConnectionStatus("failed");
 			alert("Erro ao testar conexão");
 		} finally {
@@ -132,8 +145,8 @@ export default function BlingIntegration() {
 	};
 
 	const handleImportOrders = async () => {
-		if (!config.apiKey) {
-			alert("Configure a API Key antes de importar ordens");
+		if (!config.clientId || !config.clientSecret) {
+			alert("Configure o Client ID e Client Secret antes de importar ordens");
 			return;
 		}
 
@@ -217,7 +230,7 @@ export default function BlingIntegration() {
 				<div className="bling-header">
 					<div className="header-content">
 						<h1>
-							<FaApi className="header-icon" />
+							<FaPlug className="header-icon" />
 							Integração Bling
 						</h1>
 						<p>
@@ -283,20 +296,41 @@ export default function BlingIntegration() {
 
 							<div className="config-form">
 								<div className="form-group">
-									<label>API Key</label>
+									<label>Client ID</label>
 									<Input
-										type="password"
-										value={config.apiKey}
+										name="clientId"
+										type="text"
+										value={config.clientId}
 										onChange={(e) =>
-											setConfig((prev) => ({ ...prev, apiKey: e.target.value }))
+											setConfig((prev) => ({ ...prev, clientId: e.target.value }))
 										}
-										placeholder="Digite sua API Key do Bling"
+										placeholder="Digite seu Client ID do Bling"
 									/>
+									<div style={{ fontSize: '0.8rem', color: config.clientId ? '#48bb78' : '#e53e3e', marginTop: '0.25rem' }}>
+										{config.clientId ? '✅ Client ID configurado' : '❌ Client ID necessário'}
+									</div>
+								</div>
+
+								<div className="form-group">
+									<label>Client Secret</label>
+									<Input
+										name="clientSecret"
+										type="password"
+										value={config.clientSecret}
+										onChange={(e) =>
+											setConfig((prev) => ({ ...prev, clientSecret: e.target.value }))
+										}
+										placeholder="Digite seu Client Secret do Bling"
+									/>
+									<div style={{ fontSize: '0.8rem', color: config.clientSecret ? '#48bb78' : '#e53e3e', marginTop: '0.25rem' }}>
+										{config.clientSecret ? '✅ Client Secret configurado' : '❌ Client Secret necessário'}
+									</div>
 								</div>
 
 								<div className="form-group">
 									<label>URL Base</label>
 									<Input
+										name="baseUrl"
 										type="text"
 										value={config.baseUrl}
 										onChange={(e) =>
@@ -305,7 +339,7 @@ export default function BlingIntegration() {
 												baseUrl: e.target.value,
 											}))
 										}
-										placeholder="https://bling.com.br/Api/v2"
+										placeholder="https://www.bling.com.br/Api/v2"
 									/>
 								</div>
 
@@ -329,28 +363,44 @@ export default function BlingIntegration() {
 									<div className="form-group">
 										<label>Intervalo de Sincronização (minutos)</label>
 										<Input
+											name="syncInterval"
 											type="number"
-											value={config.syncInterval}
+											value={config.syncInterval.toString()}
 											onChange={(e) =>
 												setConfig((prev) => ({
 													...prev,
 													syncInterval: parseInt(e.target.value) || 30,
 												}))
 											}
-											min="5"
-											max="1440"
+											placeholder="30"
 										/>
 									</div>
 								)}
 
 								<div className="form-actions">
-									<Button
-										variant="outline"
+									<button
+										type="button"
+										className="btn btn-outline"
 										onClick={handleTestConnection}
-										disabled={testing || !config.apiKey}
+										disabled={testing || !config.clientId || !config.clientSecret}
+										style={{
+											padding: '0.75rem 1.5rem',
+											border: '1px solid #e2e8f0',
+											borderRadius: '8px',
+											background: (testing || !config.clientId || !config.clientSecret) ? '#f7fafc' : 'white',
+											color: (testing || !config.clientId || !config.clientSecret) ? '#a0aec0' : '#4a5568',
+											cursor: (testing || !config.clientId || !config.clientSecret) ? 'not-allowed' : 'pointer',
+											fontSize: '1rem',
+											fontWeight: '500'
+										}}
 									>
 										{testing ? "Testando..." : "Testar Conexão"}
-									</Button>
+									</button>
+									<div style={{ fontSize: '0.8rem', color: '#4a5568', marginTop: '0.5rem' }}>
+										{testing ? '⏳ Testando conexão...' : 
+										 (!config.clientId || !config.clientSecret) ? '❌ Configure Client ID e Client Secret' : 
+										 '✅ Pronto para testar'}
+									</div>
 									<Button onClick={handleSaveConfig}>
 										Salvar Configuração
 									</Button>
@@ -409,7 +459,7 @@ export default function BlingIntegration() {
 								</div>
 							</div>
 
-							{orders.length > 0 && (
+							{/* orders.length > 0 && (
 								<div className="orders-preview">
 									<h3>Últimas Ordens Importadas</h3>
 									<div className="orders-table">
@@ -439,7 +489,7 @@ export default function BlingIntegration() {
 										))}
 									</div>
 								</div>
-							)}
+							) */}
 						</div>
 					)}
 

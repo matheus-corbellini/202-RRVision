@@ -12,6 +12,8 @@ import PriorityOptimization from "../PriorityOptimization/PriorityOptimization";
 import OperatorRegistration from "../OperatorRegistration/OperatorRegistration";
 import OperatorsList from "../OperatorsList/OperatorsList";
 import BlingIntegration from "../BlingIntegration/BlingIntegration";
+import OperationalRoutes from "../OperationalRoutes/OperationalRoutes";
+import OperationalRoutesList from "../OperationalRoutesList/OperationalRoutesList";
 import Settings from "../Settings/Settings";
 import "./DashboardWithSidebar.css";
 
@@ -44,6 +46,10 @@ export default function DashboardWithSidebar() {
 				return <OperatorsList />;
 			case "bling-integration":
 				return <BlingIntegration />;
+			case "operational-routes":
+				return <OperationalRoutes />;
+			case "operational-routes-list":
+				return <OperationalRoutesList />;
 			case "settings":
 				return <Settings />;
 			default:

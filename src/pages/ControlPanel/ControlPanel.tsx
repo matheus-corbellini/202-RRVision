@@ -17,19 +17,37 @@ import type { NonConformityStats } from "../../types/nonConformities";
 
 export default function ControlPanel() {
   const [data, setData] = useState<ControlPanelData>({
+    alerts: [],
+    pendencies: [],
+    nonConformities: {
+      total: 0,
+      open: 0,
+      investigating: 0,
+      resolved: 0,
+      closed: 0,
+      bySeverity: {
+        low: 0,
+        medium: 0,
+        high: 0,
+        critical: 0,
+      },
+      byPriority: {
+        low: 0,
+        medium: 0,
+        high: 0,
+        urgent: 0,
+      },
+    },
+    stats: {
+      totalAlerts: 0,
+      activeAlerts: 0,
+      totalPendencies: 0,
+      totalNonConformities: 0,
+    },
     generalStatus: "green",
     activeOrders: 0,
     urgentOrders: 0,
     blockedOrders: 0,
-    pendencies: [],
-    alerts: [],
-    nonConformities: {
-      open: 0,
-      inProgress: 0,
-      resolved: 0,
-      critical: 0,
-      total: 0,
-    },
   });
 
   const [loading, setLoading] = useState(true);
@@ -107,148 +125,192 @@ export default function ControlPanel() {
         ],
         alerts: [
           {
-            id: "1",
-            type: "production_stop",
-            severity: "critical",
-            title: "Sistema de Refrigeração",
-            message: "Temperatura acima do limite no setor de usinagem",
-            description:
-              "Temperatura crítica detectada no sistema de refrigeração",
-            source: {
-              type: "system",
-              id: "sys-001",
-              name: "Sistema de Monitoramento",
-            },
+            id: "alert-001",
+            title: "Alerta de Qualidade",
+            description: "5 peças com dimensões fora do padrão detectadas na linha de produção",
+            severity: "high",
+            priority: "urgent",
+            status: "active",
             location: {
-              sector: "Usinagem",
-              station: "Estação 1",
+              sector: "Produção",
+              station: "Linha 01",
+              equipment: "Máquina CNC-001",
             },
             relatedEntity: {
-              type: "equipment",
-              id: "eq-001",
-              name: "Sistema de Refrigeração",
+              id: "order-123",
+              name: "Pedido #123 - Peças Mecânicas",
             },
+            source: {
+              id: "qc-system",
+              name: "Sistema de Qualidade",
+            },
+            createdAt: new Date(Date.now() - 30 * 60000).toISOString(),
+            attachments: ["relatorio_qualidade.pdf"],
+            tags: ["qualidade", "produção"],
             recipients: [
               {
                 id: "user-001",
                 name: "João Silva",
-                role: "coordinator",
-                department: "Produção",
-                notificationMethods: ["dashboard", "email"],
+                role: "Coordenador Qualidade",
+                department: "Qualidade",
                 acknowledged: false,
               },
-            ],
-            status: "active",
-            priority: "urgent",
-            createdAt: new Date(Date.now() - 10 * 60000).toISOString(),
-            updatedAt: new Date(Date.now() - 10 * 60000).toISOString(),
-            escalatedAt: undefined,
-            escalationLevel: 1,
-            autoEscalation: true,
-            tags: ["temperatura", "crítico"],
-            attachments: [],
-            comments: [],
-          },
-          {
-            id: "2",
-            type: "material",
-            severity: "high",
-            title: "Estoque Baixo",
-            message: "Material X com apenas 5% do estoque disponível",
-            description: "Estoque crítico de material essencial",
-            source: {
-              type: "system",
-              id: "sys-002",
-              name: "Sistema de Estoque",
-            },
-            location: {
-              sector: "Almoxarifado",
-            },
-            relatedEntity: {
-              type: "material",
-              id: "mat-001",
-              name: "Material X",
-            },
-            recipients: [
               {
                 id: "user-002",
                 name: "Maria Santos",
-                role: "warehouse",
-                department: "Almoxarifado",
-                notificationMethods: ["dashboard", "email"],
-                acknowledged: false,
+                role: "Supervisor Produção",
+                department: "Produção",
+                acknowledged: true,
               },
             ],
-            status: "active",
-            priority: "high",
-            createdAt: new Date(Date.now() - 45 * 60000).toISOString(),
-            updatedAt: new Date(Date.now() - 45 * 60000).toISOString(),
-            escalatedAt: undefined,
-            escalationLevel: 0,
-            autoEscalation: false,
-            tags: ["estoque", "material"],
-            attachments: [],
             comments: [],
           },
           {
-            id: "3",
-            type: "quality",
+            id: "alert-002",
+            title: "Alerta de Equipamento",
+            description: "Compressor apresentando ruído excessivo e vibração anormal",
             severity: "medium",
-            title: "Relatório Gerado",
-            message: "Relatório de produtividade semanal disponível",
-            description: "Relatório automático de produtividade foi gerado",
-            source: {
-              type: "system",
-              id: "sys-003",
-              name: "Sistema de Relatórios",
+            priority: "high",
+            status: "acknowledged",
+            location: {
+              sector: "Manutenção",
+              station: "Área Técnica",
+              equipment: "Compressor CP-005",
             },
+            relatedEntity: {
+              id: "equipment-005",
+              name: "Compressor CP-005",
+            },
+            source: {
+              id: "maintenance-system",
+              name: "Sistema de Manutenção",
+            },
+            createdAt: new Date(Date.now() - 60 * 60000).toISOString(),
+            acknowledgedAt: new Date(Date.now() - 30 * 60000).toISOString(),
+            acknowledgedBy: "user-003",
+            attachments: ["relatorio_vibracao.pdf"],
+            tags: ["manutenção", "equipamento"],
+            recipients: [
+              {
+                id: "user-003",
+                name: "Pedro Costa",
+                role: "Técnico Manutenção",
+                department: "Manutenção",
+                acknowledged: true,
+              },
+            ],
+            comments: [],
+          },
+          {
+            id: "alert-003",
+            title: "Alerta de Material",
+            description: "Material com defeito visual identificado no recebimento",
+            severity: "low",
+            priority: "medium",
+            status: "resolved",
+            location: {
+              sector: "Recebimento",
+              station: "Dock 01",
+            },
+            relatedEntity: {
+              id: "material-456",
+              name: "Lote de Materiais #456",
+            },
+            source: {
+              id: "warehouse-system",
+              name: "Sistema de Almoxarifado",
+            },
+            createdAt: new Date(Date.now() - 120 * 60000).toISOString(),
+            resolvedAt: new Date(Date.now() - 60 * 60000).toISOString(),
+            resolvedBy: "user-004",
+            attachments: ["fotos_material.jpg"],
+            tags: ["material", "recebimento"],
+            recipients: [
+              {
+                id: "user-004",
+                name: "Ana Oliveira",
+                role: "Supervisor Almoxarifado",
+                department: "Almoxarifado",
+                acknowledged: true,
+              },
+            ],
+            comments: [],
+          },
+          {
+            id: "alert-004",
+            title: "Alerta de Sistema",
+            description: "Relatório semanal de produtividade disponível para análise",
+            severity: "low",
+            priority: "low",
+            status: "acknowledged",
             location: {
               sector: "Administração",
             },
             relatedEntity: {
-              type: "task",
               id: "task-001",
               name: "Relatório Semanal",
             },
+            source: {
+              id: "report-system",
+              name: "Sistema de Relatórios",
+            },
+            createdAt: new Date(Date.now() - 120 * 60000).toISOString(),
+            acknowledgedAt: new Date(Date.now() - 60 * 60000).toISOString(),
+            acknowledgedBy: "user-003",
+            attachments: ["relatorio_semanal.pdf"],
+            tags: ["relatório", "produtividade"],
             recipients: [
               {
                 id: "user-003",
                 name: "Pedro Costa",
                 role: "admin",
                 department: "Administração",
-                notificationMethods: ["dashboard", "email"],
                 acknowledged: true,
-                acknowledgedAt: new Date(Date.now() - 60 * 60000).toISOString(),
               },
             ],
-            status: "acknowledged",
-            priority: "medium",
-            createdAt: new Date(Date.now() - 120 * 60000).toISOString(),
-            updatedAt: new Date(Date.now() - 60 * 60000).toISOString(),
-            acknowledgedAt: new Date(Date.now() - 60 * 60000).toISOString(),
-            acknowledgedBy: "user-003",
-            escalatedAt: undefined,
-            escalationLevel: 0,
-            autoEscalation: false,
-            tags: ["relatório", "produtividade"],
-            attachments: [],
             comments: [],
           },
         ],
         nonConformities: {
-          open: Math.floor(Math.random() * 8) + 2,
-          inProgress: Math.floor(Math.random() * 5) + 1,
-          resolved: Math.floor(Math.random() * 20) + 10,
-          critical: Math.floor(Math.random() * 3),
           total: 0, // Será calculado
+          open: Math.floor(Math.random() * 8) + 2,
+          investigating: Math.floor(Math.random() * 5) + 1,
+          resolved: Math.floor(Math.random() * 20) + 10,
+          closed: Math.floor(Math.random() * 3),
+          bySeverity: {
+            low: Math.floor(Math.random() * 5) + 1,
+            medium: Math.floor(Math.random() * 8) + 2,
+            high: Math.floor(Math.random() * 3) + 1,
+            critical: Math.floor(Math.random() * 2),
+          },
+          byPriority: {
+            low: Math.floor(Math.random() * 4) + 1,
+            medium: Math.floor(Math.random() * 6) + 2,
+            high: Math.floor(Math.random() * 3) + 1,
+            urgent: Math.floor(Math.random() * 2),
+          },
+        },
+        stats: {
+          totalAlerts: 0, // Será calculado
+          activeAlerts: 0, // Será calculado
+          totalPendencies: 0, // Será calculado
+          totalNonConformities: 0, // Será calculado
         },
       };
 
+      // Calcular estatísticas
+      mockData.stats.totalAlerts = mockData.alerts.length;
+      mockData.stats.activeAlerts = mockData.alerts.filter(a => a.status === 'active').length;
+      mockData.stats.totalPendencies = mockData.pendencies.length;
+      
       // Calcular total de não conformidades
       mockData.nonConformities.total =
         mockData.nonConformities.open +
-        mockData.nonConformities.inProgress +
-        mockData.nonConformities.resolved;
+        mockData.nonConformities.investigating +
+        mockData.nonConformities.resolved +
+        mockData.nonConformities.closed;
+      
+      mockData.stats.totalNonConformities = mockData.nonConformities.total;
 
       setData(mockData);
       setLoading(false);

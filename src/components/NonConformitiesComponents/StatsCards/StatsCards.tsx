@@ -5,7 +5,7 @@ import {
   FaChartBar,
 } from "react-icons/fa";
 import "./StatsCards.css";
-import type { NonConformityStats } from "../../../../types/nonConformities";
+import type { NonConformityStats } from "../../../types/nonConformities";
 
 interface StatsCardsProps {
   stats: NonConformityStats;
@@ -32,7 +32,7 @@ export default function StatsCards({
           <FaExclamationTriangle />
         </div>
         <div className="stat-content">
-          <div className="stat-value">{stats.critical}</div>
+          <div className="stat-value">{stats.bySeverity.critical}</div>
           <div className="stat-label">Críticas/Altas</div>
         </div>
       </div>

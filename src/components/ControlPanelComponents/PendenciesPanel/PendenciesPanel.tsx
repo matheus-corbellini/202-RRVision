@@ -12,7 +12,7 @@ import {
   FaCog,
 } from "react-icons/fa";
 import "./PendenciesPanel.css";
-import type { Pendency } from "../../../../types/pendencies";
+import type { Pendency } from "../../../types/pendencies";
 
 interface PendenciesPanelProps {
   pendencies: Pendency[];
@@ -23,13 +23,15 @@ export default function PendenciesPanel({
   pendencies,
   onResolve,
 }: PendenciesPanelProps) {
-  const getIcon = (type: string) => {
-    switch (type) {
+  const getIcon = (priority: string) => {
+    switch (priority) {
       case "urgent":
         return <FaExclamationTriangle />;
-      case "warning":
+      case "high":
         return <FaClock />;
-      case "info":
+      case "medium":
+        return <FaInfoCircle />;
+      case "low":
         return <FaInfoCircle />;
       default:
         return <FaInfoCircle />;
@@ -76,7 +78,7 @@ export default function PendenciesPanel({
     if (!pendency.dueDate) return false;
     const dueDate = new Date(pendency.dueDate);
     const now = new Date();
-    return dueDate < now && pendency.status !== "resolved";
+    return dueDate < now && pendency.status !== "completed";
   };
 
   return (
@@ -96,17 +98,17 @@ export default function PendenciesPanel({
           pendencies.map((pendency) => (
             <div
               key={pendency.id}
-              className={`pendency-item ${pendency.type} ${
+              className={`pendency-item ${pendency.priority} ${
                 isOverdue(pendency) ? "overdue" : ""
               }`}
             >
-              <div className="pendency-icon">{getIcon(pendency.type)}</div>
+              <div className="pendency-icon">{getIcon(pendency.priority)}</div>
 
               <div className="pendency-content">
                 <div className="pendency-header">
                   <h3>{pendency.title}</h3>
                   <span className="pendency-time">
-                    {getTimeAgo(pendency.timestamp)}
+                    {getTimeAgo(pendency.createdAt)}
                   </span>
                 </div>
 
@@ -137,7 +139,7 @@ export default function PendenciesPanel({
 
                 <div className="pendency-footer">
                   <span className="pendency-sector">
-                    Setor: {pendency.sector}
+                    Setor: {pendency.location.sector}
                   </span>
                   <button
                     className="resolve-btn"
