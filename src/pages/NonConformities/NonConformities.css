@@ -11,13 +11,19 @@
 .nc-content {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 .nc-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
+}
+
+.nc-meta {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
 }
 
 @media (max-width: 768px) {

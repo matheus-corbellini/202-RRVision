@@ -34,20 +34,14 @@
 .control-panel-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 2rem;
-  margin-top: 2rem;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .semaphore-section {
   grid-column: span 2;
 }
 
-.alerts-section,
-.pendencies-section,
-.nonconformity-section,
-.actions-section {
-  min-height: 400px;
-}
 
 /* Responsive adjustments */
 @media (max-width: 1200px) {

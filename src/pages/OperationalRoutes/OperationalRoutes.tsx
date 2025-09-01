@@ -11,6 +11,8 @@ import {
 	FaPlus,
 	FaTimes,
 	FaList,
+	FaUser,
+	FaIndustry,
 } from "react-icons/fa";
 import Button from "../../components/Button/Button";
 import { useAuth } from "../../hooks/useAuth";
@@ -20,10 +22,8 @@ import {
 	deleteOperationalRoute,
 	listAllOperationalRoutes,
 	checkRouteExists,
-	type OperationalRoute,
-	type Product,
-	type Step,
 } from "../../services/operationalRoutesService";
+import type { OperationalRoute, Product, Step } from "../../types/operationalRoutes";
 import "./OperationalRoutes.css";
 
 // Interface para o formulário
@@ -31,6 +31,8 @@ interface RouteFormData {
 	productId: string;
 	version: string;
 	status: "active" | "inactive" | "draft";
+	primarySectorId: string;
+	assignedOperatorId?: string;
 	steps: Step[];
 }
 
@@ -40,11 +42,15 @@ export default function OperationalRoutes() {
 		productId: "",
 		version: "1.0",
 		status: "draft",
+		primarySectorId: "",
+		assignedOperatorId: "",
 		steps: [],
 	});
 
 	const [routes, setRoutes] = useState<OperationalRoute[]>([]);
 	const [products, setProducts] = useState<Product[]>([]);
+	const [sectors, setSectors] = useState<any[]>([]);
+	const [operators, setOperators] = useState<any[]>([]);
 	const [newStep, setNewStep] = useState<Partial<Step>>({
 		name: "",
 		description: "",
@@ -54,6 +60,8 @@ export default function OperationalRoutes() {
 		equipment: "",
 		requirements: [],
 		notes: "",
+		sectorId: "",
+		operatorId: "",
 	});
 	const [newRequirement, setNewRequirement] = useState("");
 	const [isEditing, setIsEditing] = useState(false);
@@ -107,7 +115,26 @@ export default function OperationalRoutes() {
 					},
 				];
 
+				// Mock de setores
+				const mockSectors = [
+					{ id: "1", name: "Corte", code: "CORTE" },
+					{ id: "2", name: "Montagem", code: "MONT" },
+					{ id: "3", name: "Acabamento", code: "ACAB" },
+					{ id: "4", name: "Qualidade", code: "QUAL" },
+					{ id: "5", name: "Preparação", code: "PREP" },
+				];
+
+				// Mock de operadores
+				const mockOperators = [
+					{ id: "1", name: "João Silva", code: "OP001" },
+					{ id: "2", name: "Maria Santos", code: "OP002" },
+					{ id: "3", name: "Carlos Mendes", code: "OP003" },
+					{ id: "4", name: "Ana Oliveira", code: "OP004" },
+				];
+
 				setProducts(mockProducts);
+				setSectors(mockSectors);
+				setOperators(mockOperators);
 
 				// Carregar roteiros do Firebase
 				const routesData = await listAllOperationalRoutes();
@@ -128,6 +155,10 @@ export default function OperationalRoutes() {
 
 		if (!formData.productId) {
 			newErrors.productId = "Produto é obrigatório";
+		}
+
+		if (!formData.primarySectorId) {
+			newErrors.primarySectorId = "Setor primário é obrigatório";
 		}
 
 		if (!formData.version.trim()) {
@@ -154,6 +185,9 @@ export default function OperationalRoutes() {
 			}
 			if (step.sequence <= 0) {
 				newErrors[`step${index}Sequence`] = `Sequência da etapa ${index + 1} deve ser maior que 0`;
+			}
+			if (!step.sectorId) {
+				newErrors[`step${index}SectorId`] = `Setor da etapa ${index + 1} é obrigatório`;
 			}
 		});
 
@@ -201,6 +235,12 @@ export default function OperationalRoutes() {
 			return;
 		}
 
+		const selectedSector = sectors.find(s => s.id === formData.primarySectorId);
+		if (!selectedSector) {
+			alert("Setor selecionado não encontrado");
+			return;
+		}
+
 		// Calcular tempos totais
 		const totalStandardTime = formData.steps.reduce((sum, step) => sum + step.standardTime, 0);
 		const totalSetupTime = formData.steps.reduce((sum, step) => sum + step.setupTime, 0);
@@ -217,6 +257,8 @@ export default function OperationalRoutes() {
 				productCategory: selectedProduct.category,
 				version: formData.version,
 				status: formData.status,
+				primarySectorId: formData.primarySectorId,
+				assignedOperatorId: formData.assignedOperatorId || undefined,
 				steps: formData.steps.map((step, index) => ({
 					...step,
 					sequence: index + 1, // Garantir sequência sequencial
@@ -281,6 +323,8 @@ export default function OperationalRoutes() {
 			productId: "",
 			version: "1.0",
 			status: "draft",
+			primarySectorId: "",
+			assignedOperatorId: "",
 			steps: [],
 		});
 		setNewStep({
@@ -292,6 +336,8 @@ export default function OperationalRoutes() {
 			equipment: "",
 			requirements: [],
 			notes: "",
+			sectorId: "",
+			operatorId: "",
 		});
 		setNewRequirement("");
 		setErrors({});
@@ -304,6 +350,8 @@ export default function OperationalRoutes() {
 			productId: route.productId,
 			version: route.version,
 			status: route.status,
+			primarySectorId: route.primarySectorId,
+			assignedOperatorId: route.assignedOperatorId,
 			steps: route.steps,
 		});
 		// Scroll para o topo do formulário
@@ -328,8 +376,8 @@ export default function OperationalRoutes() {
 	};
 
 	const addStep = () => {
-		if (!newStep.name || !newStep.standardTime || newStep.standardTime <= 0) {
-			alert("Nome da etapa e tempo padrão são obrigatórios");
+		if (!newStep.name || !newStep.standardTime || newStep.standardTime <= 0 || !newStep.sectorId) {
+			alert("Nome da etapa, tempo padrão e setor são obrigatórios");
 			return;
 		}
 
@@ -352,6 +400,8 @@ export default function OperationalRoutes() {
 			equipment: newStep.equipment?.trim() || "",
 			requirements: newStep.requirements || [],
 			notes: newStep.notes?.trim() || "",
+			sectorId: newStep.sectorId,
+			operatorId: newStep.operatorId || undefined,
 		};
 
 		setFormData((prev) => ({
@@ -369,6 +419,8 @@ export default function OperationalRoutes() {
 			equipment: "",
 			requirements: [],
 			notes: "",
+			sectorId: "",
+			operatorId: "",
 		});
 		setNewRequirement("");
 	};
@@ -433,6 +485,15 @@ export default function OperationalRoutes() {
 		setIsEditing(false);
 		setEditingId(null);
 		resetForm();
+	};
+
+	const getSectorName = (sectorId: string) => {
+		return sectors.find(s => s.id === sectorId)?.name || "Setor não encontrado";
+	};
+
+	const getOperatorName = (operatorId?: string) => {
+		if (!operatorId) return "Não atribuído";
+		return operators.find(o => o.id === operatorId)?.name || "Operador não encontrado";
 	};
 
 	return (
@@ -510,6 +571,54 @@ export default function OperationalRoutes() {
 						</div>
 					</div>
 
+					{/* Associações com Setor e Operador */}
+					<div className="form-section">
+						<h3 className="section-title">
+							<FaIndustry className="section-icon" />
+							Associações
+						</h3>
+						<div className="form-grid">
+							<div className="form-group">
+								<label className="form-label">Setor Primário *</label>
+								<select
+									className={`form-select ${errors.primarySectorId ? "error" : ""}`}
+									value={formData.primarySectorId}
+									onChange={(e) =>
+										setFormData((prev) => ({ ...prev, primarySectorId: e.target.value }))
+									}
+								>
+									<option value="">Selecione um setor</option>
+									{sectors.map((sector) => (
+										<option key={sector.id} value={sector.id}>
+											{sector.code} - {sector.name}
+										</option>
+									))}
+								</select>
+								{errors.primarySectorId && (
+									<span className="form-error">{errors.primarySectorId}</span>
+								)}
+							</div>
+
+							<div className="form-group">
+								<label className="form-label">Operador Atribuído</label>
+								<select
+									className="form-select"
+									value={formData.assignedOperatorId}
+									onChange={(e) =>
+										setFormData((prev) => ({ ...prev, assignedOperatorId: e.target.value }))
+									}
+								>
+									<option value="">Selecione um operador (opcional)</option>
+									{operators.map((operator) => (
+										<option key={operator.id} value={operator.id}>
+											{operator.code} - {operator.name}
+										</option>
+									))}
+								</select>
+							</div>
+						</div>
+					</div>
+
 					{/* Etapas do Roteiro */}
 					<div className="form-section">
 						<h3 className="section-title">
@@ -540,6 +649,10 @@ export default function OperationalRoutes() {
 										<div className="step-details">
 											<p><strong>Descrição:</strong> {step.description}</p>
 											<p><strong>Equipamento:</strong> {step.equipment}</p>
+											<p><strong>Setor:</strong> {getSectorName(step.sectorId)}</p>
+											{step.operatorId && (
+												<p><strong>Operador:</strong> {getOperatorName(step.operatorId)}</p>
+											)}
 											{step.requirements.length > 0 && (
 												<p><strong>Requisitos:</strong> {step.requirements.join(", ")}</p>
 											)}
@@ -642,6 +755,42 @@ export default function OperationalRoutes() {
 										min="1"
 										placeholder="Ordem da etapa"
 									/>
+								</div>
+
+								<div className="form-group">
+									<label className="form-label">Setor da Etapa *</label>
+									<select
+										className="form-select"
+										value={newStep.sectorId}
+										onChange={(e) =>
+											setNewStep((prev) => ({ ...prev, sectorId: e.target.value }))
+										}
+									>
+										<option value="">Selecione um setor</option>
+										{sectors.map((sector) => (
+											<option key={sector.id} value={sector.id}>
+												{sector.code} - {sector.name}
+											</option>
+										))}
+									</select>
+								</div>
+
+								<div className="form-group">
+									<label className="form-label">Operador da Etapa</label>
+									<select
+										className="form-select"
+										value={newStep.operatorId}
+										onChange={(e) =>
+											setNewStep((prev) => ({ ...prev, operatorId: e.target.value }))
+										}
+									>
+										<option value="">Selecione um operador (opcional)</option>
+										{operators.map((operator) => (
+											<option key={operator.id} value={operator.id}>
+												{operator.code} - {operator.name}
+											</option>
+										))}
+									</select>
 								</div>
 							</div>
 
@@ -746,6 +895,11 @@ export default function OperationalRoutes() {
 									</div>
 									
 									<div className="route-details">
+										<div className="route-associations">
+											<p><FaIndustry /> <strong>Setor:</strong> {getSectorName(route.primarySectorId)}</p>
+											<p><FaUser /> <strong>Operador:</strong> {getOperatorName(route.assignedOperatorId)}</p>
+										</div>
+										
 										<div className="route-stats">
 											<div className="stat-item">
 												<FaRoute />
@@ -768,6 +922,7 @@ export default function OperationalRoutes() {
 													<span className="step-number">{step.sequence}</span>
 													<span className="step-name">{step.name}</span>
 													<span className="step-time">{formatTime(step.standardTime)}</span>
+													<span className="step-sector">{getSectorName(step.sectorId)}</span>
 												</div>
 											))}
 											{route.steps.length > 3 && (

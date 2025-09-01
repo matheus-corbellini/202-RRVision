@@ -27,8 +27,7 @@ export default function UserStatsCard({
     <div className="user-stats-card">
       <div className="user-stats-header">
         <div className="user-info">
-          <h3>Sua Performance</h3>
-          <p>{currentUserStats.operatorName}</p>
+          <h3>Performance do Operador</h3>
         </div>
         <div className="user-rank">
           <div className="rank-badge">#{currentUserStats.rank}</div>

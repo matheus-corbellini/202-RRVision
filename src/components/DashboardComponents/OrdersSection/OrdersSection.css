@@ -26,10 +26,8 @@
 }
 
 .btn-icon {
-  background: rgba(255, 255, 255, 0.1);
   border: none;
   color: white;
-  padding: 0.5rem;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s;
@@ -46,12 +44,6 @@
   gap: 1rem;
   flex-wrap: wrap;
   align-items: center;
-}
-
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
 .filter-select {

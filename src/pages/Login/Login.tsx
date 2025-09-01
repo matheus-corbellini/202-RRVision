@@ -37,8 +37,18 @@ export default function Login() {
 
 		try {
 			const loggedUser = await handleLogin(formData);
-			const target =
-				(loggedUser.role || "user") === "admin" ? path.admin : path.dashboard;
+			
+			// Verificar se é admin ou operador para determinar o redirecionamento
+			let target;
+			if (loggedUser.role === "admin" || loggedUser.userType === "admin") {
+				target = path.admin;
+			} else if (loggedUser.userType === "operator") {
+				// Operadores vão para dashboard mas com página padrão de agenda
+				target = path.dashboard;
+			} else {
+				target = path.dashboard;
+			}
+			
 			goTo(target);
 		} catch (err) {
 			// Error is handled by the hook

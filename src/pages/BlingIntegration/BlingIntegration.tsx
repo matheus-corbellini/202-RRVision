@@ -34,6 +34,7 @@ interface BlingConfig {
 	clientId: string;
 	clientSecret: string;
 	baseUrl: string;
+	accessToken: string; // Token OAuth direto
 	autoSync: boolean;
 	syncInterval: number;
 	lastSync?: string;
@@ -50,11 +51,12 @@ export default function BlingIntegration() {
 	} = useBling();
 
 	const [config, setConfig] = useState<BlingConfig>({
-		clientId: "bb038bbf8baa2108a9e5c31b409338ef03cc93a0",
-		clientSecret: "5602db5f1ddfccf5894336d514cdfae102111c9cb4cbfc788c8bc4d771f6",
-		baseUrl: "https://www.bling.com.br/Api/v2",
-		autoSync: false,
-		syncInterval: 30,
+		clientId: import.meta.env.VITE_BLING_CLIENT_ID || "",
+		clientSecret: import.meta.env.VITE_BLING_CLIENT_SECRET || "",
+		baseUrl: "https://api.bling.com.br/Api/v3", // URL correta da API v3
+		accessToken: import.meta.env.VITE_BLING_ACCESS_TOKEN || "",
+		autoSync: import.meta.env.VITE_BLING_AUTO_SYNC === "true",
+		syncInterval: parseInt(import.meta.env.VITE_BLING_SYNC_INTERVAL || "30"),
 	});
 
 	const [importLogs, setImportLogs] = useState<ImportLog[]>([]);
@@ -75,28 +77,38 @@ export default function BlingIntegration() {
 	// Monitorar mudanças na configuração para debug
 	useEffect(() => {
 		console.log("Configuração atualizada:", config);
-		console.log("Botão desabilitado:", !config.clientId || !config.clientSecret);
-		console.log("Client ID:", config.clientId);
-		console.log("Client Secret:", config.clientSecret);
+		console.log("Botão desabilitado:", !config.accessToken);
+		console.log("Access Token:", config.accessToken ? "Configurado" : "Não configurado");
 	}, [config]);
 
 	const loadInitialData = async () => {
 		try {
 			console.log("Carregando dados iniciais...");
 			console.log("Configuração atual:", config);
+			console.log("Access Token inicial:", config.accessToken);
 			
 			const savedConfig = await getConfiguration();
 			console.log("Configuração salva:", savedConfig);
+			console.log("Access Token na configuração salva:", savedConfig?.accessToken);
 			
 			if (savedConfig) {
 				// Mesclar configuração salva com valores padrão para garantir que as credenciais não sejam perdidas
-				setConfig(prev => ({
-					...prev,
+				const newConfig = {
+					...config,
 					...savedConfig,
 					// Manter as credenciais padrão se não estiverem na configuração salva
-					clientId: savedConfig.clientId || prev.clientId,
-					clientSecret: savedConfig.clientSecret || prev.clientSecret,
-				}));
+					clientId: savedConfig.clientId || config.clientId,
+					clientSecret: savedConfig.clientSecret || config.clientSecret,
+					accessToken: savedConfig.accessToken || config.accessToken,
+				};
+				
+				console.log("Nova configuração mesclada:", newConfig);
+				console.log("Access Token na nova configuração:", newConfig.accessToken);
+				
+				setConfig(newConfig);
+			} else {
+				console.log("Nenhuma configuração salva encontrada, usando valores padrão");
+				console.log("Access Token padrão:", config.accessToken);
 			}
 
 			const history = await getImportHistory();
@@ -112,8 +124,13 @@ export default function BlingIntegration() {
 		console.log("Botão clicado! Função handleTestConnection chamada");
 		console.log("Estado atual - testing:", testing);
 		console.log("Estado atual - config:", config);
-		console.log("Client ID válido:", !!config.clientId);
-		console.log("Client Secret válido:", !!config.clientSecret);
+		console.log("Access Token válido:", !!config.accessToken);
+		console.log("Access Token valor:", config.accessToken);
+		
+		if (!config.accessToken) {
+			alert("Configure o Access Token antes de testar a conexão");
+			return;
+		}
 		
 		setTesting(true);
 		try {
@@ -137,16 +154,24 @@ export default function BlingIntegration() {
 
 	const handleSaveConfig = async () => {
 		try {
+			console.log("Salvando configuração:", config);
+			console.log("Access Token sendo salvo:", config.accessToken);
+			
 			await updateConfiguration(config);
 			alert("Configuração salva com sucesso!");
 		} catch (error) {
+			console.error("Erro ao salvar configuração:", error);
 			alert("Erro ao salvar configuração");
 		}
 	};
 
 	const handleImportOrders = async () => {
-		if (!config.clientId || !config.clientSecret) {
-			alert("Configure o Client ID e Client Secret antes de importar ordens");
+		console.log("Tentando importar ordens...");
+		console.log("Access Token disponível:", !!config.accessToken);
+		console.log("Access Token valor:", config.accessToken);
+		
+		if (!config.accessToken) {
+			alert("Configure o Access Token antes de importar ordens");
 			return;
 		}
 
@@ -296,7 +321,26 @@ export default function BlingIntegration() {
 
 							<div className="config-form">
 								<div className="form-group">
-									<label>Client ID</label>
+									<label>Access Token OAuth</label>
+									<Input
+										name="accessToken"
+										type="password"
+										value={config.accessToken}
+										onChange={(e) =>
+											setConfig((prev) => ({ ...prev, accessToken: e.target.value }))
+										}
+										placeholder="Digite seu Access Token OAuth do Bling"
+									/>
+									<div style={{ fontSize: '0.8rem', color: config.accessToken ? '#48bb78' : '#e53e3e', marginTop: '0.25rem' }}>
+										{config.accessToken ? '✅ Access Token configurado' : '❌ Access Token necessário'}
+									</div>
+									<div style={{ fontSize: '0.75rem', color: '#718096', marginTop: '0.25rem' }}>
+										ℹ️ Obtenha seu Access Token através do fluxo OAuth 2.0 no painel do Bling
+									</div>
+								</div>
+
+								<div className="form-group">
+									<label>Client ID (Opcional)</label>
 									<Input
 										name="clientId"
 										type="text"
@@ -304,15 +348,15 @@ export default function BlingIntegration() {
 										onChange={(e) =>
 											setConfig((prev) => ({ ...prev, clientId: e.target.value }))
 										}
-										placeholder="Digite seu Client ID do Bling"
+										placeholder="Digite seu Client ID do Bling (opcional)"
 									/>
-									<div style={{ fontSize: '0.8rem', color: config.clientId ? '#48bb78' : '#e53e3e', marginTop: '0.25rem' }}>
-										{config.clientId ? '✅ Client ID configurado' : '❌ Client ID necessário'}
+									<div style={{ fontSize: '0.8rem', color: '#718096', marginTop: '0.25rem' }}>
+										ℹ️ Client ID é opcional para API v3 com Bearer tokens
 									</div>
 								</div>
 
 								<div className="form-group">
-									<label>Client Secret</label>
+									<label>Client Secret (Opcional)</label>
 									<Input
 										name="clientSecret"
 										type="password"
@@ -320,10 +364,10 @@ export default function BlingIntegration() {
 										onChange={(e) =>
 											setConfig((prev) => ({ ...prev, clientSecret: e.target.value }))
 										}
-										placeholder="Digite seu Client Secret do Bling"
+										placeholder="Digite seu Client Secret do Bling (opcional)"
 									/>
-									<div style={{ fontSize: '0.8rem', color: config.clientSecret ? '#48bb78' : '#e53e3e', marginTop: '0.25rem' }}>
-										{config.clientSecret ? '✅ Client Secret configurado' : '❌ Client Secret necessário'}
+									<div style={{ fontSize: '0.8rem', color: '#718096', marginTop: '0.25rem' }}>
+										ℹ️ Client Secret é opcional para API v3 com Bearer tokens
 									</div>
 								</div>
 
@@ -339,8 +383,11 @@ export default function BlingIntegration() {
 												baseUrl: e.target.value,
 											}))
 										}
-										placeholder="https://www.bling.com.br/Api/v2"
+										placeholder="https://api.bling.com.br/Api/v3"
 									/>
+									<div style={{ fontSize: '0.8rem', color: '#718096', marginTop: '0.25rem' }}>
+										ℹ️ URL padrão da API v3 do Bling
+									</div>
 								</div>
 
 								<div className="form-group">
@@ -382,14 +429,14 @@ export default function BlingIntegration() {
 										type="button"
 										className="btn btn-outline"
 										onClick={handleTestConnection}
-										disabled={testing || !config.clientId || !config.clientSecret}
+										disabled={testing || !config.accessToken}
 										style={{
 											padding: '0.75rem 1.5rem',
 											border: '1px solid #e2e8f0',
 											borderRadius: '8px',
-											background: (testing || !config.clientId || !config.clientSecret) ? '#f7fafc' : 'white',
-											color: (testing || !config.clientId || !config.clientSecret) ? '#a0aec0' : '#4a5568',
-											cursor: (testing || !config.clientId || !config.clientSecret) ? 'not-allowed' : 'pointer',
+											background: (testing || !config.accessToken) ? '#f7fafc' : 'white',
+											color: (testing || !config.accessToken) ? '#a0aec0' : '#4a5568',
+											cursor: (testing || !config.accessToken) ? 'not-allowed' : 'pointer',
 											fontSize: '1rem',
 											fontWeight: '500'
 										}}
@@ -398,7 +445,7 @@ export default function BlingIntegration() {
 									</button>
 									<div style={{ fontSize: '0.8rem', color: '#4a5568', marginTop: '0.5rem' }}>
 										{testing ? '⏳ Testando conexão...' : 
-										 (!config.clientId || !config.clientSecret) ? '❌ Configure Client ID e Client Secret' : 
+										 (!config.accessToken) ? '❌ Configure o Access Token' : 
 										 '✅ Pronto para testar'}
 									</div>
 									<Button onClick={handleSaveConfig}>

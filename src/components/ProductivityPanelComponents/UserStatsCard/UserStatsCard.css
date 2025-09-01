@@ -16,16 +16,51 @@
   align-items: center;
 }
 
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .user-info h3 {
-  margin: 0 0 0.25rem 0;
+  margin: 0;
   font-size: 1.3rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .user-info p {
   margin: 0;
   color: #e2f8e8;
   font-size: 1rem;
+}
+
+.operator-selector {
+  margin: 0;
+}
+
+.operator-select {
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1a365d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 200px;
+}
+
+.operator-select:hover {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.operator-select:focus {
+  outline: none;
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 .user-rank {

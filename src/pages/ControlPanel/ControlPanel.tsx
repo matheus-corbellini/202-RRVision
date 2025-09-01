@@ -37,6 +37,16 @@ export default function ControlPanel() {
         high: 0,
         urgent: 0,
       },
+      byCategory: {
+        quality: 0,
+        safety: 0,
+        process: 0,
+        equipment: 0,
+        material: 0,
+      },
+      bySector: {},
+      productionStopped: 0,
+      requiresImmediateAction: 0,
     },
     stats: {
       totalAlerts: 0,
@@ -289,6 +299,22 @@ export default function ControlPanel() {
             high: Math.floor(Math.random() * 3) + 1,
             urgent: Math.floor(Math.random() * 2),
           },
+          byCategory: {
+            quality: Math.floor(Math.random() * 5) + 1,
+            safety: Math.floor(Math.random() * 3) + 1,
+            process: Math.floor(Math.random() * 8) + 2,
+            equipment: Math.floor(Math.random() * 4) + 1,
+            material: Math.floor(Math.random() * 6) + 2,
+          },
+          bySector: {
+            "Montagem": Math.floor(Math.random() * 5) + 1,
+            "Usinagem": Math.floor(Math.random() * 3) + 1,
+            "Planejamento": Math.floor(Math.random() * 2) + 1,
+            "Recebimento": Math.floor(Math.random() * 4) + 1,
+            "Administração": Math.floor(Math.random() * 3) + 1,
+          },
+          productionStopped: Math.floor(Math.random() * 3),
+          requiresImmediateAction: Math.floor(Math.random() * 2),
         },
         stats: {
           totalAlerts: 0, // Será calculado

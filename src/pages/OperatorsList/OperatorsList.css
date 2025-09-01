@@ -354,21 +354,6 @@
 	justify-content: center;
 }
 
-.btn-icon {
-	background: rgba(26, 54, 93, 0.1);
-	border: none;
-	color: #1a365d;
-	padding: 0.5rem;
-	border-radius: 6px;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 32px;
-	height: 32px;
-}
-
 .btn-icon:hover {
 	background: rgba(26, 54, 93, 0.2);
 	transform: translateY(-1px);

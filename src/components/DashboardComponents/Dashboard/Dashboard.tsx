@@ -7,7 +7,6 @@ import { path } from "../../../routes/path";
 import {
 	DashboardHeader,
 	DashboardStats,
-	ImportSection,
 	OrdersSection,
 	AlertsPanel,
 	SectorsPanel,
@@ -16,7 +15,6 @@ import type {
 	Order,
 	Alert,
 	DashboardStats as StatsData,
-	ImportData,
 } from "../../../types/dashboard";
 import type { Sector } from "../../../types/sectors";
 import "./Dashboard.css";
@@ -28,7 +26,7 @@ export default function Dashboard() {
 	const [alerts, setAlerts] = useState<Alert[]>([]);
 	const [sectors, setSectors] = useState<Sector[]>([]);
 	const [filterStatus, setFilterStatus] = useState<string>("all");
-	const [importLogs, setImportLogs] = useState<string[]>([]);
+	const [, setImportLogs] = useState<string[]>([]);
 	const [lastSync, setLastSync] = useState<Date>(new Date());
 
 	// Mock data - Em produção, isso viria da API/Bling
@@ -202,16 +200,6 @@ export default function Dashboard() {
 		efficiency: 84,
 	};
 
-	const importData: ImportData = {
-		id: "import-001",
-		fileName: "bling_orders.csv",
-		importDate: "2024-01-20T08:45:00Z",
-		status: "completed",
-		recordsCount: 15,
-		successCount: 12,
-		errorCount: 3,
-	};
-
 	if (loading) {
 		return (
 			<div className="dashboard-loading">
@@ -238,12 +226,6 @@ export default function Dashboard() {
 				/>
 
 				<DashboardStats stats={dashboardStats} />
-
-				<ImportSection
-					importData={importData}
-					importLogs={importLogs}
-					onImportBling={handleImportBling}
-				/>
 
 				<div className="dashboard-content">
 					<OrdersSection

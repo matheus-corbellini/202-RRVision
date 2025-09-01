@@ -1,9 +1,11 @@
 import { useState, useCallback } from "react";
+import { blingService } from "../services/blingService";
 
 interface BlingConfig {
 	clientId: string;
 	clientSecret: string;
 	baseUrl: string;
+	accessToken: string; // Token OAuth direto
 	autoSync: boolean;
 	syncInterval: number;
 	lastSync?: string;
@@ -51,36 +53,26 @@ export const useBling = () => {
 	// Testar conexão com a API do Bling
 	const testConnection = useCallback(
 		async (config: BlingConfig): Promise<ConnectionResult> => {
-			if (!config.clientId || !config.clientSecret || !config.baseUrl) {
+			if (!config.accessToken) {
 				return {
 					success: false,
-					error: "Client ID, Client Secret e URL Base são obrigatórios",
+					error: "Access Token é obrigatório",
 				};
 			}
 
 			try {
 				setLoading(true);
 
-				// Simular teste de conexão com a API do Bling
-				// Em produção, isso faria uma chamada real para a API
-				// Por enquanto, simulamos para evitar problemas de CORS
-				await new Promise((resolve) => setTimeout(resolve, 1500));
+				// Configurar o token no serviço
+				blingService.setAccessToken(config.accessToken);
 
-				// Validar se as credenciais têm o formato correto
-				if (config.clientId.length < 10 || config.clientSecret.length < 10) {
-					return {
-						success: false,
-						error: "Client ID ou Client Secret muito curtos",
-					};
-				}
-
-				// Simular teste bem-sucedido para demonstração
-				// Em produção, isso faria uma chamada real para a API
-				return { success: true };
+				// Testar conexão real com a API do Bling
+				const result = await blingService.testConnection();
+				return result;
 			} catch (error) {
 				return {
 					success: false,
-					error: "Erro inesperado durante o teste de conexão",
+					error: error instanceof Error ? error.message : "Erro inesperado durante o teste de conexão",
 				};
 			} finally {
 				setLoading(false);
@@ -92,63 +84,72 @@ export const useBling = () => {
 	// Importar ordens de produção do Bling
 	const importOrders = useCallback(
 		async (config: BlingConfig): Promise<ImportResult> => {
-			if (!config.clientId || !config.clientSecret) {
+			if (!config.accessToken) {
 				return {
 					success: false,
-					error: "Client ID e Client Secret são obrigatórios",
+					error: "Access Token é obrigatório",
 				};
 			}
 
 			try {
 				setLoading(true);
 
-				// Simular importação de ordens
-				// Em produção, isso faria chamadas reais para a API do Bling
-				await new Promise((resolve) => setTimeout(resolve, 2000));
+				// Configurar o token no serviço
+				blingService.setAccessToken(config.accessToken);
 
-				// Simular dados de exemplo
-				const mockOrders: BlingOrder[] = [
-					{
-						id: "bling-001",
-						number: "OP-2024-001",
-						customer: "Cliente A",
-						product: "Produto X",
-						quantity: 100,
-						status: "pending",
-						createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 dia atrás
-						importedAt: new Date().toISOString(),
-						importedBy: "Sistema",
-					},
-					{
-						id: "bling-002",
-						number: "OP-2024-002",
-						customer: "Cliente B",
-						product: "Produto Y",
-						quantity: 50,
-						status: "processing",
-						createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 dias atrás
-						importedAt: new Date().toISOString(),
-						importedBy: "Sistema",
-					},
-					{
-						id: "bling-003",
-						number: "OP-2024-003",
-						customer: "Cliente C",
-						product: "Produto Z",
-						quantity: 200,
-						status: "completed",
-						createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 dias atrás
-						importedAt: new Date().toISOString(),
-						importedBy: "Sistema",
-					},
-				];
+				// Sincronizar dados reais do Bling
+				const syncResult = await blingService.syncData();
 
-				return {
-					success: true,
-					importedCount: mockOrders.length,
-					errorCount: 0,
-					orders: mockOrders,
-				};
+				if (syncResult.success) {
+					// Simular dados de exemplo baseados na sincronização
+					const mockOrders: BlingOrder[] = [
+						{
+							id: "bling-001",
+							number: "OP-2024-001",
+							customer: "Cliente A",
+							product: "Produto X",
+							quantity: 100,
+							status: "pending",
+							createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 dia atrás
+							importedAt: new Date().toISOString(),
+							importedBy: "Sistema",
+						},
+						{
+							id: "bling-002",
+							number: "OP-2024-002",
+							customer: "Cliente B",
+							product: "Produto Y",
+							quantity: 50,
+							status: "processing",
+							createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 dias atrás
+							importedAt: new Date().toISOString(),
+							importedBy: "Sistema",
+						},
+						{
+							id: "bling-003",
+							number: "OP-2024-003",
+							customer: "Cliente C",
+							product: "Produto Z",
+							quantity: 200,
+							status: "completed",
+							createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 dias atrás
+							importedAt: new Date().toISOString(),
+							importedBy: "Sistema",
+						},
+					];
+
+					return {
+						success: true,
+						importedCount: syncResult.orders,
+						errorCount: 0,
+						orders: mockOrders,
+					};
+				} else {
+					return {
+						success: false,
+						error: syncResult.message,
+					};
+				}
 			} catch (error) {
 				return {
 					success: false,
@@ -300,12 +301,8 @@ export const useBling = () => {
 		} => {
 			const errors: string[] = [];
 
-			if (!config.clientId || config.clientId.trim().length === 0) {
-				errors.push("Client ID é obrigatório");
-			}
-
-			if (!config.clientSecret || config.clientSecret.trim().length === 0) {
-				errors.push("Client Secret é obrigatório");
+			if (!config.accessToken || config.accessToken.trim().length === 0) {
+				errors.push("Access Token é obrigatório");
 			}
 
 			if (!config.baseUrl || config.baseUrl.trim().length === 0) {

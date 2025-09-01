@@ -13,35 +13,7 @@ import {
   FaStar,
   FaIndustry,
 } from "react-icons/fa";
-
-interface Task {
-  id: string;
-  orderId: string;
-  productName: string;
-  activity: string;
-  sector: string;
-  description: string;
-  estimatedTime: number;
-  setupTime: number;
-  startTime: string;
-  endTime: string;
-  status: "pending" | "in_progress" | "paused" | "completed" | "delayed";
-  actualStartTime?: string;
-  actualEndTime?: string;
-  actualTime?: number;
-  priority: "low" | "medium" | "high" | "urgent";
-  requiredSkills: string[];
-  breaks: Break[];
-  nonConformities: string[];
-}
-
-interface Break {
-  id: string;
-  type: "coffee" | "lunch" | "bathroom" | "other";
-  startTime: string;
-  endTime?: string;
-  duration?: number;
-}
+import type { Task } from "../../../types/operatorSchedule";
 
 interface QuickActionsPanelProps {
   tasks: Task[];
@@ -232,81 +204,84 @@ export default function QuickActionsPanel({
             </div>
           </div>
 
-          {/* Filtros */}
-          <div className="filter-section">
-            <h4>Filtros</h4>
-            <div className="filter-buttons">
-              <button
-                className={`filter-btn ${
-                  activeFilter === "all" ? "active" : ""
-                }`}
-                onClick={() => applyFilter("all")}
-              >
-                <FaSearch /> Todas
-              </button>
-              <button
-                className={`filter-btn ${
-                  activeFilter === "priority" ? "active" : ""
-                }`}
-                onClick={() => applyFilter("priority")}
-              >
-                <FaFire /> Prioridade
-              </button>
-              <button
-                className={`filter-btn ${
-                  activeFilter === "status" ? "active" : ""
-                }`}
-                onClick={() => applyFilter("status")}
-              >
-                <FaClock /> Ativas
-              </button>
-              <button
-                className={`filter-btn ${
-                  activeFilter === "upcoming" ? "active" : ""
-                }`}
-                onClick={() => applyFilter("upcoming")}
-              >
-                <FaArrowRight /> Próximas
-              </button>
+          {/* Filtros e Ordenação */}
+          <div className="filters-container">
+            {/* Filtros */}
+            <div className="filter-section">
+              <h4>Filtros</h4>
+              <div className="filter-buttons">
+                <button
+                  className={`filter-btn ${
+                    activeFilter === "all" ? "active" : ""
+                  }`}
+                  onClick={() => applyFilter("all")}
+                >
+                  <FaSearch /> Todas
+                </button>
+                <button
+                  className={`filter-btn ${
+                    activeFilter === "priority" ? "active" : ""
+                  }`}
+                  onClick={() => applyFilter("priority")}
+                >
+                  <FaFire /> Prioridade
+                </button>
+                <button
+                  className={`filter-btn ${
+                    activeFilter === "status" ? "active" : ""
+                  }`}
+                  onClick={() => applyFilter("status")}
+                >
+                  <FaClock /> Ativas
+                </button>
+                <button
+                  className={`filter-btn ${
+                    activeFilter === "upcoming" ? "active" : ""
+                  }`}
+                  onClick={() => applyFilter("upcoming")}
+                >
+                  <FaArrowRight /> Próximas
+                </button>
+              </div>
             </div>
-          </div>
 
-          {/* Ordenação */}
-          <div className="sort-section">
-            <h4>Ordenar por</h4>
-            <div className="sort-buttons">
-              <button
-                className={`sort-btn ${
-                  activeSortType === "time" ? "active" : ""
-                }`}
-                onClick={() => applySort("time")}
-              >
-                <FaClock /> Horário
-              </button>
-              <button
-                className={`sort-btn ${
-                  activeSortType === "priority" ? "active" : ""
-                }`}
-                onClick={() => applySort("priority")}
-              >
-                <FaStar /> Prioridade
-              </button>
-              <button
-                className={`sort-btn ${
-                  activeSortType === "duration" ? "active" : ""
-                }`}
-                onClick={() => applySort("duration")}
-              >
-                <FaClock /> Duração
-              </button>
-              <button
-                className={`sort-btn ${
-                  activeSortType === "sector" ? "active" : ""
-                }`}
-                onClick={() => applySort("sector")}
-              >
-                <FaIndustry /> Setor
-              </button>
+            {/* Ordenação */}
+            <div className="sort-section">
+              <h4>Ordenar por</h4>
+              <div className="sort-buttons">
+                <button
+                  className={`sort-btn ${
+                    activeSortType === "time" ? "active" : ""
+                  }`}
+                  onClick={() => applySort("time")}
+                >
+                  <FaClock /> Horário
+                </button>
+                <button
+                  className={`sort-btn ${
+                    activeSortType === "priority" ? "active" : ""
+                  }`}
+                  onClick={() => applySort("priority")}
+                >
+                  <FaStar /> Prioridade
+                </button>
+                <button
+                  className={`sort-btn ${
+                    activeSortType === "duration" ? "active" : ""
+                  }`}
+                  onClick={() => applySort("duration")}
+                >
+                  <FaClock /> Duração
+                </button>
+                <button
+                  className={`sort-btn ${
+                    activeSortType === "sector" ? "active" : ""
+                  }`}
+                  onClick={() => applySort("sector")}
+                >
+                  <FaIndustry /> Setor
+                </button>
+              </div>
             </div>
           </div>
 

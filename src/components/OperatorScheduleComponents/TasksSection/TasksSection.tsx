@@ -1,34 +1,6 @@
 import TaskCard from "../TaskCard/TaskCard";
 import "./TasksSection.css";
-
-interface Break {
-	id: string;
-	type: "coffee" | "lunch" | "bathroom" | "other";
-	startTime: string;
-	endTime?: string;
-	duration?: number;
-}
-
-interface Task {
-	id: string;
-	orderId: string;
-	productName: string;
-	activity: string;
-	sector: string;
-	description: string;
-	estimatedTime: number;
-	setupTime: number;
-	startTime: string;
-	endTime: string;
-	status: "pending" | "in_progress" | "paused" | "completed" | "delayed";
-	actualStartTime?: string;
-	actualEndTime?: string;
-	actualTime?: number;
-	priority: "low" | "medium" | "high" | "urgent";
-	requiredSkills: string[];
-	breaks: Break[];
-	nonConformities: string[];
-}
+import type { Task } from "../../../types/operatorSchedule";
 
 interface TasksSectionProps {
 	tasks: Task[];
@@ -39,6 +11,7 @@ interface TasksSectionProps {
 	getPriorityColor: (priority: Task["priority"]) => string;
 	getEfficiencyColor: (efficiency: number) => string;
 	formatTime: (minutes: number) => string;
+	onDateChange?: (date: Date) => void;
 }
 
 export default function TasksSection({
@@ -50,6 +23,7 @@ export default function TasksSection({
 	getPriorityColor,
 	getEfficiencyColor,
 	formatTime,
+	onDateChange,
 }: TasksSectionProps) {
 	return (
 		<div className="tasks-section">
@@ -58,11 +32,11 @@ export default function TasksSection({
 				<div className="date-selector">
 					<button
 						className="date-nav"
-						onClick={() =>
-							setCurrentDate(
-								new Date(currentDate.getTime() - 24 * 60 * 60 * 1000)
-							)
-						}
+						onClick={() => {
+							const newDate = new Date(currentDate.getTime() - 24 * 60 * 60 * 1000);
+							setCurrentDate(newDate);
+							onDateChange?.(newDate);
+						}}
 					>
 						←
 					</button>
@@ -76,11 +50,11 @@ export default function TasksSection({
 					</span>
 					<button
 						className="date-nav"
-						onClick={() =>
-							setCurrentDate(
-								new Date(currentDate.getTime() + 24 * 60 * 60 * 1000)
-							)
-						}
+						onClick={() => {
+							const newDate = new Date(currentDate.getTime() + 24 * 60 * 60 * 1000);
+							setCurrentDate(newDate);
+							onDateChange?.(newDate);
+						}}
 					>
 						→
 					</button>

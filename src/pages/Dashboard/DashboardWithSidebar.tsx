@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../hooks/useAuth";
 import Sidebar from "../../components/Sidebar/Sidebar";
 import Dashboard from "../../components/DashboardComponents/Dashboard";
 import OperatorSchedule from "../OperatorSchedule/OperatorSchedule";
@@ -18,7 +19,27 @@ import Settings from "../Settings/Settings";
 import "./DashboardWithSidebar.css";
 
 export default function DashboardWithSidebar() {
-	const [currentPage, setCurrentPage] = useState("orders");
+	const { user } = useAuth();
+	
+	// Determinar a página padrão baseada no tipo de usuário
+	const getDefaultPage = () => {
+		if (user?.userType === "operator") {
+			return "schedule"; // Operadores vão direto para agenda
+		}
+		return "orders"; // Outros usuários vão para dashboard
+	};
+	
+	const [currentPage, setCurrentPage] = useState(getDefaultPage());
+
+	// Atualizar a página padrão quando o usuário for carregado
+	useEffect(() => {
+		if (user) {
+			const defaultPage = getDefaultPage();
+			if (currentPage !== defaultPage) {
+				setCurrentPage(defaultPage);
+			}
+		}
+	}, [user]);
 
 	const handlePageChange = (page: string) => {
 		setCurrentPage(page);

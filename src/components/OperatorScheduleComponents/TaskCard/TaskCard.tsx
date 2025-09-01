@@ -1,34 +1,6 @@
 import { FaPlay } from "react-icons/fa";
 import "./TaskCard.css";
-
-interface Break {
-  id: string;
-  type: "coffee" | "lunch" | "bathroom" | "other";
-  startTime: string;
-  endTime?: string;
-  duration?: number;
-}
-
-interface Task {
-  id: string;
-  orderId: string;
-  productName: string;
-  activity: string;
-  sector: string;
-  description: string;
-  estimatedTime: number;
-  setupTime: number;
-  startTime: string;
-  endTime: string;
-  status: "pending" | "in_progress" | "paused" | "completed" | "delayed";
-  actualStartTime?: string;
-  actualEndTime?: string;
-  actualTime?: number;
-  priority: "low" | "medium" | "high" | "urgent";
-  requiredSkills: string[];
-  breaks: Break[];
-  nonConformities: string[];
-}
+import type { Task } from "../../../types/operatorSchedule";
 
 interface TaskCardProps {
   task: Task;

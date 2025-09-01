@@ -1,10 +1,23 @@
 import "./FiltersSection.css";
 
+interface OperatorWithUser {
+  operator: {
+    id: string;
+    code: string;
+    status: string;
+  };
+  user: {
+    name?: string;
+    email: string;
+  };
+}
+
 interface FiltersSectionProps {
   selectedOperator: string;
   setSelectedOperator: (operator: string) => void;
   selectedSector: string;
   setSelectedSector: (sector: string) => void;
+  availableOperators: OperatorWithUser[];
 }
 
 export default function FiltersSection({
@@ -12,6 +25,7 @@ export default function FiltersSection({
   setSelectedOperator,
   selectedSector,
   setSelectedSector,
+  availableOperators,
 }: FiltersSectionProps) {
   return (
     <div className="filters-section">
@@ -22,10 +36,11 @@ export default function FiltersSection({
           onChange={(e) => setSelectedOperator(e.target.value)}
         >
           <option value="all">Todos</option>
-          <option value="op-001">João Silva</option>
-          <option value="op-002">Maria Santos</option>
-          <option value="op-003">Pedro Costa</option>
-          <option value="op-004">Ana Oliveira</option>
+          {availableOperators.map((operatorWithUser) => (
+            <option key={operatorWithUser.operator.id} value={operatorWithUser.operator.id}>
+              {operatorWithUser.user.name || operatorWithUser.operator.code}
+            </option>
+          ))}
         </select>
       </div>
       <div className="filter-group">

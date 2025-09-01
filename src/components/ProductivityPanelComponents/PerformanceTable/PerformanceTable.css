@@ -3,7 +3,7 @@
   border-radius: 16px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
 }
 
 .section-header {
@@ -13,12 +13,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.section-header h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  font-weight: 600;
 }
 
 .section-actions {
@@ -44,7 +38,6 @@
 
 .performance-table-container {
   overflow-x: auto;
-  max-height: 600px;
   overflow-y: auto;
 }
 

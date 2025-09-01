@@ -1,7 +1,7 @@
 "use client";
 
 import "./ControlPanelHeader.css";
-import { FaCog, FaSync } from "react-icons/fa";
+import { FaSync } from "react-icons/fa";
 
 interface ControlPanelHeaderProps {
   onRefresh: () => void;
@@ -16,12 +16,8 @@ export default function ControlPanelHeader({
     <div className="control-panel-header">
       <div className="header-content">
         <div className="header-info">
-          <div className="header-icon">
-            <FaCog />
-          </div>
           <div className="header-text">
             <h1>Painel de Controle</h1>
-            <p>Monitoramento em tempo real da produção</p>
           </div>
         </div>
         <div className="header-actions">

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProductivityData } from "../../hooks";
+import { getAllOperatorsWithUsers } from "../../services/authService";
 import {
   ProductivityHeader,
   UserStatsCard,
@@ -13,6 +14,19 @@ import {
 } from "../../components/ProductivityPanelComponents/index";
 import "./ProductivityPanel.css";
 import { FaChartLine, FaChartBar, FaArrowRight } from "react-icons/fa";
+import React from "react";
+
+interface OperatorWithUser {
+  operator: {
+    id: string;
+    code: string;
+    status: string;
+  };
+  user: {
+    name?: string;
+    email: string;
+  };
+}
 
 export default function ProductivityPanel() {
   const [selectedPeriod, setSelectedPeriod] = useState<
@@ -20,10 +34,66 @@ export default function ProductivityPanel() {
   >("today");
   const [selectedOperator, setSelectedOperator] = useState<string>("all");
   const [selectedSector, setSelectedSector] = useState<string>("all");
+  const [selectedOperatorForStats, setSelectedOperatorForStats] = useState<string>("");
+  const [availableOperators, setAvailableOperators] = useState<OperatorWithUser[]>([]);
 
   // Hook que calcula dados de produtividade baseados na agenda do operador
   const { productivityData, operatorRankings, periodStats, currentUserStats } =
     useProductivityData();
+
+  // Carregar operadores reais do sistema
+  useEffect(() => {
+    const loadOperators = async () => {
+      try {
+        const operatorsData = await getAllOperatorsWithUsers();
+        if (Array.isArray(operatorsData)) {
+          setAvailableOperators(operatorsData);
+          // Definir operador padrão para stats se não houver seleção
+          if (operatorsData.length > 0 && !selectedOperatorForStats) {
+            setSelectedOperatorForStats(operatorsData[0].operator.id);
+          }
+        }
+      } catch (error) {
+        console.error("Erro ao carregar operadores:", error);
+        setAvailableOperators([]);
+      }
+    };
+
+    loadOperators();
+  }, []);
+
+  // Definir operador padrão para stats se não houver seleção
+  React.useEffect(() => {
+    if (operatorRankings.length > 0 && !selectedOperatorForStats) {
+      setSelectedOperatorForStats(operatorRankings[0].operatorId);
+    }
+  }, [operatorRankings, selectedOperatorForStats]);
+
+  // Obter stats do operador selecionado
+  const getSelectedOperatorStats = () => {
+    if (!selectedOperatorForStats) return currentUserStats;
+    
+    // Buscar nos operadores reais primeiro
+    const realOperator = availableOperators.find(op => op.operator.id === selectedOperatorForStats);
+    if (realOperator) {
+      // Criar stats básicos para o operador real
+      return {
+        operatorId: realOperator.operator.id,
+        operatorName: realOperator.user.name || realOperator.operator.code,
+        totalTasks: 0, // Será calculado quando implementar integração com agenda
+        averageEfficiency: 85, // Valor padrão
+        totalProductivity: 80, // Valor padrão
+        onTimeCompletion: 90, // Valor padrão
+        rank: 1, // Será calculado quando implementar ranking
+        trend: "stable" as const,
+      };
+    }
+    
+    // Fallback para operatorRankings se não encontrar nos operadores reais
+    return operatorRankings.find(op => op.operatorId === selectedOperatorForStats) || currentUserStats;
+  };
+
+  const selectedOperatorStats = getSelectedOperatorStats();
 
   const getEfficiencyColor = (efficiency: number) => {
     if (efficiency >= 105) return "#48bb78";
@@ -78,9 +148,9 @@ export default function ProductivityPanel() {
           setSelectedPeriod={setSelectedPeriod}
         />
 
-        {currentUserStats && (
+        {selectedOperatorStats && (
           <UserStatsCard
-            currentUserStats={currentUserStats}
+            currentUserStats={selectedOperatorStats}
             getEfficiencyColor={getEfficiencyColor}
             getTrendIcon={getTrendIcon}
           />
@@ -100,6 +170,7 @@ export default function ProductivityPanel() {
             setSelectedOperator={setSelectedOperator}
             selectedSector={selectedSector}
             setSelectedSector={setSelectedSector}
+            availableOperators={availableOperators}
           />
 
           <PerformanceTable

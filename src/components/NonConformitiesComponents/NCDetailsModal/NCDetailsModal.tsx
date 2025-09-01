@@ -93,10 +93,10 @@ export default function NCDetailsModal({
                 <div className="info-section">
                   <h4>Anexos</h4>
                   <div className="attachments-grid">
-                    {selectedNC.attachments.map((attName, index) => (
+                    {selectedNC.attachments.map((attachment, index) => (
                       <div key={index} className="attachment-item">
                         <div className="attachment-info">
-                          <span className="attachment-name">{attName}</span>
+                          <span className="attachment-name">{attachment.fileName}</span>
                         </div>
                       </div>
                     ))}

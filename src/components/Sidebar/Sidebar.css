@@ -96,6 +96,8 @@
 }
 
 .user-info {
+  display: flex;
+  flex-direction: row;
   flex: 1;
   min-width: 0;
 }
@@ -116,12 +118,7 @@
 
 .sidebar-nav {
   flex: 1;
-  padding: 1rem 0;
   overflow-y: auto;
-}
-
-.nav-section {
-  margin-bottom: 1.5rem;
 }
 
 .nav-section-title {

@@ -1,33 +1,5 @@
 import { useState, useEffect } from "react";
-
-interface Task {
-  id: string;
-  orderId: string;
-  productName: string;
-  activity: string;
-  sector: string;
-  description: string;
-  estimatedTime: number; // em minutos
-  setupTime: number;
-  startTime: string;
-  endTime: string;
-  status: "pending" | "in_progress" | "paused" | "completed" | "delayed";
-  actualStartTime?: string;
-  actualEndTime?: string;
-  actualTime?: number;
-  priority: "low" | "medium" | "high" | "urgent";
-  requiredSkills: string[];
-  breaks: Break[];
-  nonConformities: string[];
-}
-
-interface Break {
-  id: string;
-  type: "coffee" | "lunch" | "bathroom" | "other";
-  startTime: string;
-  endTime?: string;
-  duration?: number;
-}
+import type { Task } from "../types/operatorSchedule";
 
 interface ProductivityData {
   operatorId: string;
@@ -119,6 +91,9 @@ export const useProductivityData = () => {
         requiredSkills: ["Corte", "Medição"],
         breaks: [],
         nonConformities: [],
+        sectorId: "corte-001",
+        assignedOperatorId: "op-001",
+        qualityChecks: [],
       },
       {
         id: "task-002",
@@ -147,6 +122,9 @@ export const useProductivityData = () => {
           },
         ],
         nonConformities: [],
+        sectorId: "montagem-001",
+        assignedOperatorId: "op-001",
+        qualityChecks: [],
       },
       {
         id: "task-003",
@@ -167,6 +145,9 @@ export const useProductivityData = () => {
         requiredSkills: ["Acabamento", "Inspeção"],
         breaks: [],
         nonConformities: [],
+        sectorId: "acabamento-001",
+        assignedOperatorId: "op-001",
+        qualityChecks: [],
       },
       {
         id: "task-004",
@@ -187,6 +168,9 @@ export const useProductivityData = () => {
         requiredSkills: ["Preparação"],
         breaks: [],
         nonConformities: [],
+        sectorId: "preparacao-001",
+        assignedOperatorId: "op-001",
+        qualityChecks: [],
       },
       {
         id: "task-005",
@@ -207,6 +191,9 @@ export const useProductivityData = () => {
         requiredSkills: ["Qualidade", "Inspeção"],
         breaks: [],
         nonConformities: [],
+        sectorId: "qualidade-001",
+        assignedOperatorId: "op-001",
+        qualityChecks: [],
       },
     ];
 

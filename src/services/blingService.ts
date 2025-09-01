@@ -2,14 +2,9 @@ interface BlingConfig {
 	clientId: string;
 	clientSecret: string;
 	baseUrl: string;
+	accessToken?: string;
 }
 
-interface BlingAuthResponse {
-	access_token: string;
-	token_type: string;
-	expires_in: number;
-	refresh_token?: string;
-}
 
 class BlingService {
 	private config: BlingConfig;
@@ -20,43 +15,23 @@ class BlingService {
 		this.config = {
 			clientId: import.meta.env.VITE_BLING_CLIENT_ID || "",
 			clientSecret: import.meta.env.VITE_BLING_CLIENT_SECRET || "",
-			baseUrl:
-				import.meta.env.VITE_BLING_API_BASE_URL ||
-				"https://www.bling.com.br/Api/v2",
+			baseUrl: "https://api.bling.com.br/Api/v3",
+			accessToken: import.meta.env.VITE_BLING_ACCESS_TOKEN || "",
 		};
+		
+		if (this.config.accessToken) {
+			this.accessToken = this.config.accessToken;
+			this.tokenExpiry = Date.now() + (365 * 24 * 60 * 60 * 1000); 
+		}
 	}
 
 	/**
-	 * Autentica com a API Bling usando Client Credentials
+	 * Define o token de acesso OAuth
+	 * Este método deve ser chamado quando o usuário autorizar o aplicativo
 	 */
-	async authenticate(): Promise<string> {
-		try {
-			const response = await fetch(`${this.config.baseUrl}/oauth/token`, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded",
-				},
-				body: new URLSearchParams({
-					grant_type: "client_credentials",
-					client_id: this.config.clientId,
-					client_secret: this.config.clientSecret,
-				}),
-			});
-
-			if (!response.ok) {
-				throw new Error(`Erro na autenticação: ${response.status}`);
-			}
-
-			const authData: BlingAuthResponse = await response.json();
-
-			this.accessToken = authData.access_token;
-			this.tokenExpiry = Date.now() + authData.expires_in * 1000;
-
-			return this.accessToken;
-		} catch (error) {
-			console.error("Erro na autenticação Bling:", error);
-			throw error;
-		}
+	setAccessToken(token: string): void {
+		this.accessToken = token;
+		this.tokenExpiry = Date.now() + (365 * 24 * 60 * 60 * 1000); // 1 ano
 	}
 
 	/**
@@ -67,11 +42,11 @@ class BlingService {
 	}
 
 	/**
-	 * Obtém um token válido (renova se necessário)
+	 * Obtém um token válido
 	 */
-	private async getValidToken(): Promise<string> {
+	private getValidToken(): string {
 		if (!this.isTokenValid()) {
-			await this.authenticate();
+			throw new Error("Token de acesso não configurado ou expirado. Configure o VITE_BLING_ACCESS_TOKEN ou use setAccessToken()");
 		}
 		return this.accessToken!;
 	}
@@ -81,10 +56,10 @@ class BlingService {
 	 */
 	async getOrders(page: number = 1, limit: number = 50): Promise<any> {
 		try {
-			const token = await this.getValidToken();
+			const token = this.getValidToken();
 
 			const response = await fetch(
-				`${this.config.baseUrl}/pedidos?apikey=${token}&page=${page}&limit=${limit}`,
+				`${this.config.baseUrl}/pedidos?page=${page}&limit=${limit}`,
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -109,10 +84,10 @@ class BlingService {
 	 */
 	async getProducts(page: number = 1, limit: number = 50): Promise<any> {
 		try {
-			const token = await this.getValidToken();
+			const token = this.getValidToken();
 
 			const response = await fetch(
-				`${this.config.baseUrl}/produtos?apikey=${token}&page=${page}&limit=${limit}`,
+				`${this.config.baseUrl}/produtos?page=${page}&limit=${limit}`,
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -137,10 +112,10 @@ class BlingService {
 	 */
 	async getCustomers(page: number = 1, limit: number = 50): Promise<any> {
 		try {
-			const token = await this.getValidToken();
+			const token = this.getValidToken();
 
 			const response = await fetch(
-				`${this.config.baseUrl}/contatos?apikey=${token}&page=${page}&limit=${limit}`,
+				`${this.config.baseUrl}/contatos?page=${page}&limit=${limit}`,
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -157,6 +132,36 @@ class BlingService {
 		} catch (error) {
 			console.error("Erro ao buscar clientes:", error);
 			throw error;
+		}
+	}
+
+	/**
+	 * Testa a conexão com a API Bling
+	 */
+	async testConnection(): Promise<{ success: boolean; error?: string }> {
+		try {
+			const token = this.getValidToken();
+
+			const response = await fetch(`${this.config.baseUrl}/contatos?page=1&limit=1`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"Content-Type": "application/json",
+				},
+			});
+
+			if (response.ok) {
+				return { success: true };
+			} else {
+				return { 
+					success: false, 
+					error: `Erro ${response.status}: ${response.statusText}` 
+				};
+			}
+		} catch (error) {
+			return { 
+				success: false, 
+				error: error instanceof Error ? error.message : "Erro desconhecido" 
+			};
 		}
 	}
 

@@ -3,18 +3,11 @@
   padding: 1.5rem 2rem;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
   display: flex;
   gap: 2rem;
   align-items: center;
   flex-wrap: wrap;
-}
-
-.filter-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-width: 150px;
 }
 
 .filter-group label {

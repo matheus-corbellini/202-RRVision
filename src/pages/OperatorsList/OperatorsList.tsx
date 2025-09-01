@@ -440,9 +440,6 @@ export default function OperatorsList() {
 							<FaUsers className="header-icon" />
 							Lista de Operadores
 						</h1>
-						<p>
-							Visualize e gerencie todos os operadores registrados no sistema
-						</p>
 					</div>
 					<div className="header-actions">
 						<Button

@@ -16,8 +16,8 @@ import Button from "../../components/Button/Button";
 import {
 	listAllOperationalRoutes,
 	deleteOperationalRoute,
-	type OperationalRoute,
 } from "../../services/operationalRoutesService";
+import type { OperationalRoute } from "../../types/operationalRoutes";
 import "./OperationalRoutesList.css";
 
 export default function OperationalRoutesList() {

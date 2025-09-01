@@ -125,12 +125,6 @@
 	overflow: hidden;
 }
 
-.section-header {
-	background: linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%);
-	padding: 2rem;
-	border-bottom: 1px solid #e2e8f0;
-}
-
 .section-header h2 {
 	font-size: 1.5rem;
 	font-weight: 700;
@@ -349,7 +343,7 @@
 
 .filter-group {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	gap: 0.5rem;
 }
 

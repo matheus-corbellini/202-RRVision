@@ -57,6 +57,7 @@ export default function NonConformities() {
         status: "investigating",
         location: {
           sector: "Corte",
+          sectorId: "corte-001",
           station: "Estação 02",
           equipment: "Serra CNC-001",
         },
@@ -74,9 +75,30 @@ export default function NonConformities() {
         createdAt: "2024-01-20T10:30:00",
         updatedAt: "2024-01-20T11:15:00",
         attachments: [
-          "peca_defeituosa.jpg",
-          "medicao_dimensional.pdf",
+          {
+            id: "att-001",
+            fileName: "peca_defeituosa.jpg",
+            fileType: "image/jpeg",
+            fileSize: 1024000,
+            uploadedAt: "2024-01-20T10:30:00",
+            uploadedBy: "op-001",
+            url: "/attachments/peca_defeituosa.jpg",
+            category: "photo"
+          },
+          {
+            id: "att-002",
+            fileName: "medicao_dimensional.pdf",
+            fileType: "application/pdf",
+            fileSize: 512000,
+            uploadedAt: "2024-01-20T10:30:00",
+            uploadedBy: "op-001",
+            url: "/attachments/medicao_dimensional.pdf",
+            category: "document"
+          },
         ],
+        stopProduction: false,
+        requiresImmediateAction: true,
+        escalationLevel: "supervisor",
       },
       {
         id: "NC-2024-002",
@@ -89,6 +111,7 @@ export default function NonConformities() {
         status: "resolved",
         location: {
           sector: "Recebimento",
+          sectorId: "recebimento-001",
           station: "Dock 01",
         },
         reportedBy: {
@@ -105,8 +128,20 @@ export default function NonConformities() {
         updatedAt: "2024-01-19T16:45:00",
         resolvedAt: "2024-01-19T16:45:00",
         attachments: [
-          "material_defeituoso.jpg",
+          {
+            id: "att-003",
+            fileName: "material_defeituoso.jpg",
+            fileType: "image/jpeg",
+            fileSize: 2048000,
+            uploadedAt: "2024-01-19T14:20:00",
+            uploadedBy: "op-002",
+            url: "/attachments/material_defeituoso.jpg",
+            category: "photo"
+          },
         ],
+        stopProduction: false,
+        requiresImmediateAction: false,
+        escalationLevel: "none",
       },
       {
         id: "NC-2024-003",
@@ -119,6 +154,7 @@ export default function NonConformities() {
         status: "open",
         location: {
           sector: "Montagem",
+          sectorId: "montagem-001",
           station: "Linha 03",
           equipment: "Compressor CP-005",
         },
@@ -130,6 +166,9 @@ export default function NonConformities() {
         createdAt: "2024-01-20T08:15:00",
         updatedAt: "2024-01-20T08:15:00",
         attachments: [],
+        stopProduction: false,
+        requiresImmediateAction: false,
+        escalationLevel: "none",
       },
     ];
 
@@ -147,6 +186,7 @@ export default function NonConformities() {
       status: "open",
       location: {
         sector: newNC.sector,
+        sectorId: "default-sector-id", // TODO: Get actual sector ID
         station: newNC.station,
         equipment: newNC.equipment || undefined,
       },
@@ -158,6 +198,9 @@ export default function NonConformities() {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       attachments: [],
+      stopProduction: false,
+      requiresImmediateAction: false,
+      escalationLevel: "none",
     };
 
     setNonConformities((prev) => [newNonConformity, ...prev]);
@@ -316,9 +359,22 @@ export default function NonConformities() {
       high: nonConformities.filter((nc) => nc.priority === "high").length,
       urgent: nonConformities.filter((nc) => nc.priority === "urgent").length,
     },
+    byCategory: {
+      quality: nonConformities.filter((nc) => nc.category === "quality").length,
+      safety: nonConformities.filter((nc) => nc.category === "safety").length,
+      process: nonConformities.filter((nc) => nc.category === "process").length,
+      equipment: nonConformities.filter((nc) => nc.category === "equipment").length,
+      material: nonConformities.filter((nc) => nc.category === "material").length,
+    },
+    bySector: nonConformities.reduce((acc, nc) => {
+      acc[nc.location.sector] = (acc[nc.location.sector] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>),
+    productionStopped: nonConformities.filter((nc) => nc.stopProduction).length,
+    requiresImmediateAction: nonConformities.filter((nc) => nc.requiresImmediateAction).length,
   };
 
-  const productionStoppedCount = 0; // No stopProduction property in NonConformity type
+
 
   return (
     <div className="nc-page">
@@ -327,7 +383,7 @@ export default function NonConformities() {
 
         <StatsCards
           stats={stats}
-          productionStoppedCount={productionStoppedCount}
+          productionStoppedCount={stats.productionStopped}
         />
 
         <div className="nc-content">

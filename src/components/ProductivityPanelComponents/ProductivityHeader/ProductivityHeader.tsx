@@ -13,7 +13,6 @@ export default function ProductivityHeader({
     <div className="productivity-header">
       <div className="header-info">
         <h1>Painel de Produtividade</h1>
-        <p>Análise completa de performance e eficiência operacional</p>
       </div>
       <div className="header-controls">
         <div className="period-selector">

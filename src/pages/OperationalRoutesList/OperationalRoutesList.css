@@ -60,17 +60,6 @@
 	transform: translateY(-1px);
 }
 
-/* Filtros */
-.filters-section {
-	background: white;
-	border-radius: 12px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	padding: 1.5rem;
-	display: flex;
-	flex-direction: row;
-	gap: 1.5rem;
-}
-
 /* Busca Principal */
 .search-container {
 	display: flex;
@@ -603,11 +592,6 @@
 
 	.header-content h1 {
 		font-size: 1.75rem;
-	}
-
-	.filters-section {
-		padding: 1rem;
-		gap: 1rem;
 	}
 
 	.filters-row {

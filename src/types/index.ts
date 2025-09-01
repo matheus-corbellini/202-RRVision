@@ -155,3 +155,30 @@ export interface ProductionAlert {
 		type: "comment" | "status_change" | "escalation";
 	}>;
 }
+
+// Re-exportar tipos específicos
+export type {
+	NonConformity,
+	NonConformityStats,
+	NonConformityFilters,
+	Attachment
+} from './nonConformities';
+
+export type {
+	OperationalRoute,
+	Product,
+	Step,
+	RouteAssignment,
+	RouteStats
+} from './operationalRoutes';
+
+export type {
+	Task,
+	Break,
+	QualityCheck,
+	OperatorStats,
+	ScheduleDay,
+	ScheduleWeek,
+	TaskFilters,
+	TaskAssignment
+} from './operatorSchedule';

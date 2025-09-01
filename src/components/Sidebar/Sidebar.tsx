@@ -8,15 +8,12 @@ import {
 	FaExclamationTriangle,
 	FaExclamationCircle,
 	FaCog,
-	FaQuestionCircle,
 	FaSignOutAlt,
 	FaChevronLeft,
 	FaChevronRight,
-	FaSync,
 	FaUsersCog,
 	FaUserPlus,
 	FaUsers,
-	FaPlug,
 	FaRoute,
 } from "react-icons/fa";
 import { useNavigation } from "../../hooks/useNavigation";
@@ -28,6 +25,15 @@ interface SidebarProps {
 	currentPage: string;
 	onPageChange: (page: string) => void;
 	variant?: "default" | "admin";
+}
+
+interface MenuItem {
+	id: string;
+	title: string;
+	icon: React.ReactNode;
+	description: string;
+	badge: string | null;
+	access: string[];
 }
 
 export default function Sidebar({
@@ -60,6 +66,7 @@ export default function Sidebar({
 			icon: <FaClipboardList />,
 			description: "Visão Geral do Sistema",
 			badge: null,
+			access: ["admin"],
 		},
 		{
 			id: "schedule",
@@ -67,6 +74,7 @@ export default function Sidebar({
 			icon: <FaCalendarAlt />,
 			description: "Agenda do Operador",
 			badge: null,
+			access: ["admin", "operator"],
 		},
 		{
 			id: "productivity",
@@ -74,6 +82,7 @@ export default function Sidebar({
 			icon: <FaChartBar />,
 			description: "Painel de Produtividade",
 			badge: null,
+			access: ["admin"],
 		},
 		{
 			id: "nonconformities",
@@ -81,6 +90,7 @@ export default function Sidebar({
 			icon: <FaExclamationTriangle />,
 			description: "Controle de Qualidade",
 			badge: "2",
+			access: ["admin"],
 		},
 		{
 			id: "alerts",
@@ -88,6 +98,7 @@ export default function Sidebar({
 			icon: <FaExclamationCircle />,
 			description: "Alertas e Notificações",
 			badge: "5",
+			access: ["admin"],
 		},
 		{
 			id: "control",
@@ -95,20 +106,23 @@ export default function Sidebar({
 			icon: <FaCog />,
 			description: "Monitoramento do Sistema",
 			badge: null,
+			access: ["admin"],
 		},
-		{
-			id: "priority-optimization",
-			title: "Otimização",
-			icon: <FaSync />,
-			description: "Otimização de Prioridades",
-			badge: "1",
-		},
+		// {
+		// 	id: "priority-optimization",
+		// 	title: "Otimização",
+		// 	icon: <FaSync />,
+		// 	description: "Otimização de Prioridades",
+		// 	badge: "1",
+		// 	access: ["admin"],
+		// },
 		{
 			id: "operator-registration",
 			title: "Cadastro de Operadores",
 			icon: <FaUserPlus />,
 			description: "Gestão de Operadores",
 			badge: null,
+			access: ["admin"],
 		},
 		{
 			id: "operators-list",
@@ -116,20 +130,23 @@ export default function Sidebar({
 			icon: <FaUsers />,
 			description: "Visualizar Todos os Operadores",
 			badge: null,
+			access: ["admin"],
 		},
-		{
-			id: "bling-integration",
-			title: "Integração Bling",
-			icon: <FaPlug />,
-			description: "API e Importação de Ordens",
-			badge: null,
-		},
+		// {
+		// 	id: "bling-integration",
+		// 	title: "Integração Bling",
+		// 	icon: <FaPlug />,
+		// 	description: "API e Importação de Ordens",
+		// 	badge: null,
+		// 	access: ["admin"],
+		// },
 		{
 			id: "operational-routes",
 			title: "Roteiros Operacionais",
 			icon: <FaRoute />,
 			description: "Cadastro de Roteiros de Produção",
 			badge: null,
+			access: ["admin"],
 		},
 		{
 			id: "operational-routes-list",
@@ -137,23 +154,44 @@ export default function Sidebar({
 			icon: <FaRoute />,
 			description: "Visualizar Todos os Roteiros",
 			badge: null,
+			access: ["admin"],
 		},
 	];
 
-	const adminOnlyItems = [
+	const adminOnlyItems: MenuItem[] = [
 		{
 			id: "admin-users",
 			title: "Gerenciar Usuários",
 			icon: <FaUsersCog />,
 			description: "Administração do Sistema",
 			badge: null,
+			access: ["admin"],
 		},
 	];
 
-	const menuItems =
-		variant === "admin"
-			? adminOnlyItems
-			: [...baseMenuItems, ...(user?.role === "admin" ? adminOnlyItems : [])];
+	// Filtrar itens baseado no tipo de usuário
+	const getFilteredMenuItems = () => {
+		if (variant === "admin") {
+			return adminOnlyItems;
+		}
+
+		// Se for operador, mostrar apenas Agenda
+		if (user?.userType === "operator" || user?.role === "operator") {
+			return baseMenuItems.filter(item => item.id === "schedule");
+		}
+
+		// Para outros usuários, filtrar baseado no role
+		const userRole = user?.role || "user";
+		const allItems = [...baseMenuItems, ...(userRole === "admin" ? adminOnlyItems : [])];
+		
+		return allItems.filter(item => 
+			item.access.includes(userRole) || 
+			item.access.includes("admin") ||
+			userRole === "admin"
+		);
+	};
+
+	const menuItems = getFilteredMenuItems();
 
 	const handlePageChange = (page: string) => {
 		// Se for uma página externa (admin), navega para ela
@@ -185,7 +223,6 @@ export default function Sidebar({
 								<span className="logo-subtitle">Brazil</span>
 							</>
 						)}
-						{isCollapsed && <span className="logo-icon">RR</span>}
 					</div>
 					<button
 						className="sidebar-toggle"
@@ -196,29 +233,8 @@ export default function Sidebar({
 					</button>
 				</div>
 
-				<div className="sidebar-user">
-					<div className="user-avatar">
-						{user?.name
-							? user.name.charAt(0).toUpperCase()
-							: user?.email?.charAt(0).toUpperCase() || "U"}
-					</div>
-					{!isCollapsed && (
-						<div className="user-info">
-							<div className="user-name">
-								{user?.name || user?.displayName || "Usuário"}
-							</div>
-							<div className="user-role">
-								{user?.role === "admin" ? "Administrador" : "Operador"}
-							</div>
-						</div>
-					)}
-				</div>
-
 				<nav className="sidebar-nav">
 					<div className="nav-section">
-						{!isCollapsed && (
-							<div className="nav-section-title">Menu Principal</div>
-						)}
 						{menuItems.map((item) => (
 							<button
 								key={item.id}
@@ -259,12 +275,6 @@ export default function Sidebar({
 									<FaCog />
 								</span>
 								{!isCollapsed && <span>Configurações</span>}
-							</button>
-							<button className="footer-item" title="Ajuda">
-								<span className="footer-icon">
-									<FaQuestionCircle />
-								</span>
-								{!isCollapsed && <span>Ajuda</span>}
 							</button>
 						</>
 					)}
