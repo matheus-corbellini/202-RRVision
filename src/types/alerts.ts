@@ -1,16 +1,13 @@
 // Tipos para alertas
-export interface ProductionAlert {
-	id: string;
+import type { BaseEntity, Location, Priority, Severity, Status, Comment } from './base';
+
+export interface ProductionAlert extends BaseEntity {
 	title: string;
 	description: string;
-	severity: "low" | "medium" | "high" | "critical";
-	priority: "low" | "medium" | "high" | "urgent";
-	status: "active" | "acknowledged" | "resolved" | "dismissed";
-	location: {
-		sector: string;
-		station?: string;
-		equipment?: string;
-	};
+	severity: Severity;
+	priority: Priority;
+	status: Status;
+	location: Location;
 	relatedEntity: {
 		id: string;
 		name: string;
@@ -19,7 +16,6 @@ export interface ProductionAlert {
 		id: string;
 		name: string;
 	};
-	createdAt: string;
 	acknowledgedAt?: string;
 	acknowledgedBy?: string;
 	resolvedAt?: string;
@@ -33,14 +29,7 @@ export interface ProductionAlert {
 		acknowledged: boolean;
 		department?: string;
 	}>;
-	comments?: Array<{
-		id: string;
-		userName: string;
-		message: string;
-		timestamp: string;
-		type: "comment" | "status_change" | "escalation";
-		userId?: string;
-	}>;
+	comments?: Comment[];
 }
 
 export interface AlertStats {
@@ -49,16 +38,6 @@ export interface AlertStats {
 	acknowledged: number;
 	resolved: number;
 	dismissed: number;
-	bySeverity: {
-		low: number;
-		medium: number;
-		high: number;
-		critical: number;
-	};
-	byPriority: {
-		low: number;
-		medium: number;
-		high: number;
-		urgent: number;
-	};
+	bySeverity: Record<Severity, number>;
+	byPriority: Record<Priority, number>;
 }

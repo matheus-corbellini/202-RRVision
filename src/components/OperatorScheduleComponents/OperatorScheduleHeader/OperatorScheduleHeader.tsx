@@ -11,6 +11,7 @@ interface OperatorScheduleHeaderProps {
   isShiftStarted?: boolean;
   shiftStartTime?: string | null;
   elapsedTime?: string | null;
+  hasActiveWorkRecord?: boolean;
 }
 
 export default function OperatorScheduleHeader({
@@ -21,6 +22,7 @@ export default function OperatorScheduleHeader({
   onStopShift,
   isShiftStarted = false,
   elapsedTime = null,
+  hasActiveWorkRecord = false,
 }: OperatorScheduleHeaderProps) {
   return (
     <div className="schedule-header">
@@ -34,10 +36,12 @@ export default function OperatorScheduleHeader({
             <button
               className="start-shift-btn"
               onClick={onStartShift}
-              title="Iniciar Jornada de Trabalho"
+              title={hasActiveWorkRecord ? "Continuar Jornada de Trabalho" : "Iniciar Jornada de Trabalho"}
             >
               <span className="btn-icon">▶</span>
-              <span className="btn-text">Iniciar Jornada</span>
+              <span className="btn-text">
+                {hasActiveWorkRecord ? "Continuar Jornada" : "Iniciar Jornada"}
+              </span>
             </button>
           ) : (
             <div className="shift-status">

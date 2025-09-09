@@ -1,71 +1,29 @@
 // Tipos para não conformidades
-export interface NonConformity {
-	id: string;
+import type { BaseEntity, Location, UserReference, SectorReference, Priority, Severity, Status, Attachment, Comment } from './base';
+
+export interface NonConformity extends BaseEntity {
 	title: string;
 	description: string;
-	severity: "low" | "medium" | "high" | "critical";
-	priority: "low" | "medium" | "high" | "urgent";
-	status: "open" | "investigating" | "resolved" | "closed";
+	severity: Severity;
+	priority: Priority;
+	status: Status;
 	category: "quality" | "safety" | "process" | "equipment" | "material";
-	location: {
-		sector: string;
-		sectorId: string;
-		station?: string;
-		equipment?: string;
-	};
-	// Associações com OP, setor e operador
+	location: Location;
 	relatedOrderId?: string; // ID da ordem de produção
-	reportedBy: {
-		id: string;
-		name: string;
-		role: string;
-		operatorId?: string;
-	};
-	assignedTo?: {
-		id: string;
-		name: string;
-		role: string;
-		operatorId?: string;
-	};
-	responsibleSector?: {
-		id: string;
-		name: string;
-		managerId?: string;
-	};
-	createdAt: string;
-	updatedAt: string;
+	reportedBy: UserReference;
+	assignedTo?: UserReference;
+	responsibleSector?: SectorReference;
 	dueDate?: string;
 	resolvedAt?: string;
 	resolvedBy?: string;
 	// Upload de anexos (fotos, laudos)
 	attachments: Attachment[];
 	tags?: string[];
-	comments?: Array<{
-		id: string;
-		userId: string;
-		userName: string;
-		message: string;
-		timestamp: string;
-		type: "comment" | "status_change" | "resolution";
-		attachments?: Attachment[];
-	}>;
+	comments?: Comment[];
 	// Campos adicionais para controle
 	stopProduction: boolean;
 	requiresImmediateAction: boolean;
 	escalationLevel: "none" | "supervisor" | "manager" | "director";
-}
-
-export interface Attachment {
-	id: string;
-	fileName: string;
-	fileType: string;
-	fileSize: number;
-	uploadedAt: string;
-	uploadedBy: string;
-	url: string;
-	thumbnailUrl?: string;
-	description?: string;
-	category: "photo" | "document" | "video" | "audio" | "other";
 }
 
 export interface NonConformityStats {
@@ -74,18 +32,8 @@ export interface NonConformityStats {
 	investigating: number;
 	resolved: number;
 	closed: number;
-	bySeverity: {
-		low: number;
-		medium: number;
-		high: number;
-		critical: number;
-	};
-	byPriority: {
-		low: number;
-		medium: number;
-		high: number;
-		urgent: number;
-	};
+	bySeverity: Record<Severity, number>;
+	byPriority: Record<Priority, number>;
 	byCategory: {
 		quality: number;
 		safety: number;
@@ -99,9 +47,9 @@ export interface NonConformityStats {
 }
 
 export interface NonConformityFilters {
-	status?: string[];
-	severity?: string[];
-	priority?: string[];
+	status?: Status[];
+	severity?: Severity[];
+	priority?: Priority[];
 	category?: string[];
 	sector?: string[];
 	assignedTo?: string;

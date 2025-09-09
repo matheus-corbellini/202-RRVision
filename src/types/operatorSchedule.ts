@@ -1,6 +1,7 @@
 // Tipos para agenda de operadores
-export interface Task {
-	id: string;
+import type { BaseEntity, Priority, Status } from './base';
+
+export interface Task extends BaseEntity {
 	orderId: string;
 	productName: string;
 	activity: string;
@@ -11,11 +12,11 @@ export interface Task {
 	setupTime: number;
 	startTime: string;
 	endTime: string;
-	status: "pending" | "in_progress" | "paused" | "completed" | "delayed" | "cancelled";
+	status: Status;
 	actualStartTime?: string;
 	actualEndTime?: string;
 	actualTime?: number;
-	priority: "low" | "medium" | "high" | "urgent";
+	priority: Priority;
 	requiredSkills: string[];
 	breaks: Break[];
 	nonConformities: string[];
@@ -28,8 +29,7 @@ export interface Task {
 	notes?: string;
 }
 
-export interface Break {
-	id: string;
+export interface Break extends BaseEntity {
 	type: "coffee" | "lunch" | "bathroom" | "maintenance" | "emergency" | "other";
 	startTime: string;
 	endTime?: string;
@@ -38,8 +38,7 @@ export interface Break {
 	approvedBy?: string;
 }
 
-export interface QualityCheck {
-	id: string;
+export interface QualityCheck extends BaseEntity {
 	type: "start" | "end" | "intermediate";
 	checkTime: string;
 	operatorId: string;
@@ -85,8 +84,8 @@ export interface ScheduleWeek {
 }
 
 export interface TaskFilters {
-	status?: string[];
-	priority?: string[];
+	status?: Status[];
+	priority?: Priority[];
 	sector?: string[];
 	operator?: string;
 	dateRange?: {
@@ -97,8 +96,7 @@ export interface TaskFilters {
 	requiresQualityCheck?: boolean;
 }
 
-export interface TaskAssignment {
-	id: string;
+export interface TaskAssignment extends BaseEntity {
 	taskId: string;
 	operatorId: string;
 	assignedAt: string;

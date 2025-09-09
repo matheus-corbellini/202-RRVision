@@ -12,9 +12,10 @@ import {
 	FaChevronLeft,
 	FaChevronRight,
 	FaUsersCog,
-	FaUserPlus,
 	FaUsers,
 	FaRoute,
+	FaUserEdit,
+	FaBox,
 } from "react-icons/fa";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useAuth } from "../../hooks/useAuth";
@@ -69,6 +70,22 @@ export default function Sidebar({
 			access: ["admin"],
 		},
 		{
+			id: "user-creation",
+			title: "Usuário",
+			icon: <FaUserEdit />,
+			description: "Gerenciar Usuários",
+			badge: null,
+			access: ["admin"],
+		},
+		{
+			id: "product-management",
+			title: "Gerenciar Produtos",
+			icon: <FaBox />,
+			description: "Cadastro e Gestão de Produtos",
+			badge: null,
+			access: ["admin"],
+		},
+		{
 			id: "schedule",
 			title: "Agenda",
 			icon: <FaCalendarAlt />,
@@ -116,14 +133,14 @@ export default function Sidebar({
 		// 	badge: "1",
 		// 	access: ["admin"],
 		// },
-		{
-			id: "operator-registration",
-			title: "Cadastro de Operadores",
-			icon: <FaUserPlus />,
-			description: "Gestão de Operadores",
-			badge: null,
-			access: ["admin"],
-		},
+		// {
+		// 	id: "operator-registration",
+		// 	title: "Cadastro de Operadores",
+		// 	icon: <FaUserPlus />,
+		// 	description: "Gestão de Operadores",
+		// 	badge: null,
+		// 	access: ["admin"],
+		// },
 		{
 			id: "operators-list",
 			title: "Lista de Operadores",

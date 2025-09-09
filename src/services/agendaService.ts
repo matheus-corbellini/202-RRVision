@@ -370,6 +370,183 @@ export const getTodayWorkShifts = async (userId: string): Promise<WorkShift[]> =
 	}
 };
 
+// Interface para registro de tempo trabalhado
+export interface WorkTimeRecord {
+	id: string;
+	userId: string;
+	operatorId: string;
+	date: string; // formato: "YYYY-MM-DD"
+	startTime: string; // formato: "HH:MM:SS"
+	endTime: string; // formato: "HH:MM:SS"
+	duration: string; // formato: "HH:MM:SS"
+	totalMinutes: number;
+	totalSeconds: number;
+	status: "active" | "completed" | "interrupted";
+	notes?: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+// Buscar registro de tempo trabalhado do dia atual
+export const getTodayWorkTimeRecord = async (
+	operatorId: string
+): Promise<WorkTimeRecord | null> => {
+	try {
+		const today = new Date().toISOString().split('T')[0];
+		const workTimeRef = collection(db, "WorkTimeRecords");
+		const q = query(
+			workTimeRef,
+			where("operatorId", "==", operatorId),
+			where("date", "==", today)
+		);
+
+		const snapshot = await getDocs(q);
+		if (snapshot.empty) {
+			return null;
+		}
+
+		const doc = snapshot.docs[0];
+		return {
+			...(doc.data() as Record<string, unknown>),
+			id: doc.id,
+		} as WorkTimeRecord;
+	} catch (error) {
+		console.error("Erro ao buscar registro de tempo trabalhado de hoje:", error);
+		throw error;
+	}
+};
+
+// Criar ou atualizar registro de tempo trabalhado do operador
+export const saveOrUpdateWorkTimeRecord = async (
+	userId: string,
+	operatorId: string,
+	startTime: string,
+	endTime: string,
+	duration: string,
+	totalMinutes: number,
+	notes?: string
+): Promise<string> => {
+	try {
+		const today = new Date();
+		const dateString = today.toISOString().split('T')[0];
+		
+		// Verificar se já existe um registro para hoje
+		const existingRecord = await getTodayWorkTimeRecord(operatorId);
+		
+		// Calcular total de segundos para precisão
+		const [hours, minutes, seconds] = duration.split(":").map(Number);
+		const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+		
+		console.log(`Salvando registro - Duration: ${duration}, Hours: ${hours}, Minutes: ${minutes}, Seconds: ${seconds}`);
+		console.log(`Total minutes: ${totalMinutes}, Total seconds: ${totalSeconds}`);
+		
+		if (existingRecord) {
+			// Atualizar registro existente
+			const workTimeRef = doc(db, "WorkTimeRecords", existingRecord.id);
+			const updates: Partial<WorkTimeRecord> = {
+				endTime,
+				duration,
+				totalMinutes,
+				totalSeconds,
+				status: "completed",
+				notes,
+				updatedAt: new Date().toISOString(),
+			};
+
+			await updateDoc(workTimeRef, updates);
+			console.log(`Registro de tempo trabalhado atualizado com ID: ${existingRecord.id}`);
+			return existingRecord.id;
+		} else {
+			// Criar novo registro
+			const workTimeRecord: Omit<WorkTimeRecord, "id"> = {
+				userId,
+				operatorId,
+				date: dateString,
+				startTime,
+				endTime,
+				duration,
+				totalMinutes,
+				totalSeconds,
+				status: "completed",
+				notes,
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+			};
+
+			const workTimeRef = collection(db, "WorkTimeRecords");
+			const docRef = await addDoc(workTimeRef, workTimeRecord);
+			
+			// Garantir que o campo 'id' existe no documento
+			await updateDoc(docRef, { id: docRef.id });
+			
+			console.log(`Novo registro de tempo trabalhado criado com ID: ${docRef.id}`);
+			return docRef.id;
+		}
+	} catch (error) {
+		console.error("Erro ao salvar/atualizar registro de tempo trabalhado:", error);
+		throw error;
+	}
+};
+
+// Atualizar duração do registro de tempo trabalhado em tempo real
+export const updateWorkTimeRecordDuration = async (
+	operatorId: string,
+	duration: string,
+	totalMinutes: number
+): Promise<void> => {
+	try {
+		const existingRecord = await getTodayWorkTimeRecord(operatorId);
+		
+		if (existingRecord) {
+			// Calcular total de segundos para precisão
+			const [hours, minutes, seconds] = duration.split(":").map(Number);
+			const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+			
+			const workTimeRef = doc(db, "WorkTimeRecords", existingRecord.id);
+			const updates: Partial<WorkTimeRecord> = {
+				duration,
+				totalMinutes,
+				totalSeconds,
+				status: "active",
+				updatedAt: new Date().toISOString(),
+			};
+
+			await updateDoc(workTimeRef, updates);
+			console.log(`Duração do registro atualizada: ${duration}`);
+		}
+	} catch (error) {
+		console.error("Erro ao atualizar duração do registro:", error);
+		throw error;
+	}
+};
+
+// Buscar registros de tempo trabalhado do operador
+export const getOperatorWorkTimeRecords = async (
+	operatorId: string,
+	startDate?: string,
+	endDate?: string
+): Promise<WorkTimeRecord[]> => {
+	try {
+		const workTimeRef = collection(db, "WorkTimeRecords");
+		let q = query(workTimeRef, where("operatorId", "==", operatorId));
+
+		if (startDate && endDate) {
+			q = query(q, where("date", ">=", startDate), where("date", "<=", endDate));
+		}
+
+		q = query(q, orderBy("date", "desc"), orderBy("startTime", "desc"));
+
+		const snapshot = await getDocs(q);
+		return snapshot.docs.map((doc) => ({
+			...(doc.data() as Record<string, unknown>),
+			id: doc.id,
+		})) as WorkTimeRecord[];
+	} catch (error) {
+		console.error("Erro ao buscar registros de tempo trabalhado:", error);
+		throw error;
+	}
+};
+
 // Converter AgendaItem para Task (para compatibilidade com componentes existentes)
 export const agendaItemToTask = (agendaItem: AgendaItem): Task => {
 	return {

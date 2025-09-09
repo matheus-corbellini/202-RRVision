@@ -38,21 +38,32 @@ export default function Login() {
 		try {
 			const loggedUser = await handleLogin(formData);
 			
-			// Verificar se é admin ou operador para determinar o redirecionamento
+			// Determinar redirecionamento baseado no tipo de usuário
 			let target;
-			if (loggedUser.role === "admin" || loggedUser.userType === "admin") {
-				target = path.admin;
-			} else if (loggedUser.userType === "operator") {
-				// Operadores vão para dashboard mas com página padrão de agenda
-				target = path.dashboard;
-			} else {
-				target = path.dashboard;
+			
+
+			// Lógica de redirecionamento baseada no tipo de usuário
+			switch (loggedUser.userType) {
+				case "admin":
+					target = path.admin;
+					break;
+					
+				case "supervisor":
+					target = path.dashboard;
+					break;
+					
+				case "operator":
+					target = path.dashboard;
+					break;
+					
+				default:
+					target = path.dashboard;
+					break;
 			}
 			
 			goTo(target);
 		} catch (err) {
 			// Error is handled by the hook
-			console.error("Login failed:", err);
 		}
 	};
 

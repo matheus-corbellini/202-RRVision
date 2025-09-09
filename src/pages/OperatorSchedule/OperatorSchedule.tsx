@@ -9,6 +9,7 @@ import {
 	TasksSection,
 	QuickActionsPanel,
 	WorkShiftsHistory,
+	WorkTimeRecords,
 } from "../../components/OperatorScheduleComponents";
 import { 
 	getUserAgendaByDate, 
@@ -16,10 +17,13 @@ import {
 	addBreakToAgendaItem,
 	endBreakInAgendaItem,
 	agendaItemToTask,
-	createDefaultAgendaItem,
 	saveWorkShift,
 	getTodayWorkShifts,
-	type WorkShift
+	saveOrUpdateWorkTimeRecord,
+	getTodayWorkTimeRecord,
+	updateWorkTimeRecordDuration,
+	type WorkShift,
+	type WorkTimeRecord
 } from "../../services/agendaService";
 import "./OperatorSchedule.css";
 
@@ -53,7 +57,9 @@ export default function OperatorSchedule() {
 	const [isShiftStarted, setIsShiftStarted] = useState(false);
 	const [shiftStartTime, setShiftStartTime] = useState<string | null>(null);
 	const [elapsedTime, setElapsedTime] = useState<string | null>(null);
+	const [shiftStartTimestamp, setShiftStartTimestamp] = useState<number | null>(null);
 	const [workShifts, setWorkShifts] = useState<WorkShift[]>([]);
+	const [workTimeRecords, setWorkTimeRecords] = useState<WorkTimeRecord[]>([]);
 
 	// Buscar dados reais da coleção Agenda
 	useEffect(() => {
@@ -71,86 +77,22 @@ export default function OperatorSchedule() {
 				// Converter AgendaItem para Task para compatibilidade com componentes existentes
 				const agendaTasks = agendaItems.map(agendaItemToTask);
 				
-				// Se não houver dados na agenda, criar um documento padrão
-				if (agendaTasks.length === 0) {
-					console.log("Nenhum item encontrado na agenda para hoje. Criando tarefa padrão...");
-					
-					try {
-						// Criar uma tarefa padrão para o dia
-						const defaultAgendaItem = await createDefaultAgendaItem(user.id, dateString);
-						const defaultTask = agendaItemToTask(defaultAgendaItem);
-						
-						setTasks([defaultTask]);
-						setFilteredTasks([defaultTask]);
-						setStats({
-							tasksCompleted: 0,
-							averageEfficiency: 0,
-							totalWorkTime: defaultTask.estimatedTime + defaultTask.setupTime,
-							onTimeCompletion: 0,
-							ranking: 0,
-							dailyTarget: 1,
-							totalBreaks: 0,
-							totalBreakTime: 0,
-							qualityScore: 0,
-							productivityIndex: 0,
-						});
-						setCurrentTask(null);
-						return;
-					} catch (error) {
-						console.error("Erro ao criar tarefa padrão:", error);
-						// Em caso de erro, usar dados vazios
-						setTasks([]);
-						setFilteredTasks([]);
-						setStats({
-							tasksCompleted: 0,
-							averageEfficiency: 0,
-							totalWorkTime: 0,
-							onTimeCompletion: 0,
-							ranking: 0,
-							dailyTarget: 0,
-							totalBreaks: 0,
-							totalBreakTime: 0,
-							qualityScore: 0,
-							productivityIndex: 0,
-						});
-						setCurrentTask(null);
-						return;
-					}
-				}
-
-				// Calcular estatísticas baseadas nos dados reais
-				const completedTasks = agendaTasks.filter(t => t.status === "completed").length;
-				const totalTasks = agendaTasks.length;
-				const onTime = agendaTasks.filter(t => 
-					t.status === "completed" && 
-					t.actualTime && 
-					t.actualTime <= t.estimatedTime + t.setupTime
-				).length;
-
-				const calculatedStats: OperatorStats = {
-					tasksCompleted: completedTasks,
-					averageEfficiency: totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0,
-					totalWorkTime: agendaTasks.reduce((total, task) => {
-						if (task.actualTime) return total + task.actualTime;
-						return total + task.estimatedTime + task.setupTime;
-					}, 0),
-					onTimeCompletion: totalTasks > 0 ? (onTime / totalTasks) * 100 : 0,
-					ranking: 0, // Será calculado pelo sistema
-					dailyTarget: totalTasks,
-					totalBreaks: agendaTasks.reduce((total, task) => total + task.breaks.length, 0),
-					totalBreakTime: agendaTasks.reduce((total, task) => 
-						total + task.breaks.reduce((breakTotal, breakItem) => 
-							breakTotal + (breakItem.duration || 0), 0
-						), 0
-					),
-					qualityScore: 0, // Será calculado pelo sistema
-					productivityIndex: 0, // Será calculado pelo sistema
-				};
-
+				// Inicializar com dados zerados
 				setTasks(agendaTasks);
 				setFilteredTasks(agendaTasks);
-				setStats(calculatedStats);
-				setCurrentTask(agendaTasks.find(t => t.status === "in_progress") || null);
+				setStats({
+					tasksCompleted: 0,
+					averageEfficiency: 0,
+					totalWorkTime: 0, // Iniciar zerado
+					onTimeCompletion: 0,
+					ranking: 0,
+					dailyTarget: agendaTasks.length,
+					totalBreaks: 0,
+					totalBreakTime: 0,
+					qualityScore: 0,
+					productivityIndex: 0,
+				});
+				setCurrentTask(null);
 				
 			} catch (error) {
 				console.error("Erro ao buscar dados da agenda:", error);
@@ -176,6 +118,7 @@ export default function OperatorSchedule() {
 		const loadInitialData = async () => {
 			await fetchAgendaData();
 			await loadTodayWorkShifts();
+			await loadWorkTimeRecords();
 		};
 
 		loadInitialData();
@@ -183,24 +126,70 @@ export default function OperatorSchedule() {
 
 	// Verificar se a jornada já foi iniciada ao carregar a página
 	useEffect(() => {
-		const savedShiftStarted = localStorage.getItem("shiftStarted");
-		const savedShiftStartTime = localStorage.getItem("shiftStartTime");
-		const savedShiftStartDate = localStorage.getItem("shiftStartDate");
-		
-		// Verificar se a jornada foi iniciada hoje
-		const today = new Date().toDateString();
-		if (savedShiftStarted === "true" && savedShiftStartDate === today && savedShiftStartTime) {
-			setIsShiftStarted(true);
-			setShiftStartTime(savedShiftStartTime);
-			// Calcular tempo decorrido inicial
-			setElapsedTime(calculateElapsedTime(savedShiftStartTime));
-		} else {
-			// Limpar dados antigos se não for hoje
-			localStorage.removeItem("shiftStarted");
-			localStorage.removeItem("shiftStartTime");
-			localStorage.removeItem("shiftStartDate");
-		}
-	}, []);
+		const checkExistingWorkRecord = async () => {
+			if (!user?.id) return;
+
+			try {
+				// Verificar se existe um registro de tempo trabalhado para hoje
+				const existingRecord = await getTodayWorkTimeRecord(user.id);
+				
+				if (existingRecord) {
+					console.log("Registro de tempo trabalhado encontrado:", existingRecord);
+					
+					// Se o status for "active", significa que a jornada ainda está ativa
+					if (existingRecord.status === "active") {
+						setIsShiftStarted(true);
+						setShiftStartTime(existingRecord.startTime);
+						
+						// Calcular tempo decorrido baseado no horário de início
+						const [startHour, startMin] = existingRecord.startTime.split(":").map(Number);
+						const startTimestamp = new Date();
+						startTimestamp.setHours(startHour, startMin, 0, 0);
+						
+						setShiftStartTimestamp(startTimestamp.getTime());
+						setElapsedTime(existingRecord.duration);
+						
+						// Atualizar localStorage
+						localStorage.setItem("shiftStarted", "true");
+						localStorage.setItem("shiftStartTime", existingRecord.startTime);
+						localStorage.setItem("shiftStartTimestamp", startTimestamp.getTime().toString());
+						localStorage.setItem("shiftStartDate", new Date().toDateString());
+						
+						console.log("Jornada ativa restaurada do documento existente");
+					} else {
+						// Jornada já finalizada, apenas carregar os dados para exibição
+						console.log("Jornada já finalizada, carregando dados para exibição");
+						// Carregar registros para exibição
+						await loadWorkTimeRecords();
+					}
+				} else {
+					// Verificar localStorage como fallback
+					const savedShiftStarted = localStorage.getItem("shiftStarted");
+					const savedShiftStartTime = localStorage.getItem("shiftStartTime");
+					const savedShiftStartDate = localStorage.getItem("shiftStartDate");
+					const savedShiftStartTimestamp = localStorage.getItem("shiftStartTimestamp");
+					
+					const today = new Date().toDateString();
+					if (savedShiftStarted === "true" && savedShiftStartDate === today && savedShiftStartTime && savedShiftStartTimestamp) {
+						setIsShiftStarted(true);
+						setShiftStartTime(savedShiftStartTime);
+						setShiftStartTimestamp(parseInt(savedShiftStartTimestamp));
+						setElapsedTime(calculateElapsedTime(parseInt(savedShiftStartTimestamp)));
+					} else {
+						// Limpar dados antigos se não for hoje
+						localStorage.removeItem("shiftStarted");
+						localStorage.removeItem("shiftStartTime");
+						localStorage.removeItem("shiftStartTimestamp");
+						localStorage.removeItem("shiftStartDate");
+					}
+				}
+			} catch (error) {
+				console.error("Erro ao verificar registro de tempo trabalhado:", error);
+			}
+		};
+
+		checkExistingWorkRecord();
+	}, [user?.id]);
 
 	// Update current time and elapsed time every second
 	useEffect(() => {
@@ -208,12 +197,66 @@ export default function OperatorSchedule() {
 			setCurrentTime(new Date());
 			
 			// Atualizar tempo decorrido se a jornada estiver ativa
-			if (isShiftStarted && shiftStartTime) {
-				setElapsedTime(calculateElapsedTime(shiftStartTime));
+			if (isShiftStarted && shiftStartTimestamp) {
+				setElapsedTime(calculateElapsedTime(shiftStartTimestamp));
 			}
 		}, 1000);
 		return () => clearInterval(timer);
-	}, [isShiftStarted, shiftStartTime]);
+	}, [isShiftStarted, shiftStartTimestamp]);
+
+	// Calcular tempo trabalhado dinamicamente baseado no tempo de início da jornada
+	useEffect(() => {
+		if (isShiftStarted && shiftStartTime && elapsedTime) {
+			// Converter tempo decorrido para minutos
+			const [hours, minutes, seconds] = elapsedTime.split(":").map(Number);
+			const totalMinutes = hours * 60 + minutes + seconds / 60;
+			
+			// Atualizar estatísticas com tempo trabalhado atual
+			setStats(prev => ({
+				...prev,
+				totalWorkTime: Math.round(totalMinutes)
+			}));
+		} else if (!isShiftStarted && workTimeRecords.length > 0) {
+			// Se a jornada não estiver ativa, usar dados do documento existente
+			const todayRecord = workTimeRecords[0];
+			if (todayRecord && todayRecord.status === "completed") {
+				setStats(prev => ({
+					...prev,
+					totalWorkTime: todayRecord.totalMinutes
+				}));
+				console.log(`Tempo trabalhado carregado do documento: ${todayRecord.duration} (${todayRecord.totalMinutes} min)`);
+			}
+		} else if (!isShiftStarted) {
+			// Se não há jornada ativa e não há registros, manter tempo zerado
+			setStats(prev => ({
+				...prev,
+				totalWorkTime: 0
+			}));
+		}
+	}, [isShiftStarted, shiftStartTime, elapsedTime, workTimeRecords]);
+
+	// Atualizar documento de tempo trabalhado em tempo real
+	useEffect(() => {
+		if (isShiftStarted && elapsedTime && user?.id) {
+			// Atualizar documento a cada 30 segundos para não sobrecarregar o Firestore
+			const updateInterval = setInterval(async () => {
+				try {
+					const [hours, minutes, seconds] = elapsedTime.split(":").map(Number);
+					const totalMinutes = hours * 60 + minutes + seconds / 60;
+					
+					await updateWorkTimeRecordDuration(
+						user.id,
+						elapsedTime,
+						Math.round(totalMinutes)
+					);
+				} catch (error) {
+					console.error("Erro ao atualizar duração do registro:", error);
+				}
+			}, 30000); // Atualizar a cada 30 segundos
+
+			return () => clearInterval(updateInterval);
+		}
+	}, [isShiftStarted, elapsedTime, user?.id]);
 
 	// Atualizar estatísticas quando tarefas mudarem
 	useEffect(() => {
@@ -226,22 +269,36 @@ export default function OperatorSchedule() {
 				t.actualTime <= t.estimatedTime + t.setupTime
 		).length;
 
+		// Calcular total de pausas e tempo de pausas
+		const totalBreaks = tasks.reduce((total, task) => total + task.breaks.length, 0);
+		const totalBreakTime = tasks.reduce((total, task) => 
+			total + task.breaks.reduce((breakTotal, breakItem) => 
+				breakTotal + (breakItem.duration || 0), 0
+			), 0
+		);
+
 		setStats((prev) => ({
 			...prev,
 			tasksCompleted: completedTasks,
+			averageEfficiency: totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0,
 			onTimeCompletion: totalTasks > 0 ? (onTime / totalTasks) * 100 : 0,
+			dailyTarget: totalTasks,
+			totalBreaks,
+			totalBreakTime,
+			// Não alterar totalWorkTime aqui - será calculado dinamicamente pelo tempo de jornada
 		}));
 	}, [tasks]);
 
-	// Função para calcular tempo decorrido
-	const calculateElapsedTime = (startTime: string): string => {
-		const now = new Date();
-		const [startHour, startMin] = startTime.split(":").map(Number);
+	// Função para calcular tempo decorrido usando timestamp
+	const calculateElapsedTime = (startTimestamp: number): string => {
+		const now = Date.now();
+		const diffMs = now - startTimestamp;
 		
-		const startDate = new Date();
-		startDate.setHours(startHour, startMin, 0, 0);
+		// Se a diferença for negativa, retornar 00:00:00
+		if (diffMs < 0) {
+			return "00:00:00";
+		}
 		
-		const diffMs = now.getTime() - startDate.getTime();
 		const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
 		const diffMinutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
 		const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
@@ -250,23 +307,54 @@ export default function OperatorSchedule() {
 	};
 
 	// Função para iniciar jornada de trabalho
-	const handleStartShift = () => {
-		const now = new Date();
-		const timeString = now.toLocaleTimeString("pt-BR", {
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-		
-		setIsShiftStarted(true);
-		setShiftStartTime(timeString);
-		setElapsedTime("00:00:00");
-		
-		// Salvar no localStorage para persistir entre sessões
-		localStorage.setItem("shiftStarted", "true");
-		localStorage.setItem("shiftStartTime", timeString);
-		localStorage.setItem("shiftStartDate", now.toDateString());
-		
-		console.log(`Jornada iniciada às ${timeString}`);
+	const handleStartShift = async () => {
+		if (!user?.id) return;
+
+		try {
+			const now = new Date();
+			const timeString = now.toLocaleTimeString("pt-BR", {
+				hour: "2-digit",
+				minute: "2-digit",
+			});
+			const timestamp = now.getTime();
+			
+			// Verificar se já existe um registro para hoje
+			const existingRecord = await getTodayWorkTimeRecord(user.id);
+			
+			if (!existingRecord) {
+				// Criar documento inicial para o dia
+				await saveOrUpdateWorkTimeRecord(
+					user.id,
+					user.id,
+					timeString,
+					timeString, // Mesmo horário inicialmente
+					"00:00:00",
+					0,
+					"Jornada iniciada - documento criado"
+				);
+				console.log("Documento de tempo trabalhado criado para hoje");
+			}
+			
+			// Inicializar com tempo zerado e timestamp preciso
+			setElapsedTime("00:00:00");
+			setShiftStartTimestamp(timestamp);
+			setIsShiftStarted(true);
+			setShiftStartTime(timeString);
+			
+			// Salvar no localStorage para persistir entre sessões
+			localStorage.setItem("shiftStarted", "true");
+			localStorage.setItem("shiftStartTime", timeString);
+			localStorage.setItem("shiftStartTimestamp", timestamp.toString());
+			localStorage.setItem("shiftStartDate", now.toDateString());
+			
+			// Recarregar registros para mostrar o documento criado
+			await loadWorkTimeRecords();
+			
+			console.log(`Jornada iniciada às ${timeString}`);
+		} catch (error) {
+			console.error("Erro ao iniciar jornada:", error);
+			alert("Erro ao iniciar jornada. Tente novamente.");
+		}
 	};
 
 	// Função para parar jornada de trabalho
@@ -274,42 +362,63 @@ export default function OperatorSchedule() {
 		if (!user?.id || !shiftStartTime || !elapsedTime) return;
 
 		try {
+			// Salvar o tempo decorrido antes de zerar os estados
+			const finalElapsedTime = elapsedTime;
 			const now = new Date();
 			const endTimeString = now.toLocaleTimeString("pt-BR", {
 				hour: "2-digit",
 				minute: "2-digit",
+				second: "2-digit",
 			});
 			
-			// Calcular tempo total em minutos
-			const [hours, minutes, seconds] = elapsedTime.split(":").map(Number);
+			// Calcular tempo total em minutos usando o tempo salvo
+			const [hours, minutes, seconds] = finalElapsedTime.split(":").map(Number);
 			const totalMinutes = hours * 60 + minutes + seconds / 60;
+			
+			console.log(`Finalizando jornada - Tempo decorrido: ${finalElapsedTime}, Total minutos: ${Math.round(totalMinutes)}`);
 			
 			// Salvar jornada no Firestore
 			const shiftId = await saveWorkShift(
 				user.id,
 				shiftStartTime,
 				endTimeString,
-				elapsedTime,
+				finalElapsedTime,
 				Math.round(totalMinutes),
 				"Jornada finalizada pelo operador"
 			);
 			
 			console.log(`Jornada salva com ID: ${shiftId}`);
 			
-			// Atualizar estado local
+			// Atualizar registro de tempo trabalhado existente
+			const workTimeRecordId = await saveOrUpdateWorkTimeRecord(
+				user.id, // userId
+				user.id, // operatorId (usando o mesmo ID do usuário como UUID do operador)
+				shiftStartTime,
+				endTimeString,
+				finalElapsedTime,
+				Math.round(totalMinutes),
+				`Jornada finalizada - Jornada ID: ${shiftId}`
+			);
+			
+			console.log(`Registro de tempo trabalhado atualizado com ID: ${workTimeRecordId}`);
+			
+			// Atualizar estado local APÓS salvar os dados
 			setIsShiftStarted(false);
 			setShiftStartTime(null);
+			setShiftStartTimestamp(null);
 			setElapsedTime(null);
 			
 			// Limpar localStorage
 			localStorage.removeItem("shiftStarted");
 			localStorage.removeItem("shiftStartTime");
+			localStorage.removeItem("shiftStartTimestamp");
 			localStorage.removeItem("shiftStartDate");
 			
-			// Recarregar jornadas do dia
+			// Recarregar jornadas do dia e registros de tempo
 			await loadTodayWorkShifts();
+			await loadWorkTimeRecords();
 			
-			console.log(`Jornada finalizada às ${endTimeString}. Tempo total: ${elapsedTime}`);
+			console.log(`Jornada finalizada às ${endTimeString}. Tempo total: ${finalElapsedTime}`);
 			
 		} catch (error) {
 			console.error("Erro ao salvar jornada:", error);
@@ -330,6 +439,24 @@ export default function OperatorSchedule() {
 		}
 	};
 
+	// Função para carregar registro de tempo trabalhado do dia atual
+	const loadWorkTimeRecords = async () => {
+		if (!user?.id) return;
+
+		try {
+			const record = await getTodayWorkTimeRecord(user.id);
+			if (record) {
+				setWorkTimeRecords([record]);
+				console.log(`Carregado registro de tempo trabalhado de hoje: ${record.duration}`);
+			} else {
+				setWorkTimeRecords([]);
+				console.log("Nenhum registro de tempo trabalhado encontrado para hoje");
+			}
+		} catch (error) {
+			console.error("Erro ao carregar registro de tempo trabalhado:", error);
+		}
+	};
+
 	// Função para buscar dados da agenda por data
 	const fetchAgendaByDate = async (date: Date) => {
 		if (!user?.id) return;
@@ -343,7 +470,7 @@ export default function OperatorSchedule() {
 			setFilteredTasks(agendaTasks);
 			setCurrentTask(agendaTasks.find(t => t.status === "in_progress") || null);
 			
-			// Recalcular estatísticas
+			// Recalcular estatísticas com dados zerados
 			const completedTasks = agendaTasks.filter(t => t.status === "completed").length;
 			const totalTasks = agendaTasks.length;
 			const onTime = agendaTasks.filter(t => 
@@ -352,23 +479,23 @@ export default function OperatorSchedule() {
 				t.actualTime <= t.estimatedTime + t.setupTime
 			).length;
 
-							setStats(prev => ({
-					...prev,
-					tasksCompleted: completedTasks,
-					averageEfficiency: totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0,
-					totalWorkTime: agendaTasks.reduce((total, task) => {
-						if (task.actualTime) return total + task.actualTime;
-						return total + task.estimatedTime + task.setupTime;
-					}, 0),
-					onTimeCompletion: totalTasks > 0 ? (onTime / totalTasks) * 100 : 0,
-					dailyTarget: totalTasks,
-					totalBreaks: agendaTasks.reduce((total, task) => total + task.breaks.length, 0),
-					totalBreakTime: agendaTasks.reduce((total, task) => 
-						total + task.breaks.reduce((breakTotal, breakItem) => 
-							breakTotal + (breakItem.duration || 0), 0
-						), 0
-					),
-				}));
+			const totalBreaks = agendaTasks.reduce((total, task) => total + task.breaks.length, 0);
+			const totalBreakTime = agendaTasks.reduce((total, task) => 
+				total + task.breaks.reduce((breakTotal, breakItem) => 
+					breakTotal + (breakItem.duration || 0), 0
+				), 0
+			);
+
+			setStats(prev => ({
+				...prev,
+				tasksCompleted: completedTasks,
+				averageEfficiency: totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0,
+				totalWorkTime: 0, // Iniciar zerado - será calculado pelo tempo de jornada
+				onTimeCompletion: totalTasks > 0 ? (onTime / totalTasks) * 100 : 0,
+				dailyTarget: totalTasks,
+				totalBreaks,
+				totalBreakTime,
+			}));
 		} catch (error) {
 			console.error("Erro ao buscar agenda por data:", error);
 		}
@@ -452,7 +579,7 @@ export default function OperatorSchedule() {
 			// Atualizar estado local
 		setTasks((prev) =>
 			prev.map((task) =>
-				task.id === taskId ? { ...task, status: "paused" as const } : task
+				task.id === taskId ? { ...task, status: "pending" as const } : task
 			)
 		);
 		if (currentTask?.id === taskId) {
@@ -474,6 +601,10 @@ export default function OperatorSchedule() {
 				hour: "2-digit",
 				minute: "2-digit",
 			}),
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+			createdBy: user.id,
+			updatedBy: user.id,
 		};
 
 			// Adicionar pausa na coleção Agenda
@@ -561,11 +692,11 @@ export default function OperatorSchedule() {
 				return "#e2e8f0";
 			case "in_progress":
 				return "#bee3f8";
-			case "paused":
+			case "active":
 				return "#fbb040";
 			case "completed":
 				return "#c6f6d5";
-			case "delayed":
+			case "overdue":
 				return "#fed7d7";
 			default:
 				return "#e2e8f0";
@@ -632,6 +763,7 @@ export default function OperatorSchedule() {
 					isShiftStarted={isShiftStarted}
 					shiftStartTime={shiftStartTime}
 					elapsedTime={elapsedTime}
+					hasActiveWorkRecord={workTimeRecords.length > 0}
 				/>
 
 				<OperatorStatsGrid
@@ -680,6 +812,9 @@ export default function OperatorSchedule() {
 				
 				{/* Histórico de Jornadas */}
 				<WorkShiftsHistory workShifts={workShifts} />
+				
+				{/* Registros de Tempo Trabalhado */}
+				<WorkTimeRecords workTimeRecords={workTimeRecords} />
 			</div>
 		</div>
 	);

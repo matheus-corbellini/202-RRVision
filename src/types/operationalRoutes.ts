@@ -1,19 +1,15 @@
 // Tipos para roteiros operacionais
-export interface Product {
-	id: string;
+import type { BaseEntity } from './base';
+
+export interface Product extends BaseEntity {
 	code: string;
 	name: string;
 	description: string;
 	category: string;
 	isActive: boolean;
-	createdAt: string;
-	updatedAt: string;
-	createdBy: string;
-	updatedBy: string;
 }
 
-export interface Step {
-	id: string;
+export interface Step extends BaseEntity {
 	name: string;
 	description: string;
 	sequence: number;
@@ -26,8 +22,7 @@ export interface Step {
 	operatorId?: string; // Associação com operador (opcional)
 }
 
-export interface OperationalRoute {
-	id: string;
+export interface OperationalRoute extends BaseEntity {
 	productId: string;
 	productCode: string;
 	productName: string;
@@ -42,14 +37,9 @@ export interface OperationalRoute {
 	// Associações com setor e operador
 	primarySectorId: string;
 	assignedOperatorId?: string;
-	createdAt: string;
-	updatedAt: string;
-	createdBy: string;
-	updatedBy: string;
 }
 
-export interface RouteAssignment {
-	id: string;
+export interface RouteAssignment extends BaseEntity {
 	routeId: string;
 	operatorId: string;
 	sectorId: string;

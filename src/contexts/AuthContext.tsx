@@ -69,6 +69,7 @@ const authReducer = (state: AuthState, action: AuthAction): AuthState => {
 // Create context with better type safety
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+
 // Provider component
 interface AuthProviderProps {
 	children: ReactNode;
@@ -111,13 +112,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 	// Handle Firebase auth state changes - Optimized with useCallback
 	const handleAuthStateChange = useCallback(
 		async (firebaseUser: FirebaseUser | null) => {
-			try {
-				if (firebaseUser) {
-					const user = await convertFirebaseUser(firebaseUser);
-					setUser(user);
-				} else {
-					setUser(null);
-				}
+		try {
+			if (firebaseUser) {
+				const user = await convertFirebaseUser(firebaseUser);
+				setUser(user);
+			} else {
+				setUser(null);
+			}
 			} catch (error) {
 				console.error("Error converting Firebase user:", error);
 				setError("Failed to load user data");
@@ -219,7 +220,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 			isAuthenticated: isAuthenticated(),
 		});
 	}
-
 	return (
 		<AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
 	);
@@ -227,27 +227,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
 export default AuthContext;
 
-/**
- * Hook personalizado para usar o AuthContext
- * Fornece tipagem melhorada e validação de uso
- */
-export const useAuth = (): AuthContextType => {
-	const context = React.useContext(AuthContext);
-
-	if (context === undefined) {
-		throw new Error("useAuth must be used within an AuthProvider");
-	}
-
-	return context;
-};
 
 /**
  * Hook para verificar se o usuário está autenticado
  * Retorna um boolean indicando o status de autenticação
  */
 export const useAuthStatus = (): boolean => {
-	const { user } = useAuth();
-	return user !== null;
+	const context = React.useContext(AuthContext);
+	if (context === undefined) {
+		throw new Error("useAuthStatus must be used within an AuthProvider");
+	}
+	return context.user !== null;
 };
 
 /**
@@ -255,8 +245,11 @@ export const useAuthStatus = (): boolean => {
  * Retorna os dados do usuário ou null se não autenticado
  */
 export const useUserData = (): AuthUser | null => {
-	const { user } = useAuth();
-	return user;
+	const context = React.useContext(AuthContext);
+	if (context === undefined) {
+		throw new Error("useUserData must be used within an AuthProvider");
+	}
+	return context.user;
 };
 
 /**

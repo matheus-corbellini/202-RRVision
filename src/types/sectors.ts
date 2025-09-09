@@ -1,14 +1,9 @@
 // Tipos para setores
-export interface Sector {
-	id: string;
+import type { BaseEntity } from './base';
+
+export interface Sector extends BaseEntity {
 	name: string;
 	code: string;
 	description: string;
 	isActive: boolean;
-	createdAt: string;
-	updatedAt: string;
-	createdBy: string;
-	updatedBy: string;
 }
-
-

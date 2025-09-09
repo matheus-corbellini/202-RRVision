@@ -1,49 +1,10 @@
 // Tipos para dashboard
-import type { NonConformityStats } from "./nonConformities";
+import type { ProductionAlert } from './alerts';
+import type { NonConformityStats } from './nonConformities';
+import type { Priority } from './base';
 
-export interface Alert {
-	id: string;
-	title: string;
-	description: string;
-	severity: "low" | "medium" | "high" | "critical";
-	priority: "low" | "medium" | "high" | "urgent";
-	status: "active" | "acknowledged" | "resolved" | "dismissed";
-	location: {
-		sector: string;
-		station?: string;
-		equipment?: string;
-	};
-	relatedEntity: {
-		id: string;
-		name: string;
-	};
-	source: {
-		id: string;
-		name: string;
-	};
-	createdAt: string;
-	acknowledgedAt?: string;
-	acknowledgedBy?: string;
-	resolvedAt?: string;
-	resolvedBy?: string;
-	attachments: string[];
-	tags?: string[];
-	recipients: Array<{
-		id: string;
-		name: string;
-		role: string;
-		acknowledged: boolean;
-		department?: string;
-	}>;
-	comments?: Array<{
-		id: string;
-		userName: string;
-		message: string;
-		timestamp: string;
-		type: "comment" | "status_change" | "escalation";
-		userId?: string;
-	}>;
-}
+// Re-exportar ProductionAlert como Alert para compatibilidade
+export type { ProductionAlert as Alert } from './alerts';
 
 export interface DashboardStats {
 	totalAlerts: number;
@@ -63,7 +24,7 @@ export interface Order {
 	product: string;
 	quantity: number;
 	status: "pending" | "in_progress" | "completed" | "cancelled";
-	priority: "low" | "medium" | "high" | "urgent";
+	priority: Priority;
 	createdAt: string;
 	dueDate: string;
 	completedAt?: string;
@@ -81,7 +42,7 @@ export interface ImportData {
 }
 
 export interface ControlPanelData {
-	alerts: Alert[];
+	alerts: ProductionAlert[];
 	pendencies: any[];
 	nonConformities: NonConformityStats;
 	stats: {

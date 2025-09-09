@@ -132,7 +132,8 @@ export const convertFirebaseUser = async (
 	const userDoc = await getUserDocument(firebaseUser.uid);
 	console.log("User document from Firestore:", userDoc);
 
-	const convertedUser = {
+	// Preparar dados básicos do usuário
+	const convertedUser: AuthUser = {
 		id: firebaseUser.uid,
 		email: firebaseUser.email || "",
 		displayName: firebaseUser.displayName || undefined,
@@ -143,16 +144,44 @@ export const convertFirebaseUser = async (
 		phone: userDoc?.phone,
 		createdAt: userDoc?.createdAt,
 		updatedAt: userDoc?.updatedAt,
-		role: userDoc?.role || "user",
+		role: userDoc?.role || "operator",
 		userType: userDoc?.userType || "operator",
 		accessToken: await firebaseUser.getIdToken(),
 	};
 
+	// Se for um operador, carregar dados específicos do operador
+	if (userDoc?.userType === "operator" && userDoc?.operatorData) {
+		convertedUser.operatorData = {
+			code: userDoc.operatorData.code || "",
+			primarySectorId: userDoc.operatorData.primarySectorId || "",
+			primarySectorName: userDoc.operatorData.primarySectorName,
+			secondarySectorIds: userDoc.operatorData.secondarySectorIds || [],
+			secondarySectorNames: userDoc.operatorData.secondarySectorNames,
+			trainedActivities: userDoc.operatorData.trainedActivities || [],
+			trainedActivitiesDetails: userDoc.operatorData.trainedActivitiesDetails,
+			status: userDoc.operatorData.status || "active",
+			admissionDate: userDoc.operatorData.admissionDate || "",
+			lastTrainingDate: userDoc.operatorData.lastTrainingDate,
+			nextTrainingDate: userDoc.operatorData.nextTrainingDate,
+			contractType: userDoc.operatorData.contractType || "clt",
+			workSchedule: userDoc.operatorData.workSchedule || "day",
+			weeklyHours: userDoc.operatorData.weeklyHours || 40,
+			supervisorId: userDoc.operatorData.supervisorId,
+			supervisorName: userDoc.operatorData.supervisorName,
+			teamId: userDoc.operatorData.teamId,
+			teamName: userDoc.operatorData.teamName,
+			skills: userDoc.operatorData.skills || [],
+			certifications: userDoc.operatorData.certifications || [],
+			accessLevel: userDoc.operatorData.accessLevel || "basic",
+			permissions: userDoc.operatorData.permissions || [],
+		};
+	}
+
 	console.log("Converted user object:", convertedUser);
 	console.log("Converted user name:", convertedUser.name);
 	console.log("Converted user role:", convertedUser.role);
-	console.log("Converted user name type:", typeof convertedUser.name);
-	console.log("Converted user role type:", typeof convertedUser.role);
+	console.log("Is operator:", userDoc?.userType === "operator");
+	console.log("Operator data:", convertedUser.operatorData);
 
 	return convertedUser;
 };
