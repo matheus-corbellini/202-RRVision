@@ -1,5 +1,4 @@
 import { useAuth } from "./useAuth";
-import type { AuthUser } from "../types";
 
 /**
  * Hook para acessar dados do perfil do usuário
@@ -49,7 +48,6 @@ export const useUserProfile = () => {
 	// Obter permissões baseadas no tipo de usuário
 	const getPermissions = (): string[] => {
 		const userType = getUserType();
-		const role = getRole();
 
 		// Permissões baseadas no tipo de usuário
 		const basePermissions = {
@@ -122,12 +120,12 @@ export const useUserProfile = () => {
 			skills: user?.operatorData?.skills || [],
 			certifications: user?.operatorData?.certifications || [],
 			accessLevel: user?.operatorData?.accessLevel || "basic",
+			permissions: user?.operatorData?.permissions || [],
 		};
 	};
 
 	// Obter informações de navegação baseadas no tipo de usuário
 	const getNavigationInfo = () => {
-		const userType = getUserType();
 		
 		return {
 			canAccessAdmin: isAdmin(),

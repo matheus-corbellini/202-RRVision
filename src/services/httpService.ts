@@ -118,6 +118,7 @@ class HttpService {
             error_description: errorData.message || errorData.error_description,
             status: response.status,
             message: `Erro ${response.status}: ${response.statusText}`,
+            name: 'HttpError',
           });
         }
 

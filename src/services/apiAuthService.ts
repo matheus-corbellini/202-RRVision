@@ -27,6 +27,7 @@ export interface ApiError {
   error_description?: string;
   status: number;
   message: string;
+  name: string;
 }
 
 class ApiAuthService {
@@ -82,6 +83,7 @@ class ApiAuthService {
           error_description: errorData.error_description || 'Erro ao obter token',
           status: response.status,
           message: `Erro ${response.status}: ${response.statusText}`,
+          name: 'TokenError',
         });
       }
 
@@ -105,6 +107,7 @@ class ApiAuthService {
         error_description: 'Erro de rede ao obter token',
         status: 0,
         message: error instanceof Error ? error.message : 'Erro desconhecido',
+        name: 'NetworkError',
       });
     }
   }

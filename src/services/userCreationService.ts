@@ -1,7 +1,6 @@
 import {
 	createUserWithEmailAndPassword,
 	updateProfile,
-	type User as FirebaseUser,
 	type UserCredential,
 } from "firebase/auth";
 import {
@@ -16,7 +15,7 @@ import {
 	getDocs,
 } from "firebase/firestore";
 import { auth, db } from "../lib/firebaseconfig";
-import type { User, UserRoleType } from "../types";
+import type { User, UserRole } from "../types";
 
 // Interface para dados de criação de usuário
 export interface CreateUserData {
@@ -27,7 +26,7 @@ export interface CreateUserData {
 	phone?: string;
 	password: string;
 	userType: string;
-	role: UserRoleType;
+	role: UserRole;
 }
 
 // Interface para dados de atualização de usuário
@@ -37,7 +36,7 @@ export interface UpdateUserData {
 	company?: string;
 	phone?: string;
 	userType?: string;
-	role?: UserRoleType;
+	role?: UserRole;
 }
 
 // Interface para resposta da criação
@@ -181,6 +180,8 @@ export const createUser = async (userData: CreateUserData): Promise<CreateUserRe
 			role: firestoreData.role,
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
+			createdBy: userId, // Self-created
+			updatedBy: userId, // Self-updated
 		};
 
 		return {
@@ -267,6 +268,8 @@ export const updateUser = async (userId: string, updateData: UpdateUserData): Pr
 			role: userData?.role || "user",
 			createdAt: userData?.createdAt?.toDate?.()?.toISOString() || userData?.createdAt || new Date().toISOString(),
 			updatedAt: userData?.updatedAt?.toDate?.()?.toISOString() || userData?.updatedAt || new Date().toISOString(),
+			createdBy: userData?.createdBy || "",
+			updatedBy: userData?.updatedBy || "",
 		};
 
 		return {
@@ -312,6 +315,8 @@ export const getUserById = async (userId: string): Promise<User | null> => {
 			role: userData?.role || "user",
 			createdAt: userData?.createdAt?.toDate?.()?.toISOString() || userData?.createdAt || new Date().toISOString(),
 			updatedAt: userData?.updatedAt?.toDate?.()?.toISOString() || userData?.updatedAt || new Date().toISOString(),
+			createdBy: userData?.createdBy || "",
+			updatedBy: userData?.updatedBy || "",
 		};
 
 	} catch (error) {
@@ -343,6 +348,8 @@ export const listAllUsers = async (): Promise<User[]> => {
 				role: data.role || "user",
 				createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt || new Date().toISOString(),
 				updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || new Date().toISOString(),
+				createdBy: data.createdBy || "",
+				updatedBy: data.updatedBy || "",
 			} as User;
 		});
 	} catch (error) {

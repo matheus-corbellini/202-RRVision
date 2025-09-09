@@ -574,5 +574,9 @@ export const agendaItemToTask = (agendaItem: AgendaItem): Task => {
 		stepId: agendaItem.stepId,
 		qualityChecks: agendaItem.qualityChecks,
 		notes: agendaItem.notes,
+		createdAt: new Date().toISOString(),
+		updatedAt: new Date().toISOString(),
+		createdBy: "system",
+		updatedBy: "system",
 	};
 };

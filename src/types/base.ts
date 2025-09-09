@@ -53,7 +53,7 @@ export interface Comment {
 // Enums e Union Types centralizados
 export type Priority = "low" | "medium" | "high" | "urgent";
 export type Severity = "low" | "medium" | "high" | "critical";
-export type Status = "pending" | "in_progress" | "active" | "acknowledged" | "resolved" | "completed" | "closed" | "dismissed" | "cancelled" | "overdue" | "investigating";
+export type Status = "pending" | "in_progress" | "active" | "acknowledged" | "resolved" | "completed" | "closed" | "dismissed" | "cancelled" | "overdue" | "investigating" | "paused" | "delayed" | "open";
 export type UserRole = "admin" | "supervisor" | "operator";
 export type ContractType = "clt" | "pj" | "temporary" | "intern" | "other";
 export type AccessLevel = "basic" | "intermediate" | "advanced" | "admin";

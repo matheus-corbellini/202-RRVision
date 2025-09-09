@@ -1,4 +1,5 @@
-import { httpService, ApiResponse, PaginatedResponse } from './httpService';
+import { httpService } from './httpService';
+import type { ApiResponse, PaginatedResponse } from './httpService';
 
 // Tipos para produtos
 export interface ExternalProduct {
@@ -109,13 +110,10 @@ export interface OrderFilters {
 }
 
 class ExternalApiService {
-  private baseUrl: string = '';
-
   /**
    * Configura a URL base da API externa
    */
   setBaseUrl(url: string) {
-    this.baseUrl = url;
     httpService.setBaseUrl(url);
   }
 

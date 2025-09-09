@@ -2,7 +2,6 @@
 export {
 	default as AuthContext,
 	AuthProvider,
-	useAuth,
 	useAuthStatus,
 	useUserData,
 } from "./AuthContext";

@@ -30,6 +30,9 @@ export type {
 	Team
 } from './user';
 
+// Re-exportar Operator do authService
+export type { Operator } from '../services/authService';
+
 
 // Re-exportar tipos específicos
 export type {

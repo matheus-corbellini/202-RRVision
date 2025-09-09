@@ -10,7 +10,7 @@ import {
 	deleteUserRecord,
 	createUserRecord,
 } from "../../services/dataService";
-import type { User, UserRoleType } from "../../types";
+import type { User, UserRole } from "../../types";
 import "./Admin.css";
 
 export default function Admin() {
@@ -112,7 +112,9 @@ export default function Admin() {
 					photoURL: data.photoURL,
 					emailVerified: false,
 					userType: "user",
-					role: (data.role as UserRoleType) || "user",
+					role: (data.role as UserRole) || "operator",
+					createdBy: "admin",
+					updatedBy: "admin",
 				});
 			}
 			setModalOpen(false);
@@ -281,7 +283,7 @@ function UserModal({
 		name: initial?.name || initial?.displayName || "",
 		company: initial?.company || "",
 		phone: initial?.phone || "",
-		role: initial?.role || "user",
+  role: initial?.role || "operator",
 		displayName: initial?.displayName,
 		photoURL: initial?.photoURL,
 	});

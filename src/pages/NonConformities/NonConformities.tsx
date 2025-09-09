@@ -71,9 +71,6 @@ export default function NonConformities() {
           name: "Maria Santos",
           role: "Coordenador Qualidade",
         },
-
-        createdAt: "2024-01-20T10:30:00",
-        updatedAt: "2024-01-20T11:15:00",
         attachments: [
           {
             id: "att-001",
@@ -99,6 +96,10 @@ export default function NonConformities() {
         stopProduction: false,
         requiresImmediateAction: true,
         escalationLevel: "supervisor",
+        createdAt: "2024-01-20T08:00:00",
+        updatedAt: "2024-01-20T08:00:00",
+        createdBy: "user-001",
+        updatedBy: "user-001",
       },
       {
         id: "NC-2024-002",
@@ -124,8 +125,6 @@ export default function NonConformities() {
           name: "Roberto Lima",
           role: "Supervisor Almoxarifado",
         },
-        createdAt: "2024-01-19T14:20:00",
-        updatedAt: "2024-01-19T16:45:00",
         resolvedAt: "2024-01-19T16:45:00",
         attachments: [
           {
@@ -142,6 +141,10 @@ export default function NonConformities() {
         stopProduction: false,
         requiresImmediateAction: false,
         escalationLevel: "none",
+        createdAt: "2024-01-19T14:00:00",
+        updatedAt: "2024-01-19T14:00:00",
+        createdBy: "user-002",
+        updatedBy: "user-002",
       },
       {
         id: "NC-2024-003",
@@ -165,6 +168,8 @@ export default function NonConformities() {
         },
         createdAt: "2024-01-20T08:15:00",
         updatedAt: "2024-01-20T08:15:00",
+        createdBy: "user-003",
+        updatedBy: "user-003",
         attachments: [],
         stopProduction: false,
         requiresImmediateAction: false,
@@ -195,12 +200,14 @@ export default function NonConformities() {
         name: user?.name || user?.displayName || "Usuário Atual",
         role: "Operador",
       },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
       attachments: [],
       stopProduction: false,
       requiresImmediateAction: false,
       escalationLevel: "none",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      createdBy: "current-user",
+      updatedBy: "current-user",
     };
 
     setNonConformities((prev) => [newNonConformity, ...prev]);

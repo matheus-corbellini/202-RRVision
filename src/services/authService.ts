@@ -18,7 +18,7 @@ import { auth, db } from "../lib/firebaseconfig";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { deleteDoc } from "firebase/firestore";
-import type { UserRoleType } from "../types";
+import type { UserRole, CompetencyLevel, AuthUser as TypesAuthUser, ContractType, AccessLevel } from "../types";
 
 // Interface para usuário
 export interface User {
@@ -31,43 +31,52 @@ export interface User {
 	photoURL?: string | null;
 	emailVerified: boolean;
 	userType: string;
-	role: UserRoleType;
+	role: UserRole;
 	createdAt: string;
 	updatedAt: string;
+	createdBy: string;
+	updatedBy: string;
 	operatorData?: {
 		code: string;
 		primarySectorId: string;
+		primarySectorName?: string;
 		secondarySectorIds: string[];
+		secondarySectorNames?: string[];
 		trainedActivities: string[];
+		trainedActivitiesDetails?: Array<{
+			activityId: string;
+			activityName: string;
+			trainedDate: string;
+			validUntil?: string;
+			competencyLevel: CompetencyLevel;
+		}>;
 		skills: string[];
-		status: string;
+		status: "active" | "inactive" | "suspended" | "terminated" | "on_leave";
 		admissionDate: string;
 		lastTrainingDate?: string;
 		nextTrainingDate?: string;
-		contractType: string;
+		contractType: ContractType;
 		workSchedule: string;
 		weeklyHours: number;
 		supervisorId?: string;
+		supervisorName?: string;
 		teamId?: string;
+		teamName?: string;
+		certifications: Array<{
+			id: string;
+			name: string;
+			issuer: string;
+			issuedDate: string;
+			expiryDate?: string;
+			documentUrl?: string;
+		}>;
+		accessLevel: AccessLevel;
+		permissions?: string[];
 	};
 }
 
-// Interface para usuário autenticado
-export interface AuthUser {
-	id: string;
-	email: string;
-	displayName?: string;
-	photoURL?: string | null;
-	emailVerified: boolean;
-	name?: string;
-	company?: string;
-	phone?: string;
-	createdAt?: string;
-	updatedAt?: string;
-	role: UserRoleType;
-	userType: string;
-	accessToken: string;
-}
+// Usar o tipo AuthUser do types/user
+export type AuthUser = TypesAuthUser;
 
 // Interface para dados de registro
 export interface RegisterData {
@@ -159,11 +168,11 @@ export const convertFirebaseUser = async (
 			secondarySectorNames: userDoc.operatorData.secondarySectorNames,
 			trainedActivities: userDoc.operatorData.trainedActivities || [],
 			trainedActivitiesDetails: userDoc.operatorData.trainedActivitiesDetails,
-			status: userDoc.operatorData.status || "active",
+			status: (userDoc.operatorData.status as "active" | "inactive" | "suspended" | "terminated") || "active",
 			admissionDate: userDoc.operatorData.admissionDate || "",
 			lastTrainingDate: userDoc.operatorData.lastTrainingDate,
 			nextTrainingDate: userDoc.operatorData.nextTrainingDate,
-			contractType: userDoc.operatorData.contractType || "clt",
+			contractType: (userDoc.operatorData.contractType as ContractType) || "clt",
 			workSchedule: userDoc.operatorData.workSchedule || "day",
 			weeklyHours: userDoc.operatorData.weeklyHours || 40,
 			supervisorId: userDoc.operatorData.supervisorId,
@@ -172,7 +181,7 @@ export const convertFirebaseUser = async (
 			teamName: userDoc.operatorData.teamName,
 			skills: userDoc.operatorData.skills || [],
 			certifications: userDoc.operatorData.certifications || [],
-			accessLevel: userDoc.operatorData.accessLevel || "basic",
+			accessLevel: (userDoc.operatorData.accessLevel as AccessLevel) || "basic",
 			permissions: userDoc.operatorData.permissions || [],
 		};
 	}
@@ -226,7 +235,7 @@ export const createUserDocument = async (
 			name: userData.name,
 			company: userData.company,
 			phone: userData.phone,
-			role: "user",
+			role: "operator",
 			userType: "operator",
 			createdAt: serverTimestamp(),
 			updatedAt: serverTimestamp(),
@@ -370,9 +379,11 @@ export class AuthService {
 				photoURL: null,
 				emailVerified: false,
 				userType: "operator",
-				role: "user",
+				role: "operator",
 				createdAt: new Date().toISOString(),
 				updatedAt: new Date().toISOString(),
+				createdBy: "system",
+				updatedBy: "system",
 
 				// Dados específicos do operador
 				code: data.code,
@@ -404,6 +415,9 @@ export class AuthService {
 					weeklyHours: data.weeklyHours,
 					supervisorId: data.supervisorId || "",
 					teamId: data.teamId || "",
+					accessLevel: "basic",
+					permissions: [],
+					certifications: [],
 				},
 			};
 
@@ -418,7 +432,7 @@ export class AuthService {
 				photoURL: null,
 				emailVerified: false,
 				userType: "operator",
-				role: "user",
+				role: "operator",
 
 				// Dados específicos do operador (não aninhados)
 				code: newOperator.code,
@@ -542,21 +556,26 @@ export class AuthService {
 					role: userData.role || "user",
 					createdAt: userData.createdAt?.toDate?.()?.toISOString() || userData.createdAt || new Date().toISOString(),
 					updatedAt: userData.updatedAt?.toDate?.()?.toISOString() || userData.updatedAt || new Date().toISOString(),
+					createdBy: userData.createdBy || "system",
+					updatedBy: userData.updatedBy || "system",
 					operatorData: {
 						code: userData.code || "",
 						primarySectorId: userData.primarySectorId || "",
 						secondarySectorIds: userData.secondarySectorIds || [],
 						trainedActivities: userData.trainedActivities || [],
 						skills: userData.skills || [],
-						status: userData.status || "active",
+						status: (userData.status as "active" | "inactive" | "suspended" | "terminated" | "on_leave") || "active",
 						admissionDate: userData.admissionDate || "",
 						lastTrainingDate: userData.lastTrainingDate || "",
 						nextTrainingDate: userData.nextTrainingDate || "",
-						contractType: userData.contractType || "clt",
+						contractType: (userData.contractType as ContractType) || "clt",
 						workSchedule: userData.workSchedule || "day",
 						weeklyHours: userData.weeklyHours || 40,
 						supervisorId: userData.supervisorId || "",
 						teamId: userData.teamId || "",
+						accessLevel: (userData.accessLevel as AccessLevel) || "basic",
+						permissions: userData.permissions || [],
+						certifications: userData.certifications || [],
 					}
 				};
 
@@ -567,11 +586,11 @@ export class AuthService {
 					primarySectorId: userData.primarySectorId || "",
 					secondarySectorIds: userData.secondarySectorIds || [],
 					skills: userData.skills || [],
-					status: userData.status || "active",
+					status: (userData.status as "active" | "inactive" | "suspended" | "terminated" | "on_leave") || "active",
 					admissionDate: userData.admissionDate || "",
 					lastTrainingDate: userData.lastTrainingDate || "",
 					nextTrainingDate: userData.nextTrainingDate || "",
-					contractType: userData.contractType || "clt",
+					contractType: (userData.contractType as ContractType) || "clt",
 					workSchedule: userData.workSchedule || "day",
 					weeklyHours: userData.weeklyHours || 40,
 					supervisorId: userData.supervisorId || "",
@@ -634,6 +653,8 @@ export class AuthService {
 				role: userData.role || "user",
 				createdAt: userData.createdAt?.toDate?.()?.toISOString() || userData.createdAt || new Date().toISOString(),
 				updatedAt: userData.updatedAt?.toDate?.()?.toISOString() || userData.updatedAt || new Date().toISOString(),
+				createdBy: userData.createdBy || "system",
+				updatedBy: userData.updatedBy || "system",
 				code: userData.code || "",
 				primarySectorId: userData.primarySectorId || "",
 				secondarySectorIds: userData.secondarySectorIds || [],
@@ -642,7 +663,7 @@ export class AuthService {
 				admissionDate: userData.admissionDate || "",
 				lastTrainingDate: userData.lastTrainingDate || "",
 				nextTrainingDate: userData.nextTrainingDate || "",
-				contractType: userData.contractType || "clt",
+				contractType: (userData.contractType as ContractType) || "clt",
 				workSchedule: userData.workSchedule || "day",
 				weeklyHours: userData.weeklyHours || 40,
 				supervisorId: userData.supervisorId || "",
@@ -654,15 +675,18 @@ export class AuthService {
 					secondarySectorIds: userData.secondarySectorIds || [],
 					trainedActivities: userData.trainedActivities || [],
 					skills: userData.skills || [],
-					status: userData.status || "active",
+					status: (userData.status as "active" | "inactive" | "suspended" | "terminated" | "on_leave") || "active",
 					admissionDate: userData.admissionDate || "",
 					lastTrainingDate: userData.lastTrainingDate || "",
 					nextTrainingDate: userData.nextTrainingDate || "",
-					contractType: userData.contractType || "clt",
+					contractType: (userData.contractType as ContractType) || "clt",
 					workSchedule: userData.workSchedule || "day",
 					weeklyHours: userData.weeklyHours || 40,
 					supervisorId: userData.supervisorId || "",
 					teamId: userData.teamId || "",
+					accessLevel: (userData.accessLevel as AccessLevel) || "basic",
+					permissions: userData.permissions || [],
+					certifications: userData.certifications || [],
 				}
 			};
 
@@ -738,15 +762,17 @@ export class AuthService {
 						role: userData.role || "user",
 						createdAt: userData.createdAt?.toDate?.()?.toISOString() || userData.createdAt || new Date().toISOString(),
 						updatedAt: userData.updatedAt?.toDate?.()?.toISOString() || userData.updatedAt || new Date().toISOString(),
+						createdBy: userData.createdBy || "system",
+						updatedBy: userData.updatedBy || "system",
 						code: userData.code || "",
 						primarySectorId: userData.primarySectorId || "",
 						secondarySectorIds: userData.secondarySectorIds || [],
 						skills: userData.skills || [],
-						status: userData.status || "active",
+						status: (userData.status as "active" | "inactive" | "suspended" | "terminated" | "on_leave") || "active",
 						admissionDate: userData.admissionDate || "",
 						lastTrainingDate: userData.lastTrainingDate || "",
 						nextTrainingDate: userData.nextTrainingDate || "",
-						contractType: userData.contractType || "clt",
+						contractType: (userData.contractType as ContractType) || "clt",
 						workSchedule: userData.workSchedule || "day",
 						weeklyHours: userData.weeklyHours || 40,
 						supervisorId: userData.supervisorId || "",
@@ -758,15 +784,18 @@ export class AuthService {
 							secondarySectorIds: userData.secondarySectorIds || [],
 							trainedActivities: userData.trainedActivities || [],
 							skills: userData.skills || [],
-							status: userData.status || "active",
+							status: (userData.status as "active" | "inactive" | "suspended" | "terminated" | "on_leave") || "active",
 							admissionDate: userData.admissionDate || "",
 							lastTrainingDate: userData.lastTrainingDate || "",
 							nextTrainingDate: userData.nextTrainingDate || "",
-							contractType: userData.contractType || "clt",
+							contractType: (userData.contractType as ContractType) || "clt",
 							workSchedule: userData.workSchedule || "day",
 							weeklyHours: userData.weeklyHours || 40,
 							supervisorId: userData.supervisorId || "",
 							teamId: userData.teamId || "",
+							accessLevel: (userData.accessLevel as AccessLevel) || "basic",
+							permissions: userData.permissions || [],
+							certifications: userData.certifications || [],
 						}
 					};
 					

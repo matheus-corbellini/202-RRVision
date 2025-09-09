@@ -11,6 +11,7 @@ interface ButtonProps {
   fullWidth?: boolean;
   onClick?: () => void;
   disabled?: boolean;
+  className?: string;
 }
 
 export default function Button({
@@ -21,10 +22,11 @@ export default function Button({
   fullWidth = false,
   onClick,
   disabled = false,
+  className: customClassName,
 }: ButtonProps) {
   const className = `btn btn-${variant} btn-${size} ${
     fullWidth ? "btn-full-width" : ""
-  }`;
+  } ${customClassName || ""}`;
 
   return (
     <button

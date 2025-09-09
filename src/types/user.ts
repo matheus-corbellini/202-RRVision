@@ -54,7 +54,7 @@ export interface OperatorData {
 	}>;
 	
 	// Status (ativo/inativo)
-	status: "active" | "inactive" | "suspended" | "terminated";
+	status: "active" | "inactive" | "suspended" | "terminated" | "on_leave";
 	
 	// Data de admissão / últimos treinamentos
 	admissionDate: string;
@@ -85,7 +85,7 @@ export interface OperatorData {
 	
 	// Controle de acesso
 	accessLevel: AccessLevel;
-	permissions: string[];
+	permissions?: string[];
 }
 
 export interface AuthContextType {

@@ -651,7 +651,7 @@ export default function OperatorSchedule() {
 		}
 	};
 
-	// Handler para ações rápidas
+	// Handler para c
 	const handleQuickAction = async (action: string) => {
 		switch (action) {
 			case "start-next": {

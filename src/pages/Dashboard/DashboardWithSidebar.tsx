@@ -10,7 +10,6 @@ import NonConformities from "../NonConformities/NonConformities";
 import AlertsPanel from "../AlertsPanel/AlertsPanel";
 import ControlPanel from "../ControlPanel/ControlPanel";
 import PriorityOptimization from "../PriorityOptimization/PriorityOptimization";
-import OperatorRegistration from "../OperatorRegistration/OperatorRegistration";
 import OperatorsList from "../OperatorsList/OperatorsList";
 import BlingIntegration from "../BlingIntegration/BlingIntegration";
 import OperationalRoutes from "../OperationalRoutes/OperationalRoutes";

@@ -94,6 +94,9 @@ export default function AlertsPanel() {
         ],
         status: "active",
         createdAt: "2024-01-20T10:30:00",
+        updatedAt: "2024-01-20T10:30:00",
+        createdBy: "system",
+        updatedBy: "system",
         acknowledgedAt: "2024-01-20T10:45:00",
         acknowledgedBy: "Pedro Costa",
         tags: ["produção", "qualidade", "crítico"],
@@ -101,6 +104,7 @@ export default function AlertsPanel() {
         comments: [
           {
             id: "comment-001",
+            userId: "user-001",
             userName: "João Silva",
             message:
               "Produção interrompida. 5 peças com problema identificadas.",
@@ -161,6 +165,9 @@ export default function AlertsPanel() {
           },
         ],
         createdAt: "2024-01-20T14:15:00",
+        updatedAt: "2024-01-20T14:15:00",
+        createdBy: "system",
+        updatedBy: "system",
         acknowledgedAt: "2024-01-20T14:20:00",
         acknowledgedBy: "Pedro Costa",
         tags: ["prioridade", "planejamento"],
@@ -168,7 +175,7 @@ export default function AlertsPanel() {
         comments: [
           {
             id: "comment-004",
-
+            userId: "user-004",
             userName: "Ana Oliveira",
             message:
               "Alteração solicitada pelo cliente. Prazo reduzido em 2 dias.",
@@ -207,6 +214,9 @@ export default function AlertsPanel() {
           },
         ],
         createdAt: "2024-01-20T15:30:00",
+        updatedAt: "2024-01-20T15:30:00",
+        createdBy: "system",
+        updatedBy: "system",
         tags: ["atraso", "montagem"],
         attachments: [],
         comments: [],
@@ -249,6 +259,9 @@ export default function AlertsPanel() {
           },
         ],
         createdAt: "2024-01-20T09:00:00",
+        updatedAt: "2024-01-20T09:00:00",
+        createdBy: "system",
+        updatedBy: "system",
         acknowledgedAt: "2024-01-20T09:15:00",
         acknowledgedBy: "Roberto Lima",
         tags: ["material", "estoque"],
@@ -304,6 +317,9 @@ export default function AlertsPanel() {
           },
         ],
         createdAt: "2024-01-20T16:00:00",
+        updatedAt: "2024-01-20T16:00:00",
+        createdBy: "system",
+        updatedBy: "system",
         acknowledgedAt: "2024-01-20T16:00:00",
         acknowledgedBy: "José Santos",
         tags: ["manutenção", "preventiva"],

@@ -1,6 +1,9 @@
 // Tipos para não conformidades
 import type { BaseEntity, Location, UserReference, SectorReference, Priority, Severity, Status, Attachment, Comment } from './base';
 
+// Re-export Attachment for external use
+export type { Attachment } from './base';
+
 export interface NonConformity extends BaseEntity {
 	title: string;
 	description: string;

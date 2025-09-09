@@ -14,8 +14,6 @@ const UserProfile: React.FC = () => {
 		getRole,
 		getBasicInfo,
 		getDisplayInfo,
-		isAdmin,
-		isSupervisor,
 		isOperator,
 		getPermissions,
 		hasPermission,
@@ -143,7 +141,7 @@ const UserProfile: React.FC = () => {
 									<label>Data de Admissão:</label>
 									<span>
 										{operatorHook.getTrainingInfo().admissionDate
-											? new Date(operatorHook.getTrainingInfo().admissionDate).toLocaleDateString()
+											? new Date(operatorHook.getTrainingInfo().admissionDate || '').toLocaleDateString()
 											: "Não informado"
 										}
 									</span>

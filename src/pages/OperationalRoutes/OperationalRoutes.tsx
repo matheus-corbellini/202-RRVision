@@ -402,6 +402,10 @@ export default function OperationalRoutes() {
 			notes: newStep.notes?.trim() || "",
 			sectorId: newStep.sectorId,
 			operatorId: newStep.operatorId || undefined,
+			createdAt: new Date().toISOString(),
+			updatedAt: new Date().toISOString(),
+			createdBy: "current-user",
+			updatedBy: "current-user",
 		};
 
 		setFormData((prev) => ({

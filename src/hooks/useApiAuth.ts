@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { apiAuthService, ApiConfig, TokenData, ApiError } from '../services/apiAuthService';
+import { apiAuthService } from '../services/apiAuthService';
+import type { ApiConfig, TokenData } from '../services/apiAuthService';
+import { ApiError } from '../services/apiAuthService';
 
 export interface UseApiAuthReturn {
   token: TokenData | null;

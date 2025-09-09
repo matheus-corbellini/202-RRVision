@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useApi } from '../../contexts/ApiContext';
-import { ApiConfig } from '../../services/apiAuthService';
+import type { ApiConfig } from '../../services/apiAuthService';
 import Button from '../Button/Button';
 import Input from '../Input/Input';
 import { FaCog, FaCheck, FaTimes, FaSpinner, FaExclamationTriangle } from 'react-icons/fa';
@@ -161,7 +161,7 @@ export default function ApiConfig() {
                   <Input
                     type="text"
                     name="clientId"
-                    value={formData.clientId}
+                    value={formData.clientId || ''}
                     onChange={handleChange}
                     placeholder="seu_client_id"
                     required
@@ -173,7 +173,7 @@ export default function ApiConfig() {
                   <Input
                     type="password"
                     name="clientSecret"
-                    value={formData.clientSecret}
+                    value={formData.clientSecret || ''}
                     onChange={handleChange}
                     placeholder="seu_client_secret"
                     required
@@ -186,7 +186,7 @@ export default function ApiConfig() {
                 <Input
                   type="text"
                   name="tokenEndpoint"
-                  value={formData.tokenEndpoint}
+                  value={formData.tokenEndpoint || ''}
                   onChange={handleChange}
                   placeholder="/oauth/token"
                 />
@@ -197,7 +197,7 @@ export default function ApiConfig() {
                 <Input
                   type="text"
                   name="scope"
-                  value={formData.scope}
+                  value={formData.scope || ''}
                   onChange={handleChange}
                   placeholder="read write"
                 />
@@ -214,7 +214,7 @@ export default function ApiConfig() {
                 <Input
                   type="password"
                   name="apiKey"
-                  value={formData.apiKey}
+                  value={formData.apiKey || ''}
                   onChange={handleChange}
                   placeholder="sua_api_key"
                   required

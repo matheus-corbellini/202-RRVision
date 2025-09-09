@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { ApiConfig } from '../services/apiAuthService';
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import type { ApiConfig } from '../services/apiAuthService';
 import { useApiAuth } from '../hooks/useApiAuth';
 import { externalApiService } from '../services/externalApiService';
 
@@ -32,7 +33,6 @@ interface ApiProviderProps {
 
 export function ApiProvider({ children }: ApiProviderProps) {
   const {
-    token,
     isLoading,
     error,
     isAuthenticated,
@@ -43,7 +43,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
 
   const [config, setConfigState] = useState<ApiConfig | null>(null);
   const [isConnected, setIsConnected] = useState(false);
-  const [lastSync, setLastSync] = useState<Date | null>(null);
+  const [lastSync] = useState<Date | null>(null);
 
   // Carrega configuração do localStorage na inicialização
   useEffect(() => {
@@ -76,7 +76,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
     }
 
     try {
-      const response = await externalApiService.getApiInfo();
+      await externalApiService.getStats();
       setIsConnected(true);
       return true;
     } catch (error) {
@@ -89,7 +89,7 @@ export function ApiProvider({ children }: ApiProviderProps) {
   // Busca informações da API
   const getApiInfo = async () => {
     try {
-      const response = await externalApiService.getApiInfo();
+      const response = await externalApiService.getStats();
       return response.data;
     } catch (error) {
       console.error('Erro ao buscar informações da API:', error);
