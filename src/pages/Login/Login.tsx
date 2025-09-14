@@ -36,30 +36,14 @@ export default function Login() {
 		e.preventDefault();
 
 		try {
-			const loggedUser = await handleLogin(formData);
+			await handleLogin(formData);
 			
 			// Determinar redirecionamento baseado no tipo de usuário
 			let target;
 			
 
-			// Lógica de redirecionamento baseada no tipo de usuário
-			switch (loggedUser.userType) {
-				case "admin":
-					target = path.admin;
-					break;
-					
-				case "supervisor":
-					target = path.dashboard;
-					break;
-					
-				case "operator":
-					target = path.dashboard;
-					break;
-					
-				default:
-					target = path.dashboard;
-					break;
-			}
+			// Redirecionar para a aplicação após login
+			target = path.app;
 			
 			goTo(target);
 		} catch (err) {

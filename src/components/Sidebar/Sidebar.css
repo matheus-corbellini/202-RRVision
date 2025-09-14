@@ -24,12 +24,17 @@
   justify-content: space-between;
   align-items: center;
   min-height: 80px;
+  gap: 1rem;
 }
 
 .sidebar-logo {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  flex: 1;
+  min-width: 0;
+  gap: 0.5rem;
 }
 
 .logo-text {
@@ -40,9 +45,13 @@
 }
 
 .logo-subtitle {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #e2e8f0;
   font-weight: 500;
+  line-height: 1;
+  opacity: 0.9;
+  align-self: flex-end;
+  margin-bottom: 0.2rem;
 }
 
 .logo-icon {
@@ -154,7 +163,6 @@
 .nav-item-active {
   background: rgba(251, 176, 64, 0.2);
   color: #fbb040;
-  border-right: 3px solid #fbb040;
 }
 
 .nav-item-active::before {
@@ -299,6 +307,22 @@
   top: 0.5rem;
   right: 0.5rem;
   transform: scale(0.8);
+}
+
+.sidebar-collapsed .sidebar-logo {
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 0;
+}
+
+.sidebar-collapsed .logo-text {
+  font-size: 1.2rem;
+  margin-bottom: 0;
+}
+
+.sidebar-collapsed .logo-subtitle {
+  display: none;
 }
 
 /* Responsive Design */

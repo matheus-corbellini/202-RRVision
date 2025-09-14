@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Sidebar from "../../components/Sidebar/Sidebar";
 import Button from "../../components/Button/Button";
 import Input from "../../components/Input/Input";
 import {
@@ -14,7 +13,6 @@ import type { User, UserRole } from "../../types";
 import "./Admin.css";
 
 export default function Admin() {
-	const [currentPage, setCurrentPage] = useState("admin-users");
 	const [users, setUsers] = useState<User[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -140,14 +138,7 @@ export default function Admin() {
 	};
 
 	return (
-		<div className="dashboard-layout">
-			<Sidebar
-				currentPage={currentPage}
-				onPageChange={setCurrentPage}
-				variant="admin"
-			/>
-
-			<div className="dashboard-main admin-page">
+		<div className="admin-page">
 				<div className="admin-header">
 					<div>
 						<h1>Gerenciar Usuários</h1>
@@ -264,7 +255,6 @@ export default function Admin() {
 						onSave={handleSave}
 					/>
 				)}
-			</div>
 		</div>
 	);
 }

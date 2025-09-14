@@ -221,7 +221,7 @@ export default function UserCreation() {
 	useEffect(() => {
 		let filtered = users;
 
-		// Filtrar por tipo de usuário
+		// Filtrar por tipo de usuário (baseado apenas no userType)
 		if (userTypeFilter !== "all") {
 			filtered = filtered.filter((u) => u.userType === userTypeFilter);
 		}
@@ -538,22 +538,21 @@ export default function UserCreation() {
 		}));
 	};
 
-	const getRoleBadgeClass = (role: string) => {
-		switch (role) {
+	const getRoleBadgeClass = (userType: string) => {
+		switch (userType) {
 			case "admin": return "role-admin";
-			case "manager": return "role-manager";
-			case "supervisor": return "role-supervisor";
 			case "operator": return "role-operator";
+			case "user": return "role-user";
 			default: return "role-user";
 		}
 	};
 
-	const getRoleText = (role: string) => {
-		switch (role) {
+	const getRoleText = (userType: string) => {
+		// Baseado apenas no userType
+		switch (userType) {
 			case "admin": return "Administrador";
-			case "manager": return "Gerente";
-			case "supervisor": return "Supervisor";
 			case "operator": return "Operador";
+			case "user": return "Usuário";
 			default: return "Usuário";
 		}
 	};
@@ -608,6 +607,7 @@ export default function UserCreation() {
 								<option value="all">Todos os tipos</option>
 								<option value="admin">Administradores</option>
 								<option value="operator">Operadores</option>
+								<option value="user">Usuários</option>
 							</select>
 						</div>
 						<div className="search-actions">
@@ -664,9 +664,9 @@ export default function UserCreation() {
 											{u.phone || "—"}
 										</div>
 										<div className="role-cell">
-											<span className={`role-badge ${getRoleBadgeClass(u.role)}`}>
+											<span className={`role-badge ${getRoleBadgeClass(u.userType)}`}>
 												<FaUserTag />
-												{getRoleText(u.role)}
+												{getRoleText(u.userType)}
 											</span>
 										</div>
 										<div className="actions-cell">

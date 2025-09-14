@@ -52,8 +52,8 @@ export default function Register() {
 
 		try {
 			await handleRegister(formData);
-			// On successful registration, navigate to dashboard or welcome page
-			goTo(path.dashboard);
+			// On successful registration, navigate to app
+			goTo(path.app);
 		} catch (err) {
 			// Error is handled by the hook
 			console.error("Registration failed:", err);

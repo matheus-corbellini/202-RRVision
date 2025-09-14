@@ -12,7 +12,6 @@ import {
 	FaChevronLeft,
 	FaChevronRight,
 	FaUsersCog,
-	FaUsers,
 	FaRoute,
 	FaUserEdit,
 	FaBox,
@@ -141,14 +140,6 @@ export default function Sidebar({
 		// 	badge: null,
 		// 	access: ["admin"],
 		// },
-		{
-			id: "operators-list",
-			title: "Lista de Operadores",
-			icon: <FaUsers />,
-			description: "Visualizar Todos os Operadores",
-			badge: null,
-			access: ["admin"],
-		},
 		// {
 		// 	id: "bling-integration",
 		// 	title: "Integração Bling",

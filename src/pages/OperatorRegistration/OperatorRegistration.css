@@ -2,6 +2,8 @@
 	min-height: 100vh;
 	background: linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%);
 	padding: 0;
+	width: 100%;
+	box-sizing: border-box;
 }
 
 .operator-registration-container {

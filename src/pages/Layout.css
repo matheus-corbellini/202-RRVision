@@ -1,0 +1,58 @@
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f7fafc;
+}
+
+.dashboard-main {
+  flex: 1;
+  margin-left: 280px;
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+.dashboard-layout:has(.sidebar-collapsed) .dashboard-main {
+  margin-left: 70px;
+}
+
+@media (max-width: 768px) {
+  .dashboard-main {
+    margin-left: 0;
+  }
+
+  .dashboard-layout:has(.sidebar:not(.sidebar-collapsed)) .dashboard-main {
+    margin-left: 0;
+  }
+}
+
+.dashboard-main > * {
+  transition: all 0.3s ease;
+}
+
+.dashboard-main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ajustes para páginas específicas */
+.dashboard-main .admin-page,
+.dashboard-main .alerts-page,
+.dashboard-main .bling-integration-page,
+.dashboard-main .control-panel-container,
+.dashboard-main .nc-page,
+.dashboard-main .operational-routes-page,
+.dashboard-main .operational-routes-list-page,
+.dashboard-main .operator-registration-page,
+.dashboard-main .operators-list-page,
+.dashboard-main .priority-optimization-page,
+.dashboard-main .product-management-content,
+.dashboard-main .productivity-page,
+.dashboard-main .schedule-page,
+.dashboard-main .settings-page,
+.dashboard-main .user-creation-page {
+  min-height: 100vh;
+  width: 100%;
+  box-sizing: border-box;
+}
