@@ -1,0 +1,155 @@
+.bling-callback-page {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	padding: 2rem;
+}
+
+.bling-callback-container {
+	background: white;
+	border-radius: 16px;
+	box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+	padding: 3rem;
+	max-width: 500px;
+	width: 100%;
+	text-align: center;
+}
+
+.callback-status {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1.5rem;
+}
+
+.status-icon {
+	font-size: 4rem;
+	margin-bottom: 1rem;
+}
+
+.status-icon .spinning {
+	animation: spin 1s linear infinite;
+	color: #667eea;
+}
+
+.status-icon .success {
+	color: #48bb78;
+}
+
+.status-icon .error {
+	color: #e53e3e;
+}
+
+.callback-status h1 {
+	font-size: 2rem;
+	font-weight: 600;
+	color: #2d3748;
+	margin: 0;
+}
+
+.status-message {
+	font-size: 1.1rem;
+	color: #4a5568;
+	margin: 0;
+	line-height: 1.6;
+}
+
+.error-actions {
+	margin-top: 2rem;
+}
+
+.btn {
+	padding: 0.75rem 1.5rem;
+	border: none;
+	border-radius: 8px;
+	font-size: 1rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-decoration: none;
+	display: inline-block;
+}
+
+.btn-primary {
+	background: #667eea;
+	color: white;
+}
+
+.btn-primary:hover {
+	background: #5a67d8;
+	transform: translateY(-1px);
+}
+
+.loading {
+	animation: pulse 2s ease-in-out infinite;
+}
+
+.success {
+	animation: successPulse 0.6s ease-out;
+}
+
+.error {
+	animation: errorShake 0.5s ease-out;
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes pulse {
+	0%, 100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.7;
+	}
+}
+
+@keyframes successPulse {
+	0% {
+		transform: scale(1);
+	}
+	50% {
+		transform: scale(1.05);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+@keyframes errorShake {
+	0%, 100% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-5px);
+	}
+	75% {
+		transform: translateX(5px);
+	}
+}
+
+@media (max-width: 640px) {
+	.bling-callback-page {
+		padding: 1rem;
+	}
+	
+	.bling-callback-container {
+		padding: 2rem;
+	}
+	
+	.callback-status h1 {
+		font-size: 1.5rem;
+	}
+	
+	.status-icon {
+		font-size: 3rem;
+	}
+}

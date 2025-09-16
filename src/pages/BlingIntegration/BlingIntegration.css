@@ -596,3 +596,126 @@
 		padding: 0.5rem 0;
 	}
 }
+
+/* Métodos de Autenticação */
+.auth-method-selector {
+	display: flex;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.auth-method-btn {
+	flex: 1;
+	padding: 1rem;
+	border: 2px solid #e2e8f0;
+	border-radius: 8px;
+	background: white;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-weight: 500;
+	color: #4a5568;
+}
+
+.auth-method-btn:hover {
+	border-color: #667eea;
+	background: #f7fafc;
+}
+
+.auth-method-btn.active {
+	border-color: #667eea;
+	background: #667eea;
+	color: white;
+}
+
+.auth-method-btn svg {
+	font-size: 1.2rem;
+}
+
+/* Seção OAuth */
+.oauth-section {
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	padding: 1.5rem;
+	background: #f8fafc;
+	margin-bottom: 1rem;
+}
+
+.oauth-info {
+	text-align: center;
+	margin-bottom: 1.5rem;
+}
+
+.oauth-info h3 {
+	font-size: 1.25rem;
+	font-weight: 600;
+	color: #2d3748;
+	margin: 0 0 0.5rem 0;
+}
+
+.oauth-info p {
+	color: #718096;
+	margin: 0;
+}
+
+.connected-status {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 1rem;
+	background: white;
+	border-radius: 8px;
+	border: 1px solid #48bb78;
+}
+
+.success-icon {
+	color: #48bb78;
+	font-size: 1.5rem;
+}
+
+.connected-status h4 {
+	margin: 0;
+	color: #2d3748;
+	font-size: 1.1rem;
+}
+
+.connected-status p {
+	margin: 0.25rem 0 0 0;
+	color: #718096;
+	font-size: 0.9rem;
+}
+
+.oauth-actions {
+	text-align: center;
+}
+
+.oauth-btn {
+	padding: 1rem 2rem;
+	font-size: 1.1rem;
+	font-weight: 600;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+}
+
+.oauth-description {
+	color: #718096;
+	font-size: 0.9rem;
+	margin: 0;
+}
+
+/* Responsive para OAuth */
+@media (max-width: 768px) {
+	.auth-method-selector {
+		flex-direction: column;
+	}
+
+	.connected-status {
+		flex-direction: column;
+		text-align: center;
+		gap: 0.5rem;
+	}
+}

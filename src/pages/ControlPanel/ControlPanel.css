@@ -1,5 +1,5 @@
 .control-panel-container {
-  padding: 1rem;
+  padding: 1.5rem;
   min-height: 100vh;
   background: linear-gradient(135deg, #f7fafc 0%, #e2e8f0 100%);
   width: 100%;
@@ -33,40 +33,113 @@
   }
 }
 
+/* Layout Principal */
 .control-panel-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto auto;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  max-width: 1400px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+/* Seções específicas */
 .semaphore-section {
-  grid-column: span 2;
+  grid-column: 1 / -1;
+  grid-row: 1;
 }
 
+.alerts-section {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.pendencies-section {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.nonconformity-section {
+  grid-column: 1;
+  grid-row: 3;
+}
+
+.actions-section {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+/* Estilos para as seções */
+.control-panel-grid > div {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
 
 /* Responsive adjustments */
 @media (max-width: 1200px) {
-  .control-panel-grid {
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  .control-panel-container {
+    padding: 1rem;
   }
+  
+  .control-panel-grid {
+    gap: 1rem;
+  }
+}
 
+@media (max-width: 1024px) {
+  .control-panel-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto auto;
+  }
+  
   .semaphore-section {
-    grid-column: span 1;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  
+  .alerts-section {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  .pendencies-section {
+    grid-column: 1;
+    grid-row: 3;
+  }
+  
+  .nonconformity-section {
+    grid-column: 1;
+    grid-row: 4;
+  }
+  
+  .actions-section {
+    grid-column: 1;
+    grid-row: 5;
   }
 }
 
 @media (max-width: 768px) {
   .control-panel-container {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .control-panel-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 0.75rem;
+    margin-top: 1rem;
   }
+}
 
-  .semaphore-section {
-    grid-column: span 1;
+@media (max-width: 480px) {
+  .control-panel-container {
+    padding: 0.5rem;
+  }
+  
+  .control-panel-grid {
+    gap: 0.5rem;
   }
 }

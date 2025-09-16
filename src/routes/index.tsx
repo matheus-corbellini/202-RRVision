@@ -2,6 +2,7 @@ import LandingPage from "../pages/LandingPage/LandingPage";
 import Login from "../pages/Login/Login";
 import Register from "../pages/Register/Register";
 import RecoveryPassword from "../pages/RecoveryPassword/RecoveryPassword";
+import BlingCallback from "../pages/BlingCallback/BlingCallback";
 import Layout from "../pages/Layout";
 import { Routes, Route, Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
@@ -23,6 +24,7 @@ export default function AppRoutes() {
 			<Route path={path.login} element={<Login />} />
 			<Route path={path.register} element={<Register />} />
 			<Route path={path.forgotPassword} element={<RecoveryPassword />} />
+			<Route path="/bling/callback" element={<BlingCallback />} />
 
 			{/* Rotas protegidas - com Layout e Sidebar */}
 			<Route
@@ -33,7 +35,7 @@ export default function AppRoutes() {
 					</RequireAuth>
 				}
 			/>
-			
+
 			{/* Redirecionamento padrão */}
 			<Route path="*" element={<Navigate to={path.landing} replace />} />
 		</Routes>

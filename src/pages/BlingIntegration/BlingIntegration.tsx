@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useBling } from "../../hooks/useBling";
+import { blingService } from "../../services/blingService";
 import Button from "../../components/Button/Button";
 import Input from "../../components/Input/Input";
+import BlingOrdersList from "../../components/BlingOrdersList/BlingOrdersList";
 import {
 	FaCog,
 	FaDownload,
@@ -15,6 +17,9 @@ import {
 	FaDatabase,
 	FaPlug,
 	FaClock,
+	FaExternalLinkAlt,
+	FaKey,
+	FaList,
 } from "react-icons/fa";
 import "./BlingIntegration.css";
 
@@ -63,11 +68,12 @@ export default function BlingIntegration() {
 	const [testing, setTesting] = useState(false);
 	const [importing, setImporting] = useState(false);
 	const [activeTab, setActiveTab] = useState<
-		"config" | "import" | "history" | "logs"
+		"config" | "import" | "orders" | "history" | "logs"
 	>("config");
 	const [connectionStatus, setConnectionStatus] = useState<
 		"unknown" | "connected" | "failed"
 	>("unknown");
+	const [authMethod, setAuthMethod] = useState<"token" | "oauth">("token");
 
 	// Carregar configuração e histórico ao montar o componente
 	useEffect(() => {
@@ -86,11 +92,11 @@ export default function BlingIntegration() {
 			console.log("Carregando dados iniciais...");
 			console.log("Configuração atual:", config);
 			console.log("Access Token inicial:", config.accessToken);
-			
+
 			const savedConfig = await getConfiguration();
 			console.log("Configuração salva:", savedConfig);
 			console.log("Access Token na configuração salva:", savedConfig?.accessToken);
-			
+
 			if (savedConfig) {
 				// Mesclar configuração salva com valores padrão para garantir que as credenciais não sejam perdidas
 				const newConfig = {
@@ -101,10 +107,10 @@ export default function BlingIntegration() {
 					clientSecret: savedConfig.clientSecret || config.clientSecret,
 					accessToken: savedConfig.accessToken || config.accessToken,
 				};
-				
+
 				console.log("Nova configuração mesclada:", newConfig);
 				console.log("Access Token na nova configuração:", newConfig.accessToken);
-				
+
 				setConfig(newConfig);
 			} else {
 				console.log("Nenhuma configuração salva encontrada, usando valores padrão");
@@ -126,12 +132,12 @@ export default function BlingIntegration() {
 		console.log("Estado atual - config:", config);
 		console.log("Access Token válido:", !!config.accessToken);
 		console.log("Access Token valor:", config.accessToken);
-		
+
 		if (!config.accessToken) {
 			alert("Configure o Access Token antes de testar a conexão");
 			return;
 		}
-		
+
 		setTesting(true);
 		try {
 			const result = await testConnection(config);
@@ -156,7 +162,7 @@ export default function BlingIntegration() {
 		try {
 			console.log("Salvando configuração:", config);
 			console.log("Access Token sendo salvo:", config.accessToken);
-			
+
 			await updateConfiguration(config);
 			alert("Configuração salva com sucesso!");
 		} catch (error) {
@@ -165,11 +171,30 @@ export default function BlingIntegration() {
 		}
 	};
 
+	const handleOAuthLogin = () => {
+		try {
+			const authUrl = blingService.getAuthorizationUrl();
+			window.location.href = authUrl;
+		} catch (error) {
+			console.error("Erro ao iniciar OAuth:", error);
+			alert("Erro ao iniciar processo de autorização");
+		}
+	};
+
+	const handleDisconnect = () => {
+		localStorage.removeItem("bling_access_token");
+		localStorage.removeItem("bling_refresh_token");
+		localStorage.removeItem("bling_token_expiry");
+		setConfig(prev => ({ ...prev, accessToken: "" }));
+		setConnectionStatus("unknown");
+		alert("Desconectado com sucesso!");
+	};
+
 	const handleImportOrders = async () => {
 		console.log("Tentando importar ordens...");
 		console.log("Access Token disponível:", !!config.accessToken);
 		console.log("Access Token valor:", config.accessToken);
-		
+
 		if (!config.accessToken) {
 			alert("Configure o Access Token antes de importar ordens");
 			return;
@@ -294,6 +319,13 @@ export default function BlingIntegration() {
 						Importação
 					</button>
 					<button
+						className={`tab-button ${activeTab === "orders" ? "active" : ""}`}
+						onClick={() => setActiveTab("orders")}
+					>
+						<FaList />
+						Pedidos
+					</button>
+					<button
 						className={`tab-button ${activeTab === "history" ? "active" : ""}`}
 						onClick={() => setActiveTab("history")}
 					>
@@ -320,24 +352,91 @@ export default function BlingIntegration() {
 							</div>
 
 							<div className="config-form">
+								{/* Método de Autenticação */}
 								<div className="form-group">
-									<label>Access Token OAuth</label>
-									<Input
-										name="accessToken"
-										type="password"
-										value={config.accessToken}
-										onChange={(e) =>
-											setConfig((prev) => ({ ...prev, accessToken: e.target.value }))
-										}
-										placeholder="Digite seu Access Token OAuth do Bling"
-									/>
-									<div style={{ fontSize: '0.8rem', color: config.accessToken ? '#48bb78' : '#e53e3e', marginTop: '0.25rem' }}>
-										{config.accessToken ? '✅ Access Token configurado' : '❌ Access Token necessário'}
-									</div>
-									<div style={{ fontSize: '0.75rem', color: '#718096', marginTop: '0.25rem' }}>
-										ℹ️ Obtenha seu Access Token através do fluxo OAuth 2.0 no painel do Bling
+									<label>Método de Autenticação</label>
+									<div className="auth-method-selector">
+										<button
+											type="button"
+											className={`auth-method-btn ${authMethod === "oauth" ? "active" : ""}`}
+											onClick={() => setAuthMethod("oauth")}
+										>
+											<FaKey />
+											OAuth 2.0 (Recomendado)
+										</button>
+										<button
+											type="button"
+											className={`auth-method-btn ${authMethod === "token" ? "active" : ""}`}
+											onClick={() => setAuthMethod("token")}
+										>
+											<FaPlug />
+											Token Manual
+										</button>
 									</div>
 								</div>
+
+								{/* OAuth 2.0 */}
+								{authMethod === "oauth" && (
+									<div className="oauth-section">
+										<div className="oauth-info">
+											<h3>Autorização OAuth 2.0</h3>
+											<p>Conecte-se de forma segura usando OAuth 2.0 do Bling</p>
+										</div>
+
+										{config.accessToken ? (
+											<div className="connected-status">
+												<FaCheckCircle className="success-icon" />
+												<div>
+													<h4>Conectado com Sucesso!</h4>
+													<p>Você está autorizado a acessar a API do Bling</p>
+												</div>
+												<button
+													type="button"
+													className="btn btn-outline"
+													onClick={handleDisconnect}
+												>
+													Desconectar
+												</button>
+											</div>
+										) : (
+											<div className="oauth-actions">
+												<button
+													type="button"
+													className="btn btn-primary oauth-btn"
+													onClick={handleOAuthLogin}
+												>
+													<FaExternalLinkAlt />
+													Autorizar com Bling
+												</button>
+												<p className="oauth-description">
+													Você será redirecionado para o Bling para autorizar o acesso
+												</p>
+											</div>
+										)}
+									</div>
+								)}
+
+								{/* Token Manual */}
+								{authMethod === "token" && (
+									<div className="form-group">
+										<label>Access Token OAuth</label>
+										<Input
+											name="accessToken"
+											type="password"
+											value={config.accessToken}
+											onChange={(e) =>
+												setConfig((prev) => ({ ...prev, accessToken: e.target.value }))
+											}
+											placeholder="Digite seu Access Token OAuth do Bling"
+										/>
+										<div style={{ fontSize: '0.8rem', color: config.accessToken ? '#48bb78' : '#e53e3e', marginTop: '0.25rem' }}>
+											{config.accessToken ? '✅ Access Token configurado' : '❌ Access Token necessário'}
+										</div>
+										<div style={{ fontSize: '0.75rem', color: '#718096', marginTop: '0.25rem' }}>
+											ℹ️ Obtenha seu Access Token através do fluxo OAuth 2.0 no painel do Bling
+										</div>
+									</div>
+								)}
 
 								<div className="form-group">
 									<label>Client ID (Opcional)</label>
@@ -444,9 +543,9 @@ export default function BlingIntegration() {
 										{testing ? "Testando..." : "Testar Conexão"}
 									</button>
 									<div style={{ fontSize: '0.8rem', color: '#4a5568', marginTop: '0.5rem' }}>
-										{testing ? '⏳ Testando conexão...' : 
-										 (!config.accessToken) ? '❌ Configure o Access Token' : 
-										 '✅ Pronto para testar'}
+										{testing ? '⏳ Testando conexão...' :
+											(!config.accessToken) ? '❌ Configure o Access Token' :
+												'✅ Pronto para testar'}
 									</div>
 									<Button onClick={handleSaveConfig}>
 										Salvar Configuração
@@ -537,6 +636,24 @@ export default function BlingIntegration() {
 									</div>
 								</div>
 							) */}
+						</div>
+					)}
+
+					{/* Pedidos */}
+					{activeTab === "orders" && (
+						<div className="orders-section">
+							<div className="section-header">
+								<h2>Pedidos do Bling</h2>
+								<p>Visualize e gerencie os pedidos importados do Bling</p>
+							</div>
+
+							<BlingOrdersList
+								accessToken={config.accessToken}
+								onOrderSelect={(order) => {
+									console.log("Pedido selecionado:", order);
+									// Aqui você pode implementar a lógica para mostrar detalhes do pedido
+								}}
+							/>
 						</div>
 					)}
 

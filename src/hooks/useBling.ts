@@ -101,48 +101,27 @@ export const useBling = () => {
 				const syncResult = await blingService.syncData();
 
 				if (syncResult.success) {
-					// Simular dados de exemplo baseados na sincronização
-					const mockOrders: BlingOrder[] = [
-						{
-							id: "bling-001",
-							number: "OP-2024-001",
-							customer: "Cliente A",
-							product: "Produto X",
-							quantity: 100,
-							status: "pending",
-							createdAt: new Date(Date.now() - 86400000).toISOString(), // 1 dia atrás
-							importedAt: new Date().toISOString(),
-							importedBy: "Sistema",
-						},
-						{
-							id: "bling-002",
-							number: "OP-2024-002",
-							customer: "Cliente B",
-							product: "Produto Y",
-							quantity: 50,
-							status: "processing",
-							createdAt: new Date(Date.now() - 172800000).toISOString(), // 2 dias atrás
-							importedAt: new Date().toISOString(),
-							importedBy: "Sistema",
-						},
-						{
-							id: "bling-003",
-							number: "OP-2024-003",
-							customer: "Cliente C",
-							product: "Produto Z",
-							quantity: 200,
-							status: "completed",
-							createdAt: new Date(Date.now() - 259200000).toISOString(), // 3 dias atrás
-							importedAt: new Date().toISOString(),
-							importedBy: "Sistema",
-						},
-					];
+					// Buscar pedidos reais de produção
+					const productionOrders = await blingService.getProductionOrders(1, 100);
+
+					// Converter pedidos do Bling para o formato interno
+					const convertedOrders: BlingOrder[] = productionOrders.data.map((order, index) => ({
+						id: `bling-${order.id}`,
+						number: order.numero,
+						customer: order.cliente.nome,
+						product: order.itens[0]?.descricao || "Produto não especificado",
+						quantity: order.itens.reduce((sum, item) => sum + item.quantidade, 0),
+						status: mapBlingStatusToInternal(order.situacao),
+						createdAt: order.data,
+						importedAt: new Date().toISOString(),
+						importedBy: "Sistema",
+					}));
 
 					return {
 						success: true,
-						importedCount: syncResult.orders,
-						errorCount: 0,
-						orders: mockOrders,
+						importedCount: convertedOrders.length,
+						errorCount: syncResult.errors.length,
+						orders: convertedOrders,
 					};
 				} else {
 					return {
@@ -164,6 +143,18 @@ export const useBling = () => {
 		},
 		[]
 	);
+
+	// Mapear status do Bling para status interno
+	const mapBlingStatusToInternal = (blingStatus: string): string => {
+		const statusMap: Record<string, string> = {
+			"em_aberto": "pending",
+			"em_producao": "processing",
+			"aguardando_producao": "pending",
+			"concluido": "completed",
+			"cancelado": "cancelled",
+		};
+		return statusMap[blingStatus] || "pending";
+	};
 
 	// Obter histórico de importações
 	const getImportHistory = useCallback(async (): Promise<ImportLog[]> => {

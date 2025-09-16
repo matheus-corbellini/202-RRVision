@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Routes, Route } from "react-router-dom";
 import Sidebar from "../components/Sidebar/Sidebar";
 import "./Layout.css";
 import Dashboard from "./Dashboard/DashboardWithSidebar";
@@ -17,13 +17,20 @@ import Settings from "./Settings/Settings";
 import UserCreation from "./UserCreation/UserCreation";
 import ProductManagement from "./ProductManagement/ProductManagement";
 import Admin from "./Admin/Admin";
+// Novas páginas das ações rápidas
+import Reports from "./Reports/Reports";
+import Analytics from "./Analytics/Analytics";
+import TeamManagement from "./TeamManagement/TeamManagement";
+import Scheduling from "./Scheduling/Scheduling";
+import DataSync from "./DataSync/DataSync";
 
 export default function Layout() {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   const getCurrentPage = () => {
     const path = location.pathname;
+
     if (path === "/app" || path === "/app/") return "orders";
     if (path === "/app/schedule") return "schedule";
     if (path === "/app/productivity") return "productivity";
@@ -39,6 +46,13 @@ export default function Layout() {
     if (path === "/app/user-creation") return "user-creation";
     if (path === "/app/product-management") return "product-management";
     if (path === "/app/admin-users") return "admin-users";
+    // Novas rotas das ações rápidas
+    if (path === "/app/reports") return "reports";
+    if (path === "/app/analytics") return "analytics";
+    if (path === "/app/team-management") return "team-management";
+    if (path === "/app/scheduling") return "scheduling";
+    if (path === "/app/data-sync") return "data-sync";
+
     return "orders";
   };
 
@@ -59,46 +73,16 @@ export default function Layout() {
       "user-creation": "/app/user-creation",
       "product-management": "/app/product-management",
       "admin-users": "/app/admin-users",
+      // Novas rotas das ações rápidas
+      "reports": "/app/reports",
+      "analytics": "/app/analytics",
+      "team-management": "/app/team-management",
+      "scheduling": "/app/scheduling",
+      "data-sync": "/app/data-sync",
     };
-    
+
     const route = routeMap[page] || "/app";
     navigate(route);
-  };
-
-  const renderCurrentPage = () => {
-    const currentPage = getCurrentPage();
-    switch (currentPage) {
-      case "orders":
-        return <Dashboard />;
-      case "schedule":
-        return <OperatorSchedule />;
-      case "productivity":
-        return <ProductivityPanel />;
-      case "nonconformities":
-        return <NonConformities />;
-      case "alerts":
-        return <AlertsPanel />;
-      case "control":
-        return <ControlPanel />;
-      case "priority-optimization":
-        return <PriorityOptimization />;
-      case "bling-integration":
-        return <BlingIntegration />;
-      case "operational-routes":
-        return <OperationalRoutes />;
-      case "operational-routes-list":
-        return <OperationalRoutesList />;
-      case "settings":
-        return <Settings />;
-      case "user-creation":
-        return <UserCreation />;
-      case "product-management":
-        return <ProductManagement />;
-      case "admin-users":
-        return <Admin />;
-      default:
-        return <Dashboard />;
-    }
   };
 
   return (
@@ -109,7 +93,29 @@ export default function Layout() {
         variant="default"
       />
       <div className="dashboard-main">
-        {renderCurrentPage()}
+        <Routes>
+          <Route index element={<Dashboard />} />
+          <Route path="schedule" element={<OperatorSchedule />} />
+          <Route path="productivity" element={<ProductivityPanel />} />
+          <Route path="nonconformities" element={<NonConformities />} />
+          <Route path="alerts" element={<AlertsPanel />} />
+          <Route path="control" element={<ControlPanel />} />
+          <Route path="priority-optimization" element={<PriorityOptimization />} />
+          <Route path="operators-list" element={<OperatorSchedule />} />
+          <Route path="bling-integration" element={<BlingIntegration />} />
+          <Route path="operational-routes" element={<OperationalRoutes />} />
+          <Route path="operational-routes-list" element={<OperationalRoutesList />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="user-creation" element={<UserCreation />} />
+          <Route path="product-management" element={<ProductManagement />} />
+          <Route path="admin-users" element={<Admin />} />
+          {/* Novas rotas das ações rápidas */}
+          <Route path="reports" element={<Reports />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="team-management" element={<TeamManagement />} />
+          <Route path="scheduling" element={<Scheduling />} />
+          <Route path="data-sync" element={<DataSync />} />
+        </Routes>
       </div>
     </div>
   );

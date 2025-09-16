@@ -22,4 +22,10 @@ export const path = {
 	blingIntegration: "/app/bling-integration",
 	userCreation: "/app/user-creation",
 	productManagement: "/app/product-management",
+	// Novas rotas das ações rápidas
+	reports: "/app/reports",
+	analytics: "/app/analytics",
+	teamManagement: "/app/team-management",
+	scheduling: "/app/scheduling",
+	dataSync: "/app/data-sync",
 };

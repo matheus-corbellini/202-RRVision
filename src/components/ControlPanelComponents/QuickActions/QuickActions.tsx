@@ -10,9 +10,12 @@ import {
   FaCalendarAlt,
   FaSync,
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import "./QuickActions.css";
 
 export default function QuickActions() {
+  const navigate = useNavigate();
+
   const actions = [
     {
       id: "generate-report",
@@ -20,7 +23,7 @@ export default function QuickActions() {
       description: "Relatório completo de produção",
       icon: <FaFileAlt />,
       color: "blue",
-      onClick: () => console.log("Generating report..."),
+      onClick: () => navigate("/app/reports"),
     },
     {
       id: "export-data",
@@ -28,7 +31,7 @@ export default function QuickActions() {
       description: "Exportar dados para Excel/PDF",
       icon: <FaDownload />,
       color: "green",
-      onClick: () => console.log("Exporting data..."),
+      onClick: () => navigate("/app/reports"),
     },
     {
       id: "system-config",
@@ -36,7 +39,7 @@ export default function QuickActions() {
       description: "Configurar parâmetros do sistema",
       icon: <FaCog />,
       color: "gray",
-      onClick: () => console.log("Opening settings..."),
+      onClick: () => navigate("/app/settings"),
     },
     {
       id: "analytics",
@@ -44,7 +47,7 @@ export default function QuickActions() {
       description: "Visualizar métricas detalhadas",
       icon: <FaChartBar />,
       color: "purple",
-      onClick: () => console.log("Opening analytics..."),
+      onClick: () => navigate("/app/analytics"),
     },
     {
       id: "emergency-stop",
@@ -60,7 +63,7 @@ export default function QuickActions() {
       description: "Gerenciar operadores e turnos",
       icon: <FaUsers />,
       color: "orange",
-      onClick: () => console.log("Opening team management..."),
+      onClick: () => navigate("/app/team-management"),
     },
     {
       id: "schedule",
@@ -68,7 +71,7 @@ export default function QuickActions() {
       description: "Visualizar cronograma de produção",
       icon: <FaCalendarAlt />,
       color: "teal",
-      onClick: () => console.log("Opening schedule..."),
+      onClick: () => navigate("/app/scheduling"),
     },
     {
       id: "sync-data",
@@ -76,7 +79,7 @@ export default function QuickActions() {
       description: "Sincronizar dados com ERP",
       icon: <FaSync />,
       color: "indigo",
-      onClick: () => console.log("Syncing data..."),
+      onClick: () => navigate("/app/data-sync"),
     },
   ];
 
