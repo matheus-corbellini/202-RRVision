@@ -1,0 +1,277 @@
+.bling-debug {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.debug-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.debug-header h2 {
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.debug-header p {
+    color: #718096;
+    font-size: 16px;
+}
+
+.debug-actions {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.debug-results {
+    background: #f7fafc;
+    border-radius: 8px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.debug-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.debug-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.debug-section h3 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.debug-info {
+    display: grid;
+    gap: 10px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.info-item strong {
+    color: #4a5568;
+}
+
+.info-value {
+    color: #2d3748;
+    font-family: monospace;
+}
+
+.success {
+    color: #38a169;
+    font-weight: 500;
+}
+
+.error {
+    color: #e53e3e;
+    font-weight: 500;
+}
+
+.auth-url-container {
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.auth-url {
+    padding: 12px;
+    background: #f7fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.auth-url code {
+    font-family: monospace;
+    font-size: 12px;
+    color: #2d3748;
+    word-break: break-all;
+    display: block;
+}
+
+.auth-url-actions {
+    padding: 12px;
+    display: flex;
+    gap: 10px;
+}
+
+.validation-status {
+    margin-bottom: 20px;
+}
+
+.status-success {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #38a169;
+    font-weight: 500;
+}
+
+.status-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e53e3e;
+    font-weight: 500;
+}
+
+.success-icon {
+    color: #38a169;
+}
+
+.error-icon {
+    color: #e53e3e;
+}
+
+.validation-errors,
+.validation-suggestions {
+    margin-top: 15px;
+}
+
+.validation-errors h4,
+.validation-suggestions h4 {
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.validation-errors ul,
+.validation-suggestions ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.validation-errors li {
+    padding: 8px 12px;
+    background: #fed7d7;
+    color: #c53030;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.validation-suggestions li {
+    padding: 8px 12px;
+    background: #c6f6d5;
+    color: #2f855a;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.instructions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.instruction-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.instruction-number {
+    background: #3182ce;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.instruction-text {
+    color: #2d3748;
+    line-height: 1.5;
+}
+
+.checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.checklist-icon {
+    font-size: 16px;
+}
+
+.checklist-text {
+    color: #2d3748;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: #3182ce;
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: #2c5aa0;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #3182ce;
+    border: 1px solid #3182ce;
+}
+
+.btn-outline:hover:not(:disabled) {
+    background: #3182ce;
+    color: white;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 12px;
+}

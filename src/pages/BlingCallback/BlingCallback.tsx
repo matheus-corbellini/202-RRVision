@@ -9,25 +9,58 @@ export default function BlingCallback() {
     const navigate = useNavigate();
     const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
     const [message, setMessage] = useState("Processando autorização...");
+    const [processedCodes, setProcessedCodes] = useState<Set<string>>(new Set());
 
     useEffect(() => {
         const handleCallback = async () => {
             try {
+                // Debug: Log all URL parameters
+                console.log("URL completa:", window.location.href);
+                console.log("Parâmetros da URL:", Object.fromEntries(searchParams.entries()));
+
                 const code = searchParams.get("code");
                 const error = searchParams.get("error");
                 const state = searchParams.get("state");
+                const errorDescription = searchParams.get("error_description");
+
+                // Log para debug
+                console.log("Parâmetros encontrados:", { code, error, state, errorDescription });
 
                 if (error) {
                     setStatus("error");
-                    setMessage(`Erro na autorização: ${error}`);
+                    const errorMsg = errorDescription || error;
+                    setMessage(`Erro na autorização: ${errorMsg}`);
+                    console.error("Erro OAuth:", error, errorDescription);
                     return;
                 }
 
                 if (!code) {
                     setStatus("error");
-                    setMessage("Código de autorização não encontrado");
+                    setMessage("Código de autorização não encontrado. Isso geralmente indica que a aplicação não está configurada corretamente no painel do Bling.");
+                    console.error("Código de autorização não encontrado. URL:", window.location.href);
+                    console.error("Possíveis causas:");
+                    console.error("1. Aplicação não registrada no Bling");
+                    console.error("2. URL de callback não configurada no Bling");
+                    console.error("3. Client ID incorreto");
+                    console.error("4. Permissões OAuth não habilitadas");
                     return;
                 }
+
+                // Verificar se o código já foi processado
+                if (processedCodes.has(code)) {
+                    console.log("Código já foi processado anteriormente:", code.substring(0, 10) + "...");
+                    setStatus("success");
+                    setMessage("Autorização já foi processada com sucesso! Redirecionando...");
+                    setTimeout(() => {
+                        navigate("/bling-integration");
+                    }, 1000);
+                    return;
+                }
+
+                // Marcar código como processado
+                setProcessedCodes(prev => new Set(prev).add(code));
+
+                setMessage("Processando código de autorização...");
 
                 // Trocar código por token
                 const authResponse = await blingService.exchangeCodeForToken(code);

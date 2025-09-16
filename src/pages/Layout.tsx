@@ -23,6 +23,7 @@ import Analytics from "./Analytics/Analytics";
 import TeamManagement from "./TeamManagement/TeamManagement";
 import Scheduling from "./Scheduling/Scheduling";
 import DataSync from "./DataSync/DataSync";
+import BlingTest from "./BlingTest/BlingTest";
 
 export default function Layout() {
   const location = useLocation();
@@ -52,6 +53,7 @@ export default function Layout() {
     if (path === "/app/team-management") return "team-management";
     if (path === "/app/scheduling") return "scheduling";
     if (path === "/app/data-sync") return "data-sync";
+    if (path === "/app/bling-test") return "bling-test";
 
     return "orders";
   };
@@ -79,6 +81,7 @@ export default function Layout() {
       "team-management": "/app/team-management",
       "scheduling": "/app/scheduling",
       "data-sync": "/app/data-sync",
+      "bling-test": "/app/bling-test",
     };
 
     const route = routeMap[page] || "/app";
@@ -115,6 +118,7 @@ export default function Layout() {
           <Route path="team-management" element={<TeamManagement />} />
           <Route path="scheduling" element={<Scheduling />} />
           <Route path="data-sync" element={<DataSync />} />
+          <Route path="bling-test" element={<BlingTest />} />
         </Routes>
       </div>
     </div>

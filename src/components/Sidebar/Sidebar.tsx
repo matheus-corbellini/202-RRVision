@@ -15,6 +15,7 @@ import {
 	FaRoute,
 	FaUserEdit,
 	FaBox,
+	FaFlask,
 } from "react-icons/fa";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useAuth } from "../../hooks/useAuth";
@@ -124,6 +125,14 @@ export default function Sidebar({
 			badge: null,
 			access: ["admin"],
 		},
+		{
+			id: "bling-test",
+			title: "Teste Bling",
+			icon: <FaFlask />,
+			description: "Testar Integração Bling",
+			badge: null,
+			access: ["admin"],
+		},
 		// {
 		// 	id: "priority-optimization",
 		// 	title: "Otimização",
@@ -191,9 +200,9 @@ export default function Sidebar({
 		// Para outros usuários, filtrar baseado no role
 		const userRole = user?.role || "user";
 		const allItems = [...baseMenuItems, ...(userRole === "admin" ? adminOnlyItems : [])];
-		
-		return allItems.filter(item => 
-			item.access.includes(userRole) || 
+
+		return allItems.filter(item =>
+			item.access.includes(userRole) ||
 			item.access.includes("admin") ||
 			userRole === "admin"
 		);
@@ -246,9 +255,8 @@ export default function Sidebar({
 						{menuItems.map((item) => (
 							<button
 								key={item.id}
-								className={`nav-item ${
-									currentPage === item.id ? "nav-item-active" : ""
-								}`}
+								className={`nav-item ${currentPage === item.id ? "nav-item-active" : ""
+									}`}
 								onClick={() => handlePageChange(item.id)}
 								title={isCollapsed ? item.title : ""}
 							>

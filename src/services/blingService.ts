@@ -41,14 +41,15 @@ class BlingService {
 	private accessToken: string | null = null;
 	private refreshToken: string | null = null;
 	private tokenExpiry: number = 0;
+	private processingCodes: Set<string> = new Set();
 
 	constructor() {
 		this.config = {
 			clientId: import.meta.env.VITE_BLING_CLIENT_ID || "",
 			clientSecret: import.meta.env.VITE_BLING_CLIENT_SECRET || "",
-			baseUrl: import.meta.env.VITE_BLING_BASE_URL || "https://api.bling.com.br/Api/v3",
+			baseUrl: import.meta.env.VITE_BLING_BASE_URL || "",
 			accessToken: import.meta.env.VITE_BLING_ACCESS_TOKEN || "",
-			redirectUri: import.meta.env.VITE_BLING_REDIRECT_URI || "http://localhost:5173/bling/callback",
+			redirectUri: import.meta.env.VITE_BLING_REDIRECT_URI || "",
 		};
 
 		if (this.config.accessToken) {
@@ -61,15 +62,34 @@ class BlingService {
 	 * Gera URL de autorização OAuth 2.0
 	 */
 	getAuthorizationUrl(): string {
+		// Validar configuração antes de gerar URL
+		if (!this.config.clientId) {
+			throw new Error("Client ID não configurado. Configure VITE_BLING_CLIENT_ID no arquivo .env");
+		}
+
+		if (!this.config.redirectUri) {
+			throw new Error("Redirect URI não configurado. Configure VITE_BLING_REDIRECT_URI no arquivo .env");
+		}
+
 		const params = new URLSearchParams({
 			client_id: this.config.clientId,
-			redirect_uri: this.config.redirectUri || "",
+			redirect_uri: this.config.redirectUri,
 			response_type: "code",
 			scope: "pedidos:read produtos:read contatos:read",
 			state: this.generateState(),
 		});
 
-		return `https://bling.com.br/Api/v3/oauth/authorize?${params.toString()}`;
+		// Usar a URL que aparece no painel do Bling (formato correto)
+		const authUrl = `https://www.bling.com.br/b/Api/v3/oauth/authorize?${params.toString()}`;
+		console.log("URL de autorização gerada:", authUrl);
+		console.log("Parâmetros da URL:", {
+			client_id: this.config.clientId,
+			redirect_uri: this.config.redirectUri,
+			response_type: "code",
+			scope: "pedidos:read produtos:read contatos:read",
+			state: "gerado_automaticamente"
+		});
+		return authUrl;
 	}
 
 	/**
@@ -77,29 +97,75 @@ class BlingService {
 	 */
 	async exchangeCodeForToken(code: string): Promise<BlingAuthResponse> {
 		try {
-			const response = await fetch("https://bling.com.br/Api/v3/oauth/token", {
+			// Verificar se o código já está sendo processado
+			if (this.processingCodes.has(code)) {
+				throw new Error("Código já está sendo processado");
+			}
+
+			// Marcar código como sendo processado
+			this.processingCodes.add(code);
+
+			// Validar configuração
+			if (!this.config.clientId) {
+				this.processingCodes.delete(code);
+				throw new Error("Client ID não configurado");
+			}
+			if (!this.config.clientSecret) {
+				this.processingCodes.delete(code);
+				throw new Error("Client Secret não configurado");
+			}
+			if (!this.config.redirectUri) {
+				this.processingCodes.delete(code);
+				throw new Error("Redirect URI não configurado");
+			}
+
+			console.log("Trocando código por token:", {
+				code: code.substring(0, 10) + "...",
+				clientId: this.config.clientId,
+				clientSecret: this.config.clientSecret ? "CONFIGURADO" : "NÃO CONFIGURADO",
+				redirectUri: this.config.redirectUri
+			});
+
+			// Usar proxy para evitar problemas de CORS
+			const proxyUrl = "/api/bling/oauth/token";
+			const requestBody = new URLSearchParams({
+				grant_type: "authorization_code",
+				code: code,
+				redirect_uri: this.config.redirectUri,
+			});
+
+			// Criar autenticação HTTP Basic com client_id e client_secret
+			const credentials = btoa(`${this.config.clientId}:${this.config.clientSecret}`);
+
+			const response = await fetch(proxyUrl, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded",
+					"Authorization": `Basic ${credentials}`,
 				},
-				body: new URLSearchParams({
-					grant_type: "authorization_code",
-					client_id: this.config.clientId,
-					client_secret: this.config.clientSecret,
-					code: code,
-					redirect_uri: this.config.redirectUri || "",
-				}),
+				body: requestBody,
 			});
 
+			console.log("Resposta da API:", response.status, response.statusText);
+
 			if (!response.ok) {
-				throw new Error(`Erro ao trocar código por token: ${response.status}`);
+				const errorText = await response.text();
+				console.error("Erro detalhado:", errorText);
+				throw new Error(`Erro ao trocar código por token: ${response.status} - ${errorText}`);
 			}
 
 			const data: BlingAuthResponse = await response.json();
+			console.log("Token recebido com sucesso");
 			this.setTokens(data.access_token, data.refresh_token, data.expires_in);
+
+			// Remover código da lista de processamento
+			this.processingCodes.delete(code);
+
 			return data;
 		} catch (error) {
 			console.error("Erro ao trocar código por token:", error);
+			// Remover código da lista de processamento em caso de erro
+			this.processingCodes.delete(code);
 			throw error;
 		}
 	}
@@ -113,17 +179,23 @@ class BlingService {
 		}
 
 		try {
-			const response = await fetch("https://bling.com.br/Api/v3/oauth/token", {
+			// Usar proxy para evitar problemas de CORS
+			const proxyUrl = "/api/bling/oauth/token";
+			const requestBody = new URLSearchParams({
+				grant_type: "refresh_token",
+				refresh_token: this.refreshToken,
+			});
+
+			// Criar autenticação HTTP Basic com client_id e client_secret
+			const credentials = btoa(`${this.config.clientId}:${this.config.clientSecret}`);
+
+			const response = await fetch(proxyUrl, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded",
+					"Authorization": `Basic ${credentials}`,
 				},
-				body: new URLSearchParams({
-					grant_type: "refresh_token",
-					client_id: this.config.clientId,
-					client_secret: this.config.clientSecret,
-					refresh_token: this.refreshToken,
-				}),
+				body: requestBody,
 			});
 
 			if (!response.ok) {
@@ -197,8 +269,13 @@ class BlingService {
 	 * Obtém um token válido, renovando automaticamente se necessário
 	 */
 	private async getValidToken(): Promise<string> {
+		// Primeiro tenta carregar tokens salvos
 		if (!this.accessToken) {
-			throw new Error("Token de acesso não configurado. Configure o VITE_BLING_ACCESS_TOKEN ou use setAccessToken()");
+			this.loadSavedTokens();
+		}
+
+		if (!this.accessToken) {
+			throw new Error("Token de acesso não configurado. Faça a autenticação OAuth primeiro.");
 		}
 
 		// Se o token está próximo do vencimento (5 minutos), tenta renovar
@@ -219,7 +296,26 @@ class BlingService {
 	}
 
 	/**
-	 * Busca pedidos da API Bling com filtros específicos para produção
+	 * Helper para fazer chamadas da API usando o proxy
+	 */
+	private async makeApiCall(endpoint: string, options: RequestInit = {}): Promise<Response> {
+		const token = await this.getValidToken();
+		const proxyUrl = `/api/bling${endpoint}`;
+
+		const headers = {
+			Authorization: `Bearer ${token}`,
+			"Content-Type": "application/json",
+			...options.headers,
+		};
+
+		return fetch(proxyUrl, {
+			...options,
+			headers,
+		});
+	}
+
+	/**
+	 * Busca vendas da API Bling com filtros específicos para produção
 	 */
 	async getOrders(page: number = 1, limit: number = 50, filters?: {
 		dataInicial?: string;
@@ -228,8 +324,6 @@ class BlingService {
 		cliente?: string;
 	}): Promise<{ data: BlingOrder[]; total: number; page: number }> {
 		try {
-			const token = await this.getValidToken();
-
 			const params = new URLSearchParams({
 				page: page.toString(),
 				limit: limit.toString(),
@@ -240,18 +334,10 @@ class BlingService {
 			if (filters?.situacao) params.append("situacao", filters.situacao);
 			if (filters?.cliente) params.append("cliente", filters.cliente);
 
-			const response = await fetch(
-				`${this.config.baseUrl}/pedidos?${params.toString()}`,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+			const response = await this.makeApiCall(`/vendas?${params.toString()}`);
 
 			if (!response.ok) {
-				throw new Error(`Erro ao buscar pedidos: ${response.status}`);
+				throw new Error(`Erro ao buscar vendas: ${response.status}`);
 			}
 
 			const result = await response.json();
@@ -261,13 +347,13 @@ class BlingService {
 				page: result.page || page,
 			};
 		} catch (error) {
-			console.error("Erro ao buscar pedidos:", error);
+			console.error("Erro ao buscar vendas:", error);
 			throw error;
 		}
 	}
 
 	/**
-	 * Busca pedidos específicos para produção (com status específicos)
+	 * Busca vendas específicas para produção (com status específicos)
 	 */
 	async getProductionOrders(page: number = 1, limit: number = 50): Promise<{ data: BlingOrder[]; total: number }> {
 		try {
@@ -284,36 +370,26 @@ class BlingService {
 
 			return { data: allOrders, total };
 		} catch (error) {
-			console.error("Erro ao buscar pedidos de produção:", error);
+			console.error("Erro ao buscar vendas de produção:", error);
 			throw error;
 		}
 	}
 
 	/**
-	 * Busca um pedido específico por ID
+	 * Busca uma venda específica por ID
 	 */
 	async getOrderById(orderId: string): Promise<BlingOrder> {
 		try {
-			const token = await this.getValidToken();
-
-			const response = await fetch(
-				`${this.config.baseUrl}/pedidos/${orderId}`,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+			const response = await this.makeApiCall(`/vendas/${orderId}`);
 
 			if (!response.ok) {
-				throw new Error(`Erro ao buscar pedido: ${response.status}`);
+				throw new Error(`Erro ao buscar venda: ${response.status}`);
 			}
 
 			const result = await response.json();
 			return result.data;
 		} catch (error) {
-			console.error("Erro ao buscar pedido:", error);
+			console.error("Erro ao buscar venda:", error);
 			throw error;
 		}
 	}
@@ -321,19 +397,9 @@ class BlingService {
 	/**
 	 * Busca produtos da API Bling
 	 */
-	async getProducts(page: number = 1, limit: number = 50): Promise<any> {
+	async getProducts(page: number = 1, limit: number = 50): Promise<{ data: any[]; total: number }> {
 		try {
-			const token = this.getValidToken();
-
-			const response = await fetch(
-				`${this.config.baseUrl}/produtos?page=${page}&limit=${limit}`,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+			const response = await this.makeApiCall(`/produtos?page=${page}&limit=${limit}`);
 
 			if (!response.ok) {
 				throw new Error(`Erro ao buscar produtos: ${response.status}`);
@@ -349,19 +415,9 @@ class BlingService {
 	/**
 	 * Busca clientes da API Bling
 	 */
-	async getCustomers(page: number = 1, limit: number = 50): Promise<any> {
+	async getCustomers(page: number = 1, limit: number = 50): Promise<{ data: any[]; total: number }> {
 		try {
-			const token = this.getValidToken();
-
-			const response = await fetch(
-				`${this.config.baseUrl}/contatos?page=${page}&limit=${limit}`,
-				{
-					headers: {
-						Authorization: `Bearer ${token}`,
-						"Content-Type": "application/json",
-					},
-				}
-			);
+			const response = await this.makeApiCall(`/contatos?page=${page}&limit=${limit}`);
 
 			if (!response.ok) {
 				throw new Error(`Erro ao buscar clientes: ${response.status}`);
@@ -379,14 +435,7 @@ class BlingService {
 	 */
 	async testConnection(): Promise<{ success: boolean; error?: string }> {
 		try {
-			const token = this.getValidToken();
-
-			const response = await fetch(`${this.config.baseUrl}/contatos?page=1&limit=1`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-					"Content-Type": "application/json",
-				},
-			});
+			const response = await this.makeApiCall(`/contatos?page=1&limit=1`);
 
 			if (response.ok) {
 				return { success: true };
@@ -402,6 +451,167 @@ class BlingService {
 				error: error instanceof Error ? error.message : "Erro desconhecido"
 			};
 		}
+	}
+
+	/**
+	 * Testa diferentes endpoints para descobrir qual funciona para vendas/pedidos
+	 */
+	async testEndpoints(): Promise<{ endpoint: string; status: number; success: boolean }[]> {
+		const endpoints = [
+			'/vendas',
+			'/pedidos',
+			'/vendas/pedidos',
+			'/pedidos/vendas',
+			'/orders',
+			'/sales',
+			'/vendas?page=1&limit=1',
+			'/pedidos?page=1&limit=1',
+			'/notas-fiscais',
+			'/notas',
+			'/nfe',
+			'/vendas/notas',
+			'/pedidos/notas',
+			'/vendas/lista',
+			'/pedidos/lista',
+			'/vendas/list',
+			'/pedidos/list',
+			'/vendas/all',
+			'/pedidos/all'
+		];
+
+		const results = [];
+
+		for (const endpoint of endpoints) {
+			try {
+				const response = await this.makeApiCall(endpoint);
+				results.push({
+					endpoint,
+					status: response.status,
+					success: response.ok
+				});
+			} catch (error) {
+				results.push({
+					endpoint,
+					status: 0,
+					success: false
+				});
+			}
+		}
+
+		return results;
+	}
+
+	/**
+	 * Testa endpoints de listagem geral para entender a estrutura da API
+	 */
+	async testApiStructure(): Promise<{ endpoint: string; status: number; success: boolean; data?: any }[]> {
+		const endpoints = [
+			'/',  // Root endpoint
+			'/api',
+			'/v3',
+			'/v3/',
+			'/v3/endpoints',
+			'/v3/resources',
+			'/v3/help',
+			'/v3/docs',
+			'/v3/status',
+			'/v3/info',
+			'/v2',  // Testar se v2 ainda funciona
+			'/v2/',
+			'/v2/pedidos',  // Testar endpoint v2
+			'/v2/vendas',   // Testar endpoint v2
+			'/v3/pedidos',  // Testar endpoint v3
+			'/v3/vendas'    // Testar endpoint v3
+		];
+
+		const results = [];
+
+		for (const endpoint of endpoints) {
+			try {
+				const response = await this.makeApiCall(endpoint);
+				let data = null;
+
+				if (response.ok) {
+					try {
+						data = await response.json();
+					} catch (e) {
+						// Se não conseguir fazer parse do JSON, continua
+					}
+				}
+
+				results.push({
+					endpoint,
+					status: response.status,
+					success: response.ok,
+					data: data
+				});
+			} catch (error) {
+				results.push({
+					endpoint,
+					status: 0,
+					success: false
+				});
+			}
+		}
+
+		return results;
+	}
+
+	/**
+	 * Testa diferentes URLs base da API para descobrir a correta
+	 */
+	async testApiBaseUrls(): Promise<{ baseUrl: string; status: number; success: boolean; data?: any }[]> {
+		const baseUrls = [
+			'https://api.bling.com.br/Api/v3',
+			'https://api.bling.com.br/Api/v2',
+			'https://api.bling.com.br/api/v3',
+			'https://api.bling.com.br/api/v2',
+			'https://www.bling.com.br/Api/v3',
+			'https://www.bling.com.br/Api/v2',
+			'https://bling.com.br/Api/v3',
+			'https://bling.com.br/Api/v2'
+		];
+
+		const results = [];
+
+		for (const baseUrl of baseUrls) {
+			try {
+				const token = await this.getValidToken();
+				const testUrl = `${baseUrl}/produtos?page=1&limit=1`;
+
+				const response = await fetch(testUrl, {
+					method: 'GET',
+					headers: {
+						'Authorization': `Bearer ${token}`,
+						'Content-Type': 'application/json',
+					},
+				});
+
+				let data = null;
+				if (response.ok) {
+					try {
+						data = await response.json();
+					} catch (e) {
+						// Se não conseguir fazer parse do JSON, continua
+					}
+				}
+
+				results.push({
+					baseUrl,
+					status: response.status,
+					success: response.ok,
+					data: data
+				});
+			} catch (error) {
+				results.push({
+					baseUrl,
+					status: 0,
+					success: false
+				});
+			}
+		}
+
+		return results;
 	}
 
 	/**
@@ -483,7 +693,300 @@ class BlingService {
 	initialize(): void {
 		this.loadSavedTokens();
 	}
+
+	/**
+	 * Verifica a configuração atual do serviço
+	 */
+	getConfigurationStatus(): {
+		clientId: boolean;
+		clientSecret: boolean;
+		redirectUri: boolean;
+		baseUrl: string;
+		authUrl: string | null;
+		errors: string[];
+	} {
+		const errors: string[] = [];
+
+		const clientId = !!this.config.clientId;
+		const clientSecret = !!this.config.clientSecret;
+		const redirectUri = !!this.config.redirectUri;
+
+		if (!clientId) errors.push("Client ID não configurado");
+		if (!clientSecret) errors.push("Client Secret não configurado");
+		if (!redirectUri) errors.push("Redirect URI não configurado");
+
+		let authUrl: string | null = null;
+		try {
+			if (clientId && redirectUri) {
+				authUrl = this.getAuthorizationUrl();
+			}
+		} catch (error) {
+			errors.push(`Erro ao gerar URL de autorização: ${error instanceof Error ? error.message : "Erro desconhecido"}`);
+		}
+
+		return {
+			clientId,
+			clientSecret,
+			redirectUri,
+			baseUrl: this.config.baseUrl,
+			authUrl,
+			errors
+		};
+	}
+
+	/**
+	 * Testa a URL de autorização e fornece instruções de configuração
+	 */
+	testAuthorizationSetup(): {
+		authUrl: string;
+		instructions: string[];
+		checklist: string[];
+		debugInfo: any;
+	} {
+		const authUrl = this.getAuthorizationUrl();
+
+		const instructions = [
+			"1. Acesse: https://www.bling.com.br/central.extensoes.php",
+			"2. Vá para 'Minhas instalações' → 'Gestão de estoques'",
+			"3. Clique nos 3 pontos da 'API Borderless'",
+			"4. Configure a URL de callback: http://localhost:5173/bling/callback",
+			"5. Habilite as permissões: Pedidos, Produtos, Contatos",
+			"6. Salve as configurações"
+		];
+
+		const checklist = [
+			"✅ Client ID configurado",
+			"✅ Client Secret configurado",
+			"✅ Redirect URI configurado",
+			"❓ Aplicação registrada no Bling",
+			"❓ URL de callback configurada no Bling",
+			"❓ Permissões OAuth habilitadas no Bling"
+		];
+
+		const debugInfo = {
+			config: {
+				clientId: this.config.clientId ? `${this.config.clientId.substring(0, 10)}...` : "NÃO CONFIGURADO",
+				clientSecret: this.config.clientSecret ? "CONFIGURADO" : "NÃO CONFIGURADO",
+				redirectUri: this.config.redirectUri,
+				baseUrl: this.config.baseUrl
+			},
+			authUrl: authUrl,
+			expectedCallback: "http://localhost:5173/bling/callback"
+		};
+
+		return {
+			authUrl,
+			instructions,
+			checklist,
+			debugInfo
+		};
+	}
+
+	/**
+	 * Valida se a aplicação está configurada corretamente no Bling
+	 */
+	async validateBlingApp(): Promise<{
+		isValid: boolean;
+		errors: string[];
+		suggestions: string[];
+	}> {
+		const errors: string[] = [];
+		const suggestions: string[] = [];
+
+		// Verificar configuração local
+		if (!this.config.clientId) {
+			errors.push("Client ID não configurado no .env");
+		}
+
+		if (!this.config.clientSecret) {
+			errors.push("Client Secret não configurado no .env");
+		}
+
+		if (!this.config.redirectUri) {
+			errors.push("Redirect URI não configurado no .env");
+		}
+
+		// Verificar se a URL de autorização é válida
+		try {
+			const authUrl = this.getAuthorizationUrl();
+			const url = new URL(authUrl);
+
+			if (!url.searchParams.get('client_id')) {
+				errors.push("Client ID não está sendo incluído na URL de autorização");
+			}
+
+			if (!url.searchParams.get('redirect_uri')) {
+				errors.push("Redirect URI não está sendo incluído na URL de autorização");
+			}
+
+			if (!url.searchParams.get('response_type')) {
+				errors.push("Response type não está sendo incluído na URL de autorização");
+			}
+
+		} catch (error) {
+			errors.push(`Erro ao gerar URL de autorização: ${error instanceof Error ? error.message : "Erro desconhecido"}`);
+		}
+
+		// Sugestões baseadas nos erros
+		if (errors.length === 0) {
+			suggestions.push("Configuração local parece estar correta");
+			suggestions.push("Verifique se a aplicação está registrada no painel do Bling");
+			suggestions.push("Teste a URL de autorização manualmente no navegador");
+		} else {
+			suggestions.push("Corrija os erros de configuração primeiro");
+			suggestions.push("Verifique o arquivo .env");
+		}
+
+		return {
+			isValid: errors.length === 0,
+			errors,
+			suggestions
+		};
+	}
+
+	/**
+	 * Testa se a aplicação está registrada corretamente no Bling
+	 */
+	async testAppRegistration(): Promise<{
+		isRegistered: boolean;
+		message: string;
+		testUrl: string;
+		instructions: string[];
+	}> {
+		const authUrl = this.getAuthorizationUrl();
+
+		// Testar se a URL de autorização é válida
+		try {
+			const response = await fetch(authUrl, { method: 'HEAD' });
+
+			if (response.ok) {
+				return {
+					isRegistered: true,
+					message: "✅ Aplicação parece estar registrada corretamente",
+					testUrl: authUrl,
+					instructions: [
+						"1. Cole a URL de teste no navegador",
+						"2. Faça login no Bling se necessário",
+						"3. Autorize a aplicação",
+						"4. Verifique se é redirecionado para o callback"
+					]
+				};
+			} else {
+				return {
+					isRegistered: false,
+					message: "❌ Aplicação não encontrada ou não registrada",
+					testUrl: authUrl,
+					instructions: [
+						"1. Verifique se a aplicação está ativa no painel do Bling",
+						"2. Confirme se o Client ID está correto",
+						"3. Verifique se as permissões estão habilitadas",
+						"4. Entre em contato com o suporte do Bling se necessário"
+					]
+				};
+			}
+		} catch (error) {
+			return {
+				isRegistered: false,
+				message: `❌ Erro ao testar aplicação: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+				testUrl: authUrl,
+				instructions: [
+					"1. Verifique sua conexão com a internet",
+					"2. Teste a URL manualmente no navegador",
+					"3. Verifique se o Bling está funcionando"
+				]
+			};
+		}
+	}
+
+	/**
+	 * Gera URL de autorização para teste manual
+	 */
+	getManualTestUrl(): string {
+		const params = new URLSearchParams({
+			response_type: "code",
+			client_id: this.config.clientId,
+			redirect_uri: this.config.redirectUri || "http://localhost:5173/bling/callback",
+			scope: "pedidos:read produtos:read contatos:read",
+			state: `fresh_${Date.now()}` // Usar timestamp para garantir unicidade
+		});
+
+		return `https://www.bling.com.br/b/Api/v3/oauth/authorize?${params.toString()}`;
+	}
+
+	/**
+	 * Testa se a aplicação está funcionando corretamente
+	 */
+	async testAppFunctionality(): Promise<{
+		status: string;
+		message: string;
+		manualTestUrl: string;
+		nextSteps: string[];
+		configStatus: any;
+	}> {
+		const manualTestUrl = this.getManualTestUrl();
+
+		// Verificar se todas as configurações estão presentes
+		const hasClientId = !!this.config.clientId;
+		const hasClientSecret = !!this.config.clientSecret;
+		const hasRedirectUri = !!this.config.redirectUri;
+
+		const configStatus = {
+			clientId: hasClientId ? `${this.config.clientId.substring(0, 10)}...` : "NÃO CONFIGURADO",
+			clientSecret: hasClientSecret ? "CONFIGURADO" : "NÃO CONFIGURADO",
+			redirectUri: this.config.redirectUri || "NÃO CONFIGURADO",
+			baseUrl: this.config.baseUrl
+		};
+
+		if (!hasClientId || !hasClientSecret || !hasRedirectUri) {
+			return {
+				status: "error",
+				message: "❌ Configuração incompleta",
+				manualTestUrl,
+				configStatus,
+				nextSteps: [
+					"1. Verifique se todas as variáveis estão no .env",
+					"2. Reinicie o servidor após alterar o .env",
+					"3. Confirme se o Client ID e Secret estão corretos"
+				]
+			};
+		}
+
+		return {
+			status: "ready",
+			message: "✅ Configuração parece estar correta",
+			manualTestUrl,
+			configStatus,
+			nextSteps: [
+				"1. Cole a URL de teste no navegador",
+				"2. Faça login no Bling se necessário",
+				"3. Autorize a aplicação IMEDIATAMENTE",
+				"4. Verifique se é redirecionado com código",
+				"5. ⚠️ IMPORTANTE: Use o código imediatamente após receber"
+			]
+		};
+	}
+
+	/**
+	 * Gera uma URL de autorização fresca com timestamp único
+	 */
+	getFreshAuthorizationUrl(): string {
+		const params = new URLSearchParams({
+			response_type: "code",
+			client_id: this.config.clientId,
+			redirect_uri: this.config.redirectUri || "http://localhost:5173/bling/callback",
+			scope: "pedidos:read produtos:read contatos:read",
+			state: `fresh_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+		});
+
+		return `https://www.bling.com.br/b/Api/v3/oauth/authorize?${params.toString()}`;
+	}
 }
 
 export const blingService = new BlingService();
+
+// Disponibilizar no window para debug no console
+if (typeof window !== 'undefined') {
+	(window as any).blingService = blingService;
+}
+
 export default blingService;
