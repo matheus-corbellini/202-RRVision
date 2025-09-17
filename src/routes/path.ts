@@ -28,4 +28,5 @@ export const path = {
 	teamManagement: "/app/team-management",
 	scheduling: "/app/scheduling",
 	dataSync: "/app/data-sync",
+	products: "/app/products",
 };

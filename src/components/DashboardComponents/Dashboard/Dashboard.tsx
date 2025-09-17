@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../hooks/useAuth";
 import { useNavigation } from "../../../hooks/useNavigation";
+import { useBlingOrders } from "../../../hooks/useBlingOrders";
+import { useBlingToken } from "../../../hooks/useBlingToken";
 import { path } from "../../../routes/path";
 import {
 	DashboardHeader,
@@ -11,6 +13,8 @@ import {
 	AlertsPanel,
 	SectorsPanel,
 } from "../index";
+import BlingIntegrationStatus from "../../BlingIntegrationStatus/BlingIntegrationStatus";
+import BlingDemoData from "../../BlingDemoData/BlingDemoData";
 import type {
 	Order,
 	Alert,
@@ -22,63 +26,31 @@ import "./Dashboard.css";
 export default function Dashboard() {
 	const { user, logout, loading } = useAuth();
 	const { goTo } = useNavigation();
-	const [orders, setOrders] = useState<Order[]>([]);
+	const { hasToken, token } = useBlingToken();
+
+	// Hook para dados do Bling
+	const {
+		orders,
+		loading: blingLoading,
+		error: blingError,
+		stats: blingStats,
+		lastSync: blingLastSync,
+		refresh: refreshBlingOrders,
+	} = useBlingOrders({
+		accessToken: token, // Token reativo do hook
+		autoRefresh: true,
+		refreshInterval: 60000, // 1 minuto
+	});
+
 	const [alerts, setAlerts] = useState<Alert[]>([]);
 	const [sectors, setSectors] = useState<Sector[]>([]);
 	const [filterStatus, setFilterStatus] = useState<string>("all");
 	const [, setImportLogs] = useState<string[]>([]);
 	const [lastSync, setLastSync] = useState<Date>(new Date());
+	const [demoOrders, setDemoOrders] = useState<Order[]>([]);
 
-	// Mock data - Em produção, isso viria da API/Bling
+	// Dados mockados apenas para alerts e setores (que não vêm do Bling)
 	useEffect(() => {
-		// Simular dados de pedidos
-		const mockOrders: Order[] = [
-			{
-				id: "OP-2024-001",
-				orderNumber: "OP-2024-001",
-				customer: "Cliente A",
-				product: "Produto A - Modelo X",
-				quantity: 100,
-				status: "in_progress",
-				priority: "urgent",
-				createdAt: "2024-01-15",
-				dueDate: "2024-01-20",
-			},
-			{
-				id: "OP-2024-002",
-				orderNumber: "OP-2024-002",
-				customer: "Cliente B",
-				product: "Produto B - Modelo Y",
-				quantity: 50,
-				status: "in_progress",
-				priority: "medium",
-				createdAt: "2024-01-16",
-				dueDate: "2024-01-22",
-			},
-			{
-				id: "OP-2024-003",
-				orderNumber: "OP-2024-003",
-				customer: "Cliente C",
-				product: "Produto C - Modelo Z",
-				quantity: 200,
-				status: "pending",
-				priority: "low",
-				createdAt: "2024-01-18",
-				dueDate: "2024-01-25",
-			},
-			{
-				id: "OP-2024-004",
-				orderNumber: "OP-2024-004",
-				customer: "Cliente D",
-				product: "Produto D - Modelo W",
-				quantity: 75,
-				status: "completed",
-				priority: "low",
-				createdAt: "2024-01-10",
-				dueDate: "2024-01-17",
-				completedAt: "2024-01-16",
-			},
-		];
 
 		const mockAlerts: Alert[] = [
 			{
@@ -175,7 +147,6 @@ export default function Dashboard() {
 			"08:51 [SUCCESS] Importação finalizada",
 		];
 
-		setOrders(mockOrders);
 		setAlerts(mockAlerts);
 		setSectors(mockSectors);
 		setImportLogs(mockLogs);
@@ -190,29 +161,51 @@ export default function Dashboard() {
 		}
 	};
 
-	const handleImportBling = () => {
-		// Simular importação do Bling
-		const newLog = `${new Date().toLocaleTimeString()} [INFO] Importação manual iniciada...`;
-		setImportLogs((prev) => [...prev, newLog]);
-		setLastSync(new Date());
+	const handleImportBling = async () => {
+		// Atualizar dados do Bling
+		try {
+			await refreshBlingOrders();
+			const newLog = `${new Date().toLocaleTimeString()} [SUCCESS] Dados do Bling atualizados com sucesso`;
+			setImportLogs((prev) => [...prev, newLog]);
+			setLastSync(blingLastSync || new Date());
+		} catch (error) {
+			const newLog = `${new Date().toLocaleTimeString()} [ERROR] Erro ao atualizar dados do Bling`;
+			setImportLogs((prev) => [...prev, newLog]);
+			console.error('Erro ao atualizar dados do Bling:', error);
+		}
 	};
 
-	// Calcular estatísticas
+	// Usar dados reais do Bling ou dados de demonstração
+	const currentOrders = hasToken ? orders : demoOrders;
+	const currentStats = hasToken ? blingStats : {
+		totalOrders: demoOrders.length,
+		pendingOrders: demoOrders.filter(o => o.status === 'pending').length,
+		completedOrders: demoOrders.filter(o => o.status === 'completed').length,
+		inProgressOrders: demoOrders.filter(o => o.status === 'in_progress').length,
+		cancelledOrders: demoOrders.filter(o => o.status === 'cancelled').length,
+		urgentOrders: demoOrders.filter(o => o.priority === 'urgent').length,
+		highPriorityOrders: demoOrders.filter(o => o.priority === 'high').length,
+		mediumPriorityOrders: demoOrders.filter(o => o.priority === 'medium').length,
+		lowPriorityOrders: demoOrders.filter(o => o.priority === 'low').length,
+	};
+
+	// Calcular estatísticas usando dados reais do Bling ou demonstração
 	const dashboardStats: StatsData = {
 		totalAlerts: alerts.length,
 		activeAlerts: alerts.filter(a => a.status === "active").length,
 		resolvedAlerts: alerts.filter(a => a.status === "resolved").length,
-		totalOrders: orders.length,
-		pendingOrders: orders.filter(o => o.status === "pending").length,
-		completedOrders: orders.filter(o => o.status === "completed").length,
-		productivity: 84,
-		efficiency: 84,
+		totalOrders: currentStats.totalOrders,
+		pendingOrders: currentStats.pendingOrders,
+		completedOrders: currentStats.completedOrders,
+		productivity: 84, // TODO: Calcular baseado em dados reais
+		efficiency: 84, // TODO: Calcular baseado em dados reais
 	};
 
-	if (loading) {
+	if (loading || blingLoading) {
 		return (
 			<div className="dashboard-loading">
 				<p>Carregando dashboard...</p>
+				{blingLoading && <p>Carregando dados do Bling...</p>}
 			</div>
 		);
 	}
@@ -229,7 +222,7 @@ export default function Dashboard() {
 			<div className="dashboard-container">
 				<DashboardHeader
 					userName={userName}
-					lastSync={lastSync}
+					lastSync={blingLastSync || lastSync}
 					onImportBling={handleImportBling}
 					onLogout={handleLogout}
 				/>
@@ -237,11 +230,24 @@ export default function Dashboard() {
 				<DashboardStats stats={dashboardStats} />
 
 				<div className="dashboard-content">
-					<OrdersSection
-						orders={orders}
-						filterStatus={filterStatus}
-						onFilterChange={setFilterStatus}
-					/>
+					{!hasToken ? (
+						<BlingDemoData onDataChange={setDemoOrders} />
+					) : (
+						<BlingIntegrationStatus
+							hasToken={hasToken}
+							lastSync={blingLastSync}
+							error={blingError}
+							onConfigure={() => goTo('/bling-integration')}
+						/>
+					)}
+
+					{(!blingError || !hasToken) && (
+						<OrdersSection
+							orders={currentOrders}
+							filterStatus={filterStatus}
+							onFilterChange={setFilterStatus}
+						/>
+					)}
 
 					<div className="sidebar-section">
 						<AlertsPanel alerts={alerts} />

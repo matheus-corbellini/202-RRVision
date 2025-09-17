@@ -24,6 +24,7 @@ import TeamManagement from "./TeamManagement/TeamManagement";
 import Scheduling from "./Scheduling/Scheduling";
 import DataSync from "./DataSync/DataSync";
 import BlingTest from "./BlingTest/BlingTest";
+import Products from "./Products/Products";
 
 export default function Layout() {
   const location = useLocation();
@@ -54,6 +55,7 @@ export default function Layout() {
     if (path === "/app/scheduling") return "scheduling";
     if (path === "/app/data-sync") return "data-sync";
     if (path === "/app/bling-test") return "bling-test";
+    if (path === "/app/products") return "products";
 
     return "orders";
   };
@@ -82,6 +84,7 @@ export default function Layout() {
       "scheduling": "/app/scheduling",
       "data-sync": "/app/data-sync",
       "bling-test": "/app/bling-test",
+      "products": "/app/products",
     };
 
     const route = routeMap[page] || "/app";
@@ -119,6 +122,7 @@ export default function Layout() {
           <Route path="scheduling" element={<Scheduling />} />
           <Route path="data-sync" element={<DataSync />} />
           <Route path="bling-test" element={<BlingTest />} />
+          <Route path="products" element={<Products />} />
         </Routes>
       </div>
     </div>

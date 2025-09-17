@@ -1,0 +1,63 @@
+.bling-integration-status {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    gap: 1rem;
+}
+
+.bling-integration-status.no-token {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}
+
+.bling-integration-status.error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.bling-integration-status.success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.status-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.status-content {
+    flex: 1;
+}
+
+.status-content h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.status-content p {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.status-content p:last-child {
+    margin-bottom: 0;
+}
+
+.last-sync {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+.status-content button {
+    margin-top: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}

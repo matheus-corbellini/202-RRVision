@@ -131,7 +131,15 @@ export default function Sidebar({
 			icon: <FaFlask />,
 			description: "Testar Integração Bling",
 			badge: null,
-			access: ["admin"],
+			access: ["user", "admin"],
+		},
+		{
+			id: "products",
+			title: "Produtos",
+			icon: <FaBox />,
+			description: "Gestão de Produtos",
+			badge: null,
+			access: ["user", "admin"],
 		},
 		// {
 		// 	id: "priority-optimization",

@@ -47,7 +47,7 @@ class BlingService {
 		this.config = {
 			clientId: import.meta.env.VITE_BLING_CLIENT_ID || "",
 			clientSecret: import.meta.env.VITE_BLING_CLIENT_SECRET || "",
-			baseUrl: import.meta.env.VITE_BLING_BASE_URL || "",
+			baseUrl: import.meta.env.VITE_BLING_BASE_URL || "/api/bling", // Usar proxy local
 			accessToken: import.meta.env.VITE_BLING_ACCESS_TOKEN || "",
 			redirectUri: import.meta.env.VITE_BLING_REDIRECT_URI || "",
 		};
@@ -205,9 +205,9 @@ class BlingService {
 			const data: BlingAuthResponse = await response.json();
 			this.setTokens(data.access_token, data.refresh_token, data.expires_in);
 			return data;
-		} catch (error) {
-			console.error("Erro ao renovar token:", error);
-			throw error;
+		} catch (err) {
+			console.error("Erro ao renovar token:", err);
+			throw err;
 		}
 	}
 
@@ -227,6 +227,9 @@ class BlingService {
 			localStorage.setItem("bling_refresh_token", refreshToken);
 		}
 		localStorage.setItem("bling_token_expiry", this.tokenExpiry.toString());
+
+		// Disparar evento customizado para notificar componentes
+		window.dispatchEvent(new CustomEvent('blingTokenChanged'));
 	}
 
 	/**
@@ -242,6 +245,23 @@ class BlingService {
 			this.refreshToken = refreshToken;
 			this.tokenExpiry = parseInt(expiry);
 		}
+	}
+
+	/**
+	 * Verifica se há um token válido configurado
+	 */
+	hasValidToken(): boolean {
+		const token = this.accessToken || localStorage.getItem("bling_access_token");
+		return !!(token && !token.startsWith('demo-token-'));
+	}
+
+	/**
+	 * Verifica se está em modo demonstração
+	 */
+	isDemoMode(): boolean {
+		const token = this.accessToken || localStorage.getItem("bling_access_token");
+		// Se não há token ou é um token demo, usar modo demonstração
+		return !token || token.startsWith('demo-token-');
 	}
 
 	/**
@@ -296,22 +316,106 @@ class BlingService {
 	}
 
 	/**
-	 * Helper para fazer chamadas da API usando o proxy
+	 * Helper para fazer chamadas da API do Bling
 	 */
 	private async makeApiCall(endpoint: string, options: RequestInit = {}): Promise<Response> {
-		const token = await this.getValidToken();
-		const proxyUrl = `/api/bling${endpoint}`;
+		// Se estiver em modo demonstração, simular resposta
+		if (this.isDemoMode()) {
+			return this.simulateApiResponse(endpoint);
+		}
 
+		const token = await this.getValidToken();
+		const apiUrl = `${this.config.baseUrl}${endpoint}`;
 		const headers = {
 			Authorization: `Bearer ${token}`,
 			"Content-Type": "application/json",
 			...options.headers,
 		};
 
-		return fetch(proxyUrl, {
+		return fetch(apiUrl, {
 			...options,
 			headers,
 		});
+	}
+
+	/**
+	 * Simula resposta da API para modo demonstração
+	 */
+	private simulateApiResponse(endpoint: string): Promise<Response> {
+		return new Promise((resolve) => {
+			setTimeout(() => {
+				const mockData = this.getMockDataForEndpoint(endpoint);
+				resolve(new Response(JSON.stringify(mockData), {
+					status: 200,
+					headers: { 'Content-Type': 'application/json' }
+				}));
+			}, 500); // Simular latência
+		});
+	}
+
+	/**
+	 * Retorna dados mockados baseados no endpoint
+	 */
+	private getMockDataForEndpoint(endpoint: string): any {
+		if (endpoint.includes('/vendas') || endpoint.includes('/pedidos')) {
+			return {
+				data: this.getDemoOrders(1, 10).data,
+				total: 4,
+				page: 1
+			};
+		}
+
+		if (endpoint.includes('/produtos')) {
+			return {
+				data: [
+					{
+						id: "1",
+						codigo: "PROD001",
+						descricao: "Produto A - Modelo Premium",
+						preco: 150.00,
+						estoque: 100
+					},
+					{
+						id: "2",
+						codigo: "PROD002",
+						descricao: "Produto B - Modelo Standard",
+						preco: 200.00,
+						estoque: 50
+					}
+				],
+				total: 2,
+				page: 1
+			};
+		}
+
+		if (endpoint.includes('/contatos')) {
+			return {
+				data: [
+					{
+						id: "1",
+						nome: "Empresa ABC Ltda",
+						email: "contato@empresaabc.com",
+						telefone: "(11) 99999-9999"
+					},
+					{
+						id: "2",
+						nome: "Comércio XYZ S.A.",
+						email: "vendas@comercioxyz.com",
+						telefone: "(11) 88888-8888"
+					}
+				],
+				total: 2,
+				page: 1
+			};
+		}
+
+		// Resposta padrão para outros endpoints
+		return {
+			data: [],
+			total: 0,
+			page: 1,
+			message: "Endpoint simulado em modo demonstração"
+		};
 	}
 
 	/**
@@ -323,6 +427,11 @@ class BlingService {
 		situacao?: string;
 		cliente?: string;
 	}): Promise<{ data: BlingOrder[]; total: number; page: number }> {
+		// Se estiver em modo demonstração, retornar dados simulados
+		if (this.isDemoMode()) {
+			return this.getDemoOrders(page, limit, filters);
+		}
+
 		try {
 			const params = new URLSearchParams({
 				page: page.toString(),
@@ -350,6 +459,113 @@ class BlingService {
 			console.error("Erro ao buscar vendas:", error);
 			throw error;
 		}
+	}
+
+	/**
+	 * Retorna dados de demonstração para testes
+	 */
+	private getDemoOrders(page: number = 1, limit: number = 50, filters?: any): { data: BlingOrder[]; total: number; page: number } {
+		const demoOrders: BlingOrder[] = [
+			{
+				id: "1",
+				numero: "V001",
+				data: "2024-01-15",
+				dataSaida: "2024-01-20",
+				cliente: {
+					nome: "Empresa ABC Ltda",
+					email: "contato@empresaabc.com",
+					telefone: "(11) 99999-9999"
+				},
+				itens: [
+					{
+						codigo: "PROD001",
+						descricao: "Produto A - Modelo Premium",
+						quantidade: 100,
+						valor: 150.00
+					}
+				],
+				observacoes: "Pedido urgente - cliente VIP",
+				situacao: "em_producao",
+				total: 15000.00
+			},
+			{
+				id: "2",
+				numero: "V002",
+				data: "2024-01-16",
+				dataSaida: "2024-01-22",
+				cliente: {
+					nome: "Comércio XYZ S.A.",
+					email: "vendas@comercioxyz.com",
+					telefone: "(11) 88888-8888"
+				},
+				itens: [
+					{
+						codigo: "PROD002",
+						descricao: "Produto B - Modelo Standard",
+						quantidade: 50,
+						valor: 200.00
+					}
+				],
+				observacoes: "",
+				situacao: "em_aberto",
+				total: 10000.00
+			},
+			{
+				id: "3",
+				numero: "V003",
+				data: "2024-01-18",
+				dataSaida: "2024-01-25",
+				cliente: {
+					nome: "Indústria DEF Ltda",
+					email: "compras@industriadef.com",
+					telefone: "(11) 77777-7777"
+				},
+				itens: [
+					{
+						codigo: "PROD003",
+						descricao: "Produto C - Modelo Industrial",
+						quantidade: 200,
+						valor: 75.00
+					}
+				],
+				observacoes: "Entrega programada",
+				situacao: "aguardando_producao",
+				total: 15000.00
+			},
+			{
+				id: "4",
+				numero: "V004",
+				data: "2024-01-10",
+				dataSaida: "2024-01-17",
+				cliente: {
+					nome: "Distribuidora GHI Ltda",
+					email: "pedidos@distribuidoraghi.com",
+					telefone: "(11) 66666-6666"
+				},
+				itens: [
+					{
+						codigo: "PROD004",
+						descricao: "Produto D - Modelo Especial",
+						quantidade: 75,
+						valor: 300.00
+					}
+				],
+				observacoes: "",
+				situacao: "concluido",
+				total: 22500.00
+			}
+		];
+
+		// Simular paginação
+		const startIndex = (page - 1) * limit;
+		const endIndex = startIndex + limit;
+		const paginatedData = demoOrders.slice(startIndex, endIndex);
+
+		return {
+			data: paginatedData,
+			total: demoOrders.length,
+			page: page,
+		};
 	}
 
 	/**
@@ -434,6 +650,11 @@ class BlingService {
 	 * Testa a conexão com a API Bling
 	 */
 	async testConnection(): Promise<{ success: boolean; error?: string }> {
+		// Se estiver em modo demonstração, simular sucesso
+		if (this.isDemoMode()) {
+			return { success: true };
+		}
+
 		try {
 			const response = await this.makeApiCall(`/contatos?page=1&limit=1`);
 
@@ -561,54 +782,46 @@ class BlingService {
 	 * Testa diferentes URLs base da API para descobrir a correta
 	 */
 	async testApiBaseUrls(): Promise<{ baseUrl: string; status: number; success: boolean; data?: any }[]> {
-		const baseUrls = [
-			'https://api.bling.com.br/Api/v3',
-			'https://api.bling.com.br/Api/v2',
-			'https://api.bling.com.br/api/v3',
-			'https://api.bling.com.br/api/v2',
-			'https://www.bling.com.br/Api/v3',
-			'https://www.bling.com.br/Api/v2',
-			'https://bling.com.br/Api/v3',
-			'https://bling.com.br/Api/v2'
-		];
+		// Se estiver em modo demonstração, simular sucesso
+		if (this.isDemoMode()) {
+			return [
+				{
+					baseUrl: '/api/bling (proxy local)',
+					status: 200,
+					success: true,
+					data: { message: 'Modo demonstração ativo - usando proxy local' }
+				}
+			];
+		}
 
+		// Para tokens reais, testar apenas o proxy local
 		const results = [];
 
-		for (const baseUrl of baseUrls) {
-			try {
-				const token = await this.getValidToken();
-				const testUrl = `${baseUrl}/produtos?page=1&limit=1`;
+		try {
+			const response = await this.makeApiCall('/produtos?page=1&limit=1');
+			let data = null;
 
-				const response = await fetch(testUrl, {
-					method: 'GET',
-					headers: {
-						'Authorization': `Bearer ${token}`,
-						'Content-Type': 'application/json',
-					},
-				});
-
-				let data = null;
-				if (response.ok) {
-					try {
-						data = await response.json();
-					} catch (e) {
-						// Se não conseguir fazer parse do JSON, continua
-					}
+			if (response.ok) {
+				try {
+					data = await response.json();
+				} catch (e) {
+					data = { message: 'Resposta não é JSON válido' };
 				}
-
-				results.push({
-					baseUrl,
-					status: response.status,
-					success: response.ok,
-					data: data
-				});
-			} catch (error) {
-				results.push({
-					baseUrl,
-					status: 0,
-					success: false
-				});
 			}
+
+			results.push({
+				baseUrl: '/api/bling (proxy local)',
+				status: response.status,
+				success: response.ok,
+				data
+			});
+		} catch (error) {
+			results.push({
+				baseUrl: '/api/bling (proxy local)',
+				status: 0,
+				success: false,
+				data: { error: error instanceof Error ? error.message : 'Erro desconhecido' }
+			});
 		}
 
 		return results;

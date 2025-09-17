@@ -1,39 +1,40 @@
 // Exportar todos os serviços
 export * from "./authService";
 export * from "./blingService";
+export * from "./blingDataMapper";
 export * from "./dataService";
 export * from "./attachmentService";
 export * from "./agendaService";
 
 // Exportar tipos específicos do operationalRoutesService para evitar conflitos
-export type { 
-	OperationalRoute, 
-	Product, 
-	Step, 
-	RouteAssignment, 
+export type {
+	OperationalRoute,
+	Product,
+	Step,
+	RouteAssignment,
 
 	RouteStats
 } from "../types/operationalRoutes";
 
 // Exportar tipos específicos do operatorScheduleService para evitar conflitos
-export type { 
-	Task, 
-	Break, 
-	QualityCheck, 
-	OperatorStats, 
+export type {
+	Task,
+	Break,
+	QualityCheck,
+	OperatorStats,
 	TaskFilters,
-	TaskAssignment 
+	TaskAssignment
 } from "../types/operatorSchedule";
 
 // Exportar interfaces de busca dos serviços
 export type { SearchOptions, SearchResult } from "./dataService";
-export type { 
-	SearchOptions as OperationalRouteSearchOptions, 
-	SearchResult as OperationalRouteSearchResult 
+export type {
+	SearchOptions as OperationalRouteSearchOptions,
+	SearchResult as OperationalRouteSearchResult
 } from "./operationalRoutesService";
 
 // Exportar funções dos serviços sem conflitos de tipos
-export { 
+export {
 	createOperationalRoute,
 	updateOperationalRoute,
 	deleteOperationalRoute,
@@ -52,7 +53,7 @@ export {
 	getRoutesStats
 } from "./operationalRoutesService";
 
-export { 
+export {
 	createTask,
 	updateTask,
 	deleteTask,

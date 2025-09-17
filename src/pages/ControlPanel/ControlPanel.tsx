@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "../../hooks/useAuth";
+import { useBlingOrders } from "../../hooks/useBlingOrders";
+import { useBlingToken } from "../../hooks/useBlingToken";
 import {
   ControlPanelHeader,
   StatusSemaphore,
@@ -9,6 +12,8 @@ import {
   NonConformity,
   QuickActions,
 } from "../../components/ControlPanelComponents/index";
+import BlingIntegrationStatus from "../../components/BlingIntegrationStatus/BlingIntegrationStatus";
+import BlingDemoData from "../../components/BlingDemoData/BlingDemoData";
 import "./ControlPanel.css";
 import type { ControlPanelData } from "../../types/dashboard";
 import type { ProductionAlert } from "../../types/alerts";
@@ -16,6 +21,25 @@ import type { Pendency } from "../../types/pendencies";
 import type { NonConformityStats } from "../../types/nonConformities";
 
 export default function ControlPanel() {
+  const { user } = useAuth();
+  const { hasToken, token } = useBlingToken();
+
+  // Hook para dados do Bling
+  const {
+    orders: blingOrders,
+    loading: blingLoading,
+    error: blingError,
+    stats: blingStats,
+    lastSync: blingLastSync,
+    refresh: refreshBlingOrders,
+  } = useBlingOrders({
+    accessToken: token, // Token reativo do hook
+    autoRefresh: true,
+    refreshInterval: 30000, // 30 segundos
+  });
+
+  const [demoOrders, setDemoOrders] = useState<any[]>([]);
+
   const [data, setData] = useState<ControlPanelData>({
     alerts: [],
     pendencies: [],
@@ -66,15 +90,13 @@ export default function ControlPanel() {
     // Simular carregamento de dados em tempo real
     const loadData = () => {
       const mockData: ControlPanelData = {
-        generalStatus:
-          Math.random() > 0.7
-            ? "red"
-            : Math.random() > 0.4
-            ? "yellow"
-            : "green",
-        activeOrders: Math.floor(Math.random() * 50) + 20,
-        urgentOrders: Math.floor(Math.random() * 10) + 2,
-        blockedOrders: Math.floor(Math.random() * 5),
+        generalStatus: hasToken ?
+          (blingStats.urgentOrders > 5 ? "red" :
+            blingStats.urgentOrders > 2 ? "yellow" : "green") :
+          (demoOrders.filter(o => o.priority === 'urgent').length > 2 ? "yellow" : "green"),
+        activeOrders: hasToken ? blingStats.totalOrders : demoOrders.length,
+        urgentOrders: hasToken ? blingStats.urgentOrders : demoOrders.filter(o => o.priority === 'urgent').length,
+        blockedOrders: hasToken ? blingStats.cancelledOrders : demoOrders.filter(o => o.status === 'cancelled').length,
         pendencies: [
           {
             id: "1",
@@ -340,14 +362,14 @@ export default function ControlPanel() {
       mockData.stats.totalAlerts = mockData.alerts.length;
       mockData.stats.activeAlerts = mockData.alerts.filter(a => a.status === 'active').length;
       mockData.stats.totalPendencies = mockData.pendencies.length;
-      
+
       // Calcular total de não conformidades
       mockData.nonConformities.total =
         mockData.nonConformities.open +
         mockData.nonConformities.investigating +
         mockData.nonConformities.resolved +
         mockData.nonConformities.closed;
-      
+
       mockData.stats.totalNonConformities = mockData.nonConformities.total;
 
       setData(mockData);
@@ -378,20 +400,24 @@ export default function ControlPanel() {
     }));
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setLoading(true);
-    // Recarregar dados
-    setTimeout(() => {
+    try {
+      await refreshBlingOrders();
+    } catch (error) {
+      console.error('Erro ao atualizar dados:', error);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
-  if (loading) {
+  if (loading || blingLoading) {
     return (
       <div className="control-panel-container">
         <div className="loading-spinner">
           <div className="spinner"></div>
           <p>Carregando painel de controle...</p>
+          {blingLoading && <p>Carregando dados do Bling...</p>}
         </div>
       </div>
     );
@@ -400,6 +426,17 @@ export default function ControlPanel() {
   return (
     <div className="control-panel-container">
       <ControlPanelHeader onRefresh={handleRefresh} />
+
+      {!hasToken ? (
+        <BlingDemoData onDataChange={setDemoOrders} />
+      ) : (
+        <BlingIntegrationStatus
+          hasToken={hasToken}
+          lastSync={blingLastSync}
+          error={blingError}
+          onConfigure={() => window.location.href = '/bling-integration'}
+        />
+      )}
 
       <div className="control-panel-grid">
         <div className="semaphore-section">

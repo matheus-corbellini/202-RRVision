@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { blingService } from "../../services/blingService";
 import { FaCheckCircle, FaExclamationTriangle, FaSpinner, FaDownload, FaSync } from "react-icons/fa";
+import BlingQuickSetup from "../../components/BlingQuickSetup/BlingQuickSetup";
 import "./BlingTest.css";
 
 interface TestResult {
@@ -12,6 +13,7 @@ interface TestResult {
 
 export default function BlingTest() {
     const [isLoading, setIsLoading] = useState(false);
+    const [hasToken, setHasToken] = useState(false);
     const [testResults, setTestResults] = useState<{
         connection: TestResult | null;
         orders: TestResult | null;
@@ -31,6 +33,26 @@ export default function BlingTest() {
         apiStructure: null,
         apiBaseUrls: null
     });
+
+    // Verificar se há token configurado
+    useEffect(() => {
+        const checkToken = () => {
+            const token = localStorage.getItem('bling_access_token');
+            setHasToken(!!token);
+        };
+
+        checkToken();
+
+        // Escutar mudanças no localStorage
+        const handleStorageChange = () => checkToken();
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('blingTokenChanged', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('blingTokenChanged', handleStorageChange);
+        };
+    }, []);
 
     const testConnection = async () => {
         setIsLoading(true);
@@ -264,6 +286,158 @@ export default function BlingTest() {
             <div className="test-header">
                 <h1>🧪 Teste da Integração Bling</h1>
                 <p>Teste todas as funcionalidades da API Bling integrada</p>
+            </div>
+
+            {!hasToken && (
+                <BlingQuickSetup onTokenConfigured={() => setHasToken(true)} />
+            )}
+
+            {/* Configuração de Token */}
+            <div style={{ margin: '1rem 0', padding: '1rem', background: '#f0f0f0', borderRadius: '8px' }}>
+                <h4>🔧 Configuração de Token</h4>
+                <p>Status atual: {hasToken ? 'Token configurado' : 'Sem token'}</p>
+
+                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+                    <button
+                        onClick={() => {
+                            localStorage.setItem('bling_access_token', 'demo-token-' + Date.now());
+                            setHasToken(true);
+                            window.location.reload();
+                        }}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: '#667eea',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        🧪 Modo Demonstração
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            const token = prompt('Cole seu Access Token do Bling:');
+                            if (token && token.trim()) {
+                                localStorage.setItem('bling_access_token', token.trim());
+                                setHasToken(true);
+                                window.location.reload();
+                            }
+                        }}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        🔑 Configurar Token Real
+                    </button>
+
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem('bling_access_token');
+                            localStorage.removeItem('bling_refresh_token');
+                            localStorage.removeItem('bling_token_expiry');
+                            setHasToken(false);
+                            window.location.reload();
+                        }}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer'
+                        }}
+                    >
+                        🗑️ Limpar Token
+                    </button>
+                </div>
+
+                <div style={{ marginTop: '1rem', padding: '0.5rem', background: '#e9ecef', borderRadius: '4px', fontSize: '0.9rem' }}>
+                    <strong>💡 Dica:</strong> Para obter um Access Token do Bling, acesse sua conta → Configurações → API → Gerar novo token
+                </div>
+
+                {/* Token Display */}
+                <div style={{ marginTop: '1rem', padding: '1rem', background: '#fff3cd', borderRadius: '8px', border: '1px solid #ffeaa7' }}>
+                    <h5>🔑 Token Atual</h5>
+                    <div style={{ marginTop: '0.5rem' }}>
+                        <strong>Status:</strong> {hasToken ? '✅ Configurado' : '❌ Não configurado'}
+                    </div>
+                    {hasToken && (
+                        <div style={{ marginTop: '0.5rem' }}>
+                            <strong>Token:</strong>
+                            <div style={{
+                                background: '#f8f9fa',
+                                padding: '0.5rem',
+                                borderRadius: '4px',
+                                marginTop: '0.25rem',
+                                fontFamily: 'monospace',
+                                fontSize: '0.8rem',
+                                wordBreak: 'break-all',
+                                border: '1px solid #dee2e6'
+                            }}>
+                                {localStorage.getItem('bling_access_token')}
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const token = localStorage.getItem('bling_access_token');
+                                    if (token) {
+                                        navigator.clipboard.writeText(token);
+                                        alert('Token copiado para a área de transferência!');
+                                    }
+                                }}
+                                style={{
+                                    marginTop: '0.5rem',
+                                    padding: '0.25rem 0.5rem',
+                                    background: '#007bff',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    fontSize: '0.8rem'
+                                }}
+                            >
+                                📋 Copiar Token
+                            </button>
+                        </div>
+                    )}
+                </div>
+
+                {/* OAuth Configuration */}
+                <div style={{ marginTop: '1rem', padding: '1rem', background: '#f8f9fa', borderRadius: '8px', border: '1px solid #dee2e6' }}>
+                    <h5>🔐 Configuração OAuth (Client ID encontrado!)</h5>
+                    <p style={{ fontSize: '0.9rem', margin: '0.5rem 0' }}>
+                        <strong>Client ID:</strong> <code>ea0ed893739830a936ff759edda059ba1d09286c</code>
+                    </p>
+                    <button
+                        onClick={() => {
+                            const clientId = 'ea0ed893739830a936ff759edda059ba1d09286c';
+                            const redirectUri = window.location.origin + '/bling/callback';
+                            const authUrl = `https://www.bling.com.br/b/Api/v3/oauth/authorize?response_type=code&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=read`;
+
+                            window.open(authUrl, '_blank', 'width=600,height=600');
+                        }}
+                        style={{
+                            padding: '0.5rem 1rem',
+                            background: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '0.9rem'
+                        }}
+                    >
+                        🔗 Fazer Autenticação OAuth
+                    </button>
+                    <p style={{ fontSize: '0.8rem', margin: '0.5rem 0', color: '#6c757d' }}>
+                        Isso abrirá uma nova janela para autenticação no Bling
+                    </p>
+                </div>
             </div>
 
             <div className="test-controls">
