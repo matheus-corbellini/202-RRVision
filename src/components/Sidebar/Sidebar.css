@@ -140,6 +140,10 @@
   margin-bottom: 0.5rem;
 }
 
+.nav-item-wrapper {
+  position: relative;
+}
+
 .nav-item {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -226,6 +230,96 @@
   flex-shrink: 0;
 }
 
+.nav-chevron {
+  font-size: 0.8rem;
+  color: #a0aec0;
+  transition: all 0.3s ease;
+  margin-left: auto;
+}
+
+.nav-item:hover .nav-chevron {
+  color: #fbb040;
+  transform: translateX(2px);
+}
+
+/* Dropdown Styles */
+.nav-dropdown {
+  position: fixed;
+  width: 280px;
+  background: linear-gradient(180deg, #1a365d 0%, #2d3748 100%);
+  border-radius: 8px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+  z-index: 9999;
+  overflow: hidden;
+  animation: dropdownSlideIn 0.2s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes dropdownSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.dropdown-header {
+  background: rgba(251, 176, 64, 0.2);
+  color: #fbb040;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.dropdown-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: #fbb040;
+}
+
+.dropdown-content {
+  padding: 0.5rem 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  color: #e2e8f0;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  display: block;
+}
+
+.dropdown-item:hover {
+  background: rgba(251, 176, 64, 0.1);
+  color: #fbb040;
+  border-left-color: #fbb040;
+  padding-left: 1.75rem;
+}
+
+.dropdown-item:active {
+  background: rgba(251, 176, 64, 0.2);
+}
+
+/* Responsive adjustments for dropdown */
+@media (max-width: 768px) {
+  .nav-dropdown {
+    position: fixed;
+    left: 280px;
+    top: auto;
+    width: 250px;
+  }
+}
+
 .sidebar-footer {
   padding: 1rem;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -295,6 +389,10 @@
 .sidebar-collapsed .nav-item {
   justify-content: center;
   padding: 0.75rem 0.5rem;
+}
+
+.sidebar-collapsed .nav-dropdown {
+  display: none;
 }
 
 .sidebar-collapsed .footer-item {

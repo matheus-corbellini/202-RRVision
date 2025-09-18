@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FaSearch, FaFilter, FaBox, FaCog, FaTruck, FaIndustry, FaTools } from 'react-icons/fa';
+import { FaSearch, FaBox, FaCog, FaFolderOpen, FaTag, FaBolt as FaLightning, FaChartBar as FaStats } from 'react-icons/fa';
 import './Products.css';
 
 interface Product {
@@ -278,7 +278,7 @@ export default function Products() {
     return (
         <div className="products-page">
             <div className="products-header">
-                <h1>📦 Gestão de Produtos</h1>
+                <h1><FaBox /> Gestão de Produtos</h1>
                 <p>Visualize e gerencie todos os produtos do sistema</p>
             </div>
 
@@ -286,7 +286,7 @@ export default function Products() {
                 {/* Sidebar de Filtros */}
                 <div className="products-sidebar">
                     <div className="sidebar-section">
-                        <h3>🔍 Busca</h3>
+                        <h3><FaSearch /> Busca</h3>
                         <div className="search-box">
                             <FaSearch className="search-icon" />
                             <input
@@ -299,7 +299,7 @@ export default function Products() {
                     </div>
 
                     <div className="sidebar-section">
-                        <h3>📂 Categorias</h3>
+                        <h3><FaFolderOpen /> Categorias</h3>
                         <div className="category-dropdown">
                             <div className="category-trigger">
                                 <span>{selectedCategory || "Todas as categorias"}</span>
@@ -326,7 +326,7 @@ export default function Products() {
                     </div>
 
                     <div className="sidebar-section">
-                        <h3>🏷️ Séries</h3>
+                        <h3><FaTag /> Séries</h3>
                         <div className="series-dropdown">
                             <div className="series-trigger">
                                 <span>{selectedSeries || "Todas as séries"}</span>
@@ -353,7 +353,7 @@ export default function Products() {
                     </div>
 
                     <div className="sidebar-section">
-                        <h3>⚡ Status</h3>
+                        <h3><FaLightning /> Status</h3>
                         <select
                             value={selectedStatus}
                             onChange={(e) => setSelectedStatus(e.target.value)}
@@ -366,7 +366,7 @@ export default function Products() {
                     </div>
 
                     <div className="sidebar-section">
-                        <h3>📊 Estatísticas</h3>
+                        <h3><FaStats /> Estatísticas</h3>
                         <div className="stats">
                             <div className="stat-item">
                                 <span className="stat-label">Total:</span>
@@ -401,7 +401,10 @@ export default function Products() {
 
                                 <div className="product-info">
                                     <h3>{product.name}</h3>
-                                    <p className="product-category">{product.category} - {product.series}</p>
+                                    <div className="product-category-section">
+                                        <span className="category-tag">{product.category}</span>
+                                        <span className="series-tag">- {product.series}</span>
+                                    </div>
                                     <p className="product-description">{product.description}</p>
 
                                     <div className="product-specs">

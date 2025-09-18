@@ -16,6 +16,7 @@ import {
 	FaUserEdit,
 	FaBox,
 	FaFlask,
+	FaChevronRight as FaChevronRightSmall,
 } from "react-icons/fa";
 import { useNavigation } from "../../hooks/useNavigation";
 import { useAuth } from "../../hooks/useAuth";
@@ -35,6 +36,13 @@ interface MenuItem {
 	description: string;
 	badge: string | null;
 	access: string[];
+	subItems?: SubMenuItem[];
+}
+
+interface SubMenuItem {
+	id: string;
+	title: string;
+	description?: string;
 }
 
 export default function Sidebar({
@@ -43,6 +51,8 @@ export default function Sidebar({
 	variant = "default",
 }: SidebarProps) {
 	const [isCollapsed, setIsCollapsed] = useState(false);
+	const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+	const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0 });
 	const authData = useAuth();
 	const { user, logout } = authData;
 	const { goTo } = useNavigation();
@@ -140,6 +150,19 @@ export default function Sidebar({
 			description: "Gestão de Produtos",
 			badge: null,
 			access: ["user", "admin"],
+			subItems: [
+				{ id: "accessory", title: "Accessory" },
+				{ id: "aviation-plug", title: "Aviation plug" },
+				{ id: "hvc", title: "HVC" },
+				{ id: "connector", title: "Connector" },
+				{ id: "fuse-relay-box", title: "Fuse and relay box" },
+				{ id: "terminal", title: "Terminal" },
+				{ id: "rubber-parts", title: "Rubber Parts" },
+				{ id: "backshell", title: "Backshell" },
+				{ id: "manifolds", title: "Manifolds" },
+				{ id: "wire-harness", title: "Wire harness" },
+				{ id: "pcb-connector", title: "PCB connector" },
+			],
 		},
 		// {
 		// 	id: "priority-optimization",
@@ -261,28 +284,78 @@ export default function Sidebar({
 				<nav className="sidebar-nav">
 					<div className="nav-section">
 						{menuItems.map((item) => (
-							<button
+							<div
 								key={item.id}
-								className={`nav-item ${currentPage === item.id ? "nav-item-active" : ""
-									}`}
-								onClick={() => handlePageChange(item.id)}
-								title={isCollapsed ? item.title : ""}
+								className="nav-item-wrapper"
+								onMouseEnter={(e) => {
+									setHoveredItem(item.id);
+									if (item.subItems) {
+										const rect = e.currentTarget.getBoundingClientRect();
+										setDropdownPosition({
+											top: rect.top - 120, // Posiciona 120px mais acima
+											left: rect.right + 8
+										});
+									}
+								}}
+								onMouseLeave={() => setHoveredItem(null)}
 							>
-								<span className="nav-icon">{item.icon}</span>
-								{!isCollapsed && (
-									<>
-										<div className="nav-content">
-											<span className="nav-title">{item.title}</span>
-											<span className="nav-description">
-												{item.description}
-											</span>
+								<button
+									className={`nav-item ${currentPage === item.id ? "nav-item-active" : ""
+										}`}
+									onClick={() => handlePageChange(item.id)}
+									title={isCollapsed ? item.title : ""}
+								>
+									<span className="nav-icon">{item.icon}</span>
+									{!isCollapsed && (
+										<>
+											<div className="nav-content">
+												<span className="nav-title">{item.title}</span>
+												<span className="nav-description">
+													{item.description}
+												</span>
+											</div>
+											{item.badge && (
+												<span className="nav-badge">{item.badge}</span>
+											)}
+											{item.subItems && (
+												<span className="nav-chevron">
+													<FaChevronRightSmall />
+												</span>
+											)}
+										</>
+									)}
+								</button>
+
+								{/* Dropdown menu */}
+								{item.subItems && hoveredItem === item.id && !isCollapsed && (
+									<div
+										className="nav-dropdown"
+										style={{
+											top: `${dropdownPosition.top}px`,
+											left: `${dropdownPosition.left}px`
+										}}
+									>
+										<div className="dropdown-header">
+											<span className="dropdown-title">Products</span>
 										</div>
-										{item.badge && (
-											<span className="nav-badge">{item.badge}</span>
-										)}
-									</>
+										<div className="dropdown-content">
+											{item.subItems.map((subItem) => (
+												<button
+													key={subItem.id}
+													className="dropdown-item"
+													onClick={() => {
+														// Handle sub-item navigation
+														console.log('Navigate to:', subItem.id);
+														setHoveredItem(null);
+													}}
+												>
+													{subItem.title}
+												</button>
+											))}
+										</div>
+									</div>
 								)}
-							</button>
+							</div>
 						))}
 					</div>
 				</nav>
