@@ -56,6 +56,8 @@ export default function Layout() {
     if (path === "/app/data-sync") return "data-sync";
     if (path === "/app/bling-test") return "bling-test";
     if (path === "/app/products") return "products";
+    // Rotas específicas de produtos por categoria
+    if (path.startsWith("/app/products/")) return "products";
 
     return "orders";
   };
@@ -123,6 +125,18 @@ export default function Layout() {
           <Route path="data-sync" element={<DataSync />} />
           <Route path="bling-test" element={<BlingTest />} />
           <Route path="products" element={<Products />} />
+          {/* Rotas específicas de produtos por categoria */}
+          <Route path="products/accessory" element={<Products category="Acessórios" />} />
+          <Route path="products/aviation-plug" element={<Products category="Aviação" />} />
+          <Route path="products/hvc" element={<Products category="HVC" />} />
+          <Route path="products/connector" element={<Products category="Conectores" />} />
+          <Route path="products/fuse-relay-box" element={<Products category="Proteção" />} />
+          <Route path="products/terminal" element={<Products category="Terminais" />} />
+          <Route path="products/rubber-parts" element={<Products category="Borracha" />} />
+          <Route path="products/backshell" element={<Products category="Backshell" />} />
+          <Route path="products/manifolds" element={<Products category="Manifolds" />} />
+          <Route path="products/wire-harness" element={<Products category="Cabos" />} />
+          <Route path="products/pcb-connector" element={<Products category="PCB" />} />
         </Routes>
       </div>
     </div>

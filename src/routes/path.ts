@@ -29,4 +29,16 @@ export const path = {
 	scheduling: "/app/scheduling",
 	dataSync: "/app/data-sync",
 	products: "/app/products",
+	// Rotas específicas de produtos por categoria
+	productAccessory: "/app/products/accessory",
+	productAviationPlug: "/app/products/aviation-plug",
+	productHvc: "/app/products/hvc",
+	productConnector: "/app/products/connector",
+	productFuseRelayBox: "/app/products/fuse-relay-box",
+	productTerminal: "/app/products/terminal",
+	productRubberParts: "/app/products/rubber-parts",
+	productBackshell: "/app/products/backshell",
+	productManifolds: "/app/products/manifolds",
+	productWireHarness: "/app/products/wire-harness",
+	productPcbConnector: "/app/products/pcb-connector",
 };

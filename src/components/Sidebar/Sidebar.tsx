@@ -251,6 +251,32 @@ export default function Sidebar({
 		onPageChange(page);
 	};
 
+	const handleProductCategoryNavigation = (categoryId: string) => {
+		// Mapear IDs das categorias para as rotas específicas
+		const categoryRoutes: { [key: string]: string } = {
+			"accessory": path.productAccessory,
+			"aviation-plug": path.productAviationPlug,
+			"hvc": path.productHvc,
+			"connector": path.productConnector,
+			"fuse-relay-box": path.productFuseRelayBox,
+			"terminal": path.productTerminal,
+			"rubber-parts": path.productRubberParts,
+			"backshell": path.productBackshell,
+			"manifolds": path.productManifolds,
+			"wire-harness": path.productWireHarness,
+			"pcb-connector": path.productPcbConnector,
+		};
+
+		const route = categoryRoutes[categoryId];
+		if (route) {
+			goTo(route);
+		} else {
+			// Fallback para a página geral de produtos
+			goTo(path.products);
+		}
+		setHoveredItem(null);
+	};
+
 	const handleLogout = async () => {
 		try {
 			await logout();
@@ -343,11 +369,7 @@ export default function Sidebar({
 												<button
 													key={subItem.id}
 													className="dropdown-item"
-													onClick={() => {
-														// Handle sub-item navigation
-														console.log('Navigate to:', subItem.id);
-														setHoveredItem(null);
-													}}
+													onClick={() => handleProductCategoryNavigation(subItem.id)}
 												>
 													{subItem.title}
 												</button>
