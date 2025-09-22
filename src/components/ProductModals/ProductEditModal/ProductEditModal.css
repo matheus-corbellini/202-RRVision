@@ -144,8 +144,8 @@
 .form-group input.error,
 .form-group select.error,
 .form-group textarea.error {
-  border-color: #e53e3e;
-  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+  border-color: #ed8936;
+  box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.1);
 }
 
 .form-group textarea {
@@ -154,7 +154,7 @@
 }
 
 .error-message {
-  color: #e53e3e;
+  color: #ed8936;
   font-size: 0.75rem;
   font-weight: 500;
   margin-top: 2px;

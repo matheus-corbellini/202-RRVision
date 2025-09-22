@@ -25,6 +25,7 @@ import Scheduling from "./Scheduling/Scheduling";
 import DataSync from "./DataSync/DataSync";
 import BlingTest from "./BlingTest/BlingTest";
 import Products from "./Products/Products";
+import ProductDetail from "./ProductDetail/ProductDetail";
 
 export default function Layout() {
   const location = useLocation();
@@ -56,6 +57,7 @@ export default function Layout() {
     if (path === "/app/data-sync") return "data-sync";
     if (path === "/app/bling-test") return "bling-test";
     if (path === "/app/products") return "products";
+    if (path.startsWith("/app/product-detail")) return "products";
     // Rotas específicas de produtos por categoria
     if (path.startsWith("/app/products/")) return "products";
 
@@ -125,6 +127,7 @@ export default function Layout() {
           <Route path="data-sync" element={<DataSync />} />
           <Route path="bling-test" element={<BlingTest />} />
           <Route path="products" element={<Products />} />
+          <Route path="product-detail/:id" element={<ProductDetail />} />
           {/* Rotas específicas de produtos por categoria */}
           <Route path="products/accessory" element={<Products category="Acessórios" />} />
           <Route path="products/aviation-plug" element={<Products category="Aviação" />} />

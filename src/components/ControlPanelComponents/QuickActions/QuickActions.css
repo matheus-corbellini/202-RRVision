@@ -94,12 +94,12 @@
 }
 
 .action-card.red {
-  background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
-  border-color: #e53e3e;
+  background: linear-gradient(135deg, #fef5e7 0%, #fbd38d 100%);
+  border-color: #fbb040;
 }
 
 .action-card.red:hover {
-  background: linear-gradient(135deg, #feb2b2 0%, #fc8181 100%);
+  background: linear-gradient(135deg, #fbd38d 0%, #f6ad55 100%);
 }
 
 .action-card.orange {
@@ -148,7 +148,7 @@
   color: #805ad5;
 }
 .action-card.red .action-icon {
-  color: #e53e3e;
+  color: #fbb040;
 }
 .action-card.orange .action-icon {
   color: #ed8936;

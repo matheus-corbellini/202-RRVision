@@ -285,12 +285,12 @@
 }
 
 .delete-btn {
-	background: #fed7d7;
-	color: #e53e3e;
+	background: #fef5e7;
+	color: #ed8936;
 }
 
 .delete-btn:hover {
-	background: #feb2b2;
+	background: #fbd38d;
 	transform: scale(1.1);
 }
 

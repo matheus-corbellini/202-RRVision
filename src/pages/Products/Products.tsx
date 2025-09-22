@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaSearch, FaBox, FaCog, FaFolderOpen, FaTag, FaBolt as FaLightning, FaChartBar as FaStats } from 'react-icons/fa';
-import { ProductDetailsModal, ProductEditModal } from '../../components/ProductModals';
+import { ProductEditModal } from '../../components/ProductModals';
 import './Products.css';
 
 interface Product {
@@ -35,6 +36,7 @@ interface ProductsProps {
 }
 
 export default function Products({ category }: ProductsProps) {
+    const navigate = useNavigate();
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -45,7 +47,6 @@ export default function Products({ category }: ProductsProps) {
 
     // Estados dos modais
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     // Aplicar filtro de categoria automaticamente quando a prop category for fornecida
@@ -294,329 +295,19 @@ export default function Products({ category }: ProductsProps) {
     }, [searchTerm, selectedCategory, selectedSeries, selectedStatus, products]);
 
     // Funções para controlar os modais
-    const handleViewDetails = (product: Product) => {
-        setSelectedProduct(product);
-        setIsDetailsModalOpen(true);
-    };
 
     const handleEditProduct = (product: Product) => {
         setSelectedProduct(product);
         setIsEditModalOpen(true);
     };
 
-    const handleProductClick = (product: Product) => {
-        // Criar uma nova aba com as especificações técnicas
-        const newWindow = window.open('', '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
 
-        if (newWindow) {
-            newWindow.document.write(`
-                <!DOCTYPE html>
-                <html lang="pt-BR">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>${product.name} - Especificações Técnicas</title>
-                    <style>
-                        * {
-                            margin: 0;
-                            padding: 0;
-                            box-sizing: border-box;
-                        }
-                        
-                        body {
-                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                            background: #f8fafc;
-                            color: #2d3748;
-                            line-height: 1.6;
-                        }
-                        
-                        .container {
-                            max-width: 1000px;
-                            margin: 0 auto;
-                            padding: 20px;
-                        }
-                        
-                        .header {
-                            background: white;
-                            border-radius: 12px;
-                            padding: 30px;
-                            margin-bottom: 20px;
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                            border-left: 4px solid #4299e1;
-                        }
-                        
-                        .product-title {
-                            font-size: 2rem;
-                            font-weight: 700;
-                            color: #1a202c;
-                            margin-bottom: 10px;
-                        }
-                        
-                        .product-category {
-                            display: inline-block;
-                            background: #4299e1;
-                            color: white;
-                            padding: 6px 12px;
-                            border-radius: 20px;
-                            font-size: 0.875rem;
-                            font-weight: 600;
-                            text-transform: uppercase;
-                            letter-spacing: 0.5px;
-                            margin-bottom: 15px;
-                        }
-                        
-                        .product-description {
-                            font-size: 1.1rem;
-                            color: #4a5568;
-                            margin-bottom: 20px;
-                        }
-                        
-                        .status-badge {
-                            display: inline-block;
-                            padding: 8px 16px;
-                            border-radius: 20px;
-                            font-size: 0.875rem;
-                            font-weight: 600;
-                            text-transform: uppercase;
-                            letter-spacing: 0.5px;
-                        }
-                        
-                        .status-active {
-                            background: #c6f6d5;
-                            color: #22543d;
-                        }
-                        
-                        .status-inactive {
-                            background: #fed7d7;
-                            color: #742a2a;
-                        }
-                        
-                        .status-maintenance {
-                            background: #fef5e7;
-                            color: #7b341e;
-                        }
-                        
-                        .specs-section {
-                            background: white;
-                            border-radius: 12px;
-                            padding: 30px;
-                            margin-bottom: 20px;
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                        }
-                        
-                        .section-title {
-                            font-size: 1.5rem;
-                            font-weight: 600;
-                            color: #2d3748;
-                            margin-bottom: 20px;
-                            padding-bottom: 10px;
-                            border-bottom: 2px solid #e2e8f0;
-                        }
-                        
-                        .specs-grid {
-                            display: grid;
-                            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-                            gap: 20px;
-                        }
-                        
-                        .spec-item {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: center;
-                            padding: 15px;
-                            background: #f8fafc;
-                            border-radius: 8px;
-                            border: 1px solid #e2e8f0;
-                        }
-                        
-                        .spec-label {
-                            font-weight: 600;
-                            color: #4a5568;
-                            text-transform: uppercase;
-                            font-size: 0.875rem;
-                            letter-spacing: 0.5px;
-                        }
-                        
-                        .spec-value {
-                            font-weight: 600;
-                            color: #2d3748;
-                            font-size: 1rem;
-                        }
-                        
-                        .additional-info {
-                            background: white;
-                            border-radius: 12px;
-                            padding: 30px;
-                            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                        }
-                        
-                        .info-grid {
-                            display: grid;
-                            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                            gap: 15px;
-                        }
-                        
-                        .info-item {
-                            display: flex;
-                            justify-content: space-between;
-                            padding: 10px 0;
-                            border-bottom: 1px solid #f1f5f9;
-                        }
-                        
-                        .info-item:last-child {
-                            border-bottom: none;
-                        }
-                        
-                        .info-label {
-                            font-weight: 500;
-                            color: #4a5568;
-                        }
-                        
-                        .info-value {
-                            font-weight: 600;
-                            color: #2d3748;
-                        }
-                        
-                        .footer {
-                            text-align: center;
-                            margin-top: 30px;
-                            padding: 20px;
-                            color: #718096;
-                            font-size: 0.875rem;
-                        }
-                        
-                        @media (max-width: 768px) {
-                            .container {
-                                padding: 10px;
-                            }
-                            
-                            .specs-grid {
-                                grid-template-columns: 1fr;
-                            }
-                            
-                            .info-grid {
-                                grid-template-columns: 1fr;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="header">
-                            <h1 class="product-title">${product.name}</h1>
-                            <div class="product-category">${product.category}</div>
-                            <p class="product-description">${product.description}</p>
-                            <div class="status-badge status-${product.status}">
-                                ${product.status === 'active' ? 'Ativo' : product.status === 'inactive' ? 'Inativo' : 'Em Manutenção'}
-                            </div>
-                        </div>
-                        
-                        <div class="specs-section">
-                            <h2 class="section-title">Especificações Técnicas</h2>
-                            <div class="specs-grid">
-                                ${product.specifications.voltage ? `
-                                    <div class="spec-item">
-                                        <span class="spec-label">Voltagem</span>
-                                        <span class="spec-value">${product.specifications.voltage}</span>
-                                    </div>
-                                ` : ''}
-                                ${product.specifications.current ? `
-                                    <div class="spec-item">
-                                        <span class="spec-label">Corrente</span>
-                                        <span class="spec-value">${product.specifications.current}</span>
-                                    </div>
-                                ` : ''}
-                                ${product.specifications.material ? `
-                                    <div class="spec-item">
-                                        <span class="spec-label">Material</span>
-                                        <span class="spec-value">${product.specifications.material}</span>
-                                    </div>
-                                ` : ''}
-                                ${product.specifications.dimensions ? `
-                                    <div class="spec-item">
-                                        <span class="spec-label">Dimensões</span>
-                                        <span class="spec-value">${product.specifications.dimensions}</span>
-                                    </div>
-                                ` : ''}
-                                ${product.specifications.weight ? `
-                                    <div class="spec-item">
-                                        <span class="spec-label">Peso</span>
-                                        <span class="spec-value">${product.specifications.weight}</span>
-                                    </div>
-                                ` : ''}
-                                ${product.specifications.temperature ? `
-                                    <div class="spec-item">
-                                        <span class="spec-label">Temperatura</span>
-                                        <span class="spec-value">${product.specifications.temperature}</span>
-                                    </div>
-                                ` : ''}
-                                ${product.specifications.certification ? `
-                                    <div class="spec-item">
-                                        <span class="spec-label">Certificação</span>
-                                        <span class="spec-value">${product.specifications.certification}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        </div>
-                        
-                        ${product.additionalInfo ? `
-                            <div class="additional-info">
-                                <h2 class="section-title">Informações Adicionais</h2>
-                                <div class="info-grid">
-                                    ${product.additionalInfo.manufacturer ? `
-                                        <div class="info-item">
-                                            <span class="info-label">Fabricante:</span>
-                                            <span class="info-value">${product.additionalInfo.manufacturer}</span>
-                                        </div>
-                                    ` : ''}
-                                    ${product.additionalInfo.partNumber ? `
-                                        <div class="info-item">
-                                            <span class="info-label">Número da Peça:</span>
-                                            <span class="info-value">${product.additionalInfo.partNumber}</span>
-                                        </div>
-                                    ` : ''}
-                                    ${product.additionalInfo.warranty ? `
-                                        <div class="info-item">
-                                            <span class="info-label">Garantia:</span>
-                                            <span class="info-value">${product.additionalInfo.warranty}</span>
-                                        </div>
-                                    ` : ''}
-                                    ${product.additionalInfo.createdAt ? `
-                                        <div class="info-item">
-                                            <span class="info-label">Criado em:</span>
-                                            <span class="info-value">${product.additionalInfo.createdAt}</span>
-                                        </div>
-                                    ` : ''}
-                                    ${product.additionalInfo.updatedAt ? `
-                                        <div class="info-item">
-                                            <span class="info-label">Atualizado em:</span>
-                                            <span class="info-value">${product.additionalInfo.updatedAt}</span>
-                                        </div>
-                                    ` : ''}
-                                    ${product.additionalInfo.createdBy ? `
-                                        <div class="info-item">
-                                            <span class="info-label">Criado por:</span>
-                                            <span class="info-value">${product.additionalInfo.createdBy}</span>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        ` : ''}
-                        
-                        <div class="footer">
-                            <p>Especificações técnicas geradas automaticamente - RR Vision Brazil</p>
-                            <p>Data: ${new Date().toLocaleDateString('pt-BR')}</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `);
-            newWindow.document.close();
-        }
+    const handleProductClick = (product: Product) => {
+        // Navegar para a página de detalhes completa
+        navigate(`/app/product-detail/${product.id}`);
     };
 
     const handleCloseModals = () => {
-        setIsDetailsModalOpen(false);
         setIsEditModalOpen(false);
         setSelectedProduct(null);
     };
@@ -626,10 +317,6 @@ export default function Products({ category }: ProductsProps) {
         setFilteredProducts(prev => prev.map(p => p.id === updatedProduct.id ? updatedProduct : p));
     };
 
-    const handleEditFromDetails = () => {
-        setIsDetailsModalOpen(false);
-        setIsEditModalOpen(true);
-    };
 
     const categories = [...new Set(products.map(p => p.category))];
     const series = [...new Set(products.map(p => p.series))];
@@ -824,16 +511,6 @@ export default function Products({ category }: ProductsProps) {
 
                                 <div className="product-actions">
                                     <button
-                                        className="btn btn-primary"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            handleViewDetails(product);
-                                        }}
-                                    >
-                                        <FaBox />
-                                        Ver Detalhes
-                                    </button>
-                                    <button
                                         className="btn btn-outline"
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -859,12 +536,6 @@ export default function Products({ category }: ProductsProps) {
             </div>
 
             {/* Modais */}
-            <ProductDetailsModal
-                product={selectedProduct}
-                isOpen={isDetailsModalOpen}
-                onClose={handleCloseModals}
-                onEdit={handleEditFromDetails}
-            />
 
             <ProductEditModal
                 product={selectedProduct}
