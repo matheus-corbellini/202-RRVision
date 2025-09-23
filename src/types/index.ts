@@ -95,3 +95,18 @@ export type {
 export type {
 	Pendency
 } from './pendencies';
+
+export type {
+	ProductCategory,
+	ConnectorSeries,
+	ConnectorSeriesExtended,
+	TerminalSeries,
+	RubberPartsSeries,
+	ProductSeries,
+	MaterialType,
+	SealingType,
+	MaleFemaleType,
+	ProductCategoryInfo,
+	ProductItem,
+	ProductFormData
+} from './productCategories';
