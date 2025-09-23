@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { blingService } from '../services/blingService';
 import { BlingDataMapper } from '../services/blingDataMapper';
 import type { Order } from '../types/dashboard';
-import type { BlingOrderData } from '../services/blingDataMapper';
 
 export interface UseBlingOrdersOptions {
     accessToken?: string;
@@ -45,7 +44,7 @@ export const useBlingOrders = (options: UseBlingOrdersOptions = {}): UseBlingOrd
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [lastSync, setLastSync] = useState<Date | null>(null);
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage] = useState(1);
 
     const loadOrders = useCallback(async () => {
         // Tentar obter token do localStorage se não foi fornecido

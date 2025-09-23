@@ -21,19 +21,19 @@ import type { Pendency } from "../../types/pendencies";
 import type { NonConformityStats } from "../../types/nonConformities";
 
 export default function ControlPanel() {
-  const { user } = useAuth();
+  const {} = useAuth();
   const { hasToken, token } = useBlingToken();
 
   // Hook para dados do Bling
   const {
-    orders: blingOrders,
+    orders: [],
     loading: blingLoading,
     error: blingError,
     stats: blingStats,
     lastSync: blingLastSync,
     refresh: refreshBlingOrders,
   } = useBlingOrders({
-    accessToken: token, // Token reativo do hook
+    accessToken: token || undefined, // Token reativo do hook
     autoRefresh: true,
     refreshInterval: 30000, // 30 segundos
   });

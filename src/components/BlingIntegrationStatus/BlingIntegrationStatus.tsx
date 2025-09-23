@@ -1,4 +1,4 @@
-import { FaExclamationTriangle, FaCog, FaCheckCircle } from "react-icons/fa";
+import { FaExclamationTriangle, FaCheckCircle } from "react-icons/fa";
 import BlingSetupInstructions from "../BlingSetupInstructions/BlingSetupInstructions";
 import "./BlingIntegrationStatus.css";
 

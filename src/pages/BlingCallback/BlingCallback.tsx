@@ -63,7 +63,7 @@ export default function BlingCallback() {
                 setMessage("Processando código de autorização...");
 
                 // Trocar código por token
-                const authResponse = await blingService.exchangeCodeForToken(code);
+                await blingService.exchangeCodeForToken(code);
 
                 setStatus("success");
                 setMessage("Autorização realizada com sucesso! Redirecionando...");

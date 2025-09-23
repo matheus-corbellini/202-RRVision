@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaFileAlt, FaDownload, FaCalendarAlt, FaChartBar, FaFilter } from "react-icons/fa";
+import { FaFileAlt, FaDownload, FaCalendarAlt, FaChartBar } from "react-icons/fa";
 import Button from "../../components/Button/Button";
 import "./Reports.css";
 

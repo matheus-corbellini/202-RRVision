@@ -429,7 +429,7 @@ class BlingService {
 	}): Promise<{ data: BlingOrder[]; total: number; page: number }> {
 		// Se estiver em modo demonstração, retornar dados simulados
 		if (this.isDemoMode()) {
-			return this.getDemoOrders(page, limit, filters);
+			return this.getDemoOrders(page, limit);
 		}
 
 		try {
@@ -464,7 +464,7 @@ class BlingService {
 	/**
 	 * Retorna dados de demonstração para testes
 	 */
-	private getDemoOrders(page: number = 1, limit: number = 50, filters?: any): { data: BlingOrder[]; total: number; page: number } {
+	private getDemoOrders(page: number = 1, limit: number = 50): { data: BlingOrder[]; total: number; page: number } {
 		const demoOrders: BlingOrder[] = [
 			{
 				id: "1",

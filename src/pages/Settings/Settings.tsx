@@ -24,8 +24,10 @@ interface SettingsConfig {
   // Configurações de Usuário
   userName: string;
   email: string;
-  language: string;
+  language: "pt" | "en" | "es";
   timezone: string;
+  dateFormat: "dd/mm/yyyy" | "mm/dd/yyyy" | "yyyy-mm-dd";
+  currency: "BRL" | "USD" | "EUR";
 
   // Configurações de Notificações
   emailNotifications: boolean;
@@ -50,6 +52,7 @@ interface SettingsConfig {
   backupFrequency: string;
   dataRetention: number;
   debugMode: boolean;
+  logLevel: "error" | "warn" | "info" | "debug";
 }
 
 export default function Settings() {
@@ -58,8 +61,10 @@ export default function Settings() {
     // Configurações de Usuário
     userName: "João Silva",
     email: "joao.silva@empresa.com",
-    language: "pt-BR",
+    language: "pt",
     timezone: "America/Sao_Paulo",
+    dateFormat: "dd/mm/yyyy",
+    currency: "BRL",
 
     // Configurações de Notificações
     emailNotifications: true,
@@ -84,6 +89,7 @@ export default function Settings() {
     backupFrequency: "daily",
     dataRetention: 365,
     debugMode: false,
+    logLevel: "info",
   });
 
   const [hasChanges, setHasChanges] = useState(false);
@@ -108,8 +114,10 @@ export default function Settings() {
     setConfig({
       userName: "João Silva",
       email: "joao.silva@empresa.com",
-      language: "pt-BR",
+      language: "pt",
       timezone: "America/Sao_Paulo",
+      dateFormat: "dd/mm/yyyy",
+      currency: "BRL",
       emailNotifications: true,
       pushNotifications: true,
       alertSounds: false,
@@ -126,6 +134,7 @@ export default function Settings() {
       backupFrequency: "daily",
       dataRetention: 365,
       debugMode: false,
+      logLevel: "info",
     });
     setHasChanges(false);
   };
@@ -192,10 +201,13 @@ export default function Settings() {
         return (
           <SystemSettings
             config={{
+              language: config.language,
+              timezone: config.timezone,
+              dateFormat: config.dateFormat,
+              currency: config.currency,
               autoSave: config.autoSave,
-              backupFrequency: config.backupFrequency,
-              dataRetention: config.dataRetention,
               debugMode: config.debugMode,
+              logLevel: config.logLevel,
             }}
             onConfigChange={handleConfigChange}
           />

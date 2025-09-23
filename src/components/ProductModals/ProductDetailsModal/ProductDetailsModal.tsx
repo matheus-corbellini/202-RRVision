@@ -1,5 +1,4 @@
-import React from 'react';
-import { FaTimes, FaBox, FaCog, FaTag, FaBolt, FaRuler, FaWeight, FaCalendarAlt, FaUser } from 'react-icons/fa';
+import { FaTimes, FaBox, FaCog, FaTag, FaBolt, FaRuler, FaWeight, FaUser } from 'react-icons/fa';
 import './ProductDetailsModal.css';
 
 interface Product {

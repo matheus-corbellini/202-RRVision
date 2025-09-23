@@ -1,6 +1,5 @@
 // Serviço para mapear dados do Bling para tipos internos do sistema
 import type { Order } from '../types/dashboard';
-import type { BlingOrder } from '../types/blingOrders';
 import type { Priority } from '../types/base';
 
 export interface BlingOrderData {

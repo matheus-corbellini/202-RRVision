@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { blingService } from "../../services/blingService";
-import { FaCheckCircle, FaExclamationTriangle, FaSpinner, FaDownload, FaSync } from "react-icons/fa";
+import { FaCheckCircle, FaExclamationTriangle, FaSpinner, FaSync } from "react-icons/fa";
 import BlingQuickSetup from "../../components/BlingQuickSetup/BlingQuickSetup";
 import "./BlingTest.css";
 

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FaTimes, FaSave, FaBox, FaCog, FaTag, FaBolt, FaRuler, FaWeight, FaUser } from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { FaTimes, FaSave, FaBox, FaCog, FaBolt, FaUser } from 'react-icons/fa';
 import './ProductEditModal.css';
 
 interface Product {
@@ -55,10 +55,11 @@ export default function ProductEditModal({ product, isOpen, onClose, onSave }: P
 
             if (field.includes('.')) {
                 const [parent, child] = field.split('.');
+                const parentValue = prev[parent as keyof Product];
                 return {
                     ...prev,
                     [parent]: {
-                        ...prev[parent as keyof Product],
+                        ...(typeof parentValue === 'object' && parentValue !== null ? parentValue : {}),
                         [child]: value
                     }
                 };

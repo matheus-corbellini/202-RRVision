@@ -37,7 +37,7 @@ export default function Dashboard() {
 		lastSync: blingLastSync,
 		refresh: refreshBlingOrders,
 	} = useBlingOrders({
-		accessToken: token, // Token reativo do hook
+		accessToken: token || undefined, // Token reativo do hook
 		autoRefresh: true,
 		refreshInterval: 60000, // 1 minuto
 	});

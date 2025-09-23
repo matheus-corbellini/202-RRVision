@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaSearch, FaDownload, FaArrowLeft } from 'react-icons/fa';
 import './ProductDetail.css';
@@ -37,7 +37,7 @@ interface ProductDetailData {
 }
 
 const ProductDetail: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const {} = useParams<{ id: string }>();
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('');

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaCalendarAlt, FaClock, FaPlus, FaEdit, FaTrash, FaFilter, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaCalendarAlt, FaClock, FaPlus, FaEdit, FaTrash, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Button from "../../components/Button/Button";
 import "./Scheduling.css";
 
@@ -22,7 +22,7 @@ export default function Scheduling() {
     const [currentDate, setCurrentDate] = useState(new Date());
     const [viewMode, setViewMode] = useState<"day" | "week" | "month">("week");
     const [filterType, setFilterType] = useState("");
-    const [showAddModal, setShowAddModal] = useState(false);
+    const [, setShowAddModal] = useState(false);
 
     useEffect(() => {
         loadScheduleData();

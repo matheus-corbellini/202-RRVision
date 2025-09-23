@@ -11,7 +11,7 @@ export default function BlingQuickSetup({ onTokenConfigured }: BlingQuickSetupPr
     const [token, setToken] = useState('');
     const [testing, setTesting] = useState(false);
     const [result, setResult] = useState<{ success: boolean; message: string } | null>(null);
-    const [showDemoMode, setShowDemoMode] = useState(false);
+    const [, setShowDemoMode] = useState(false);
 
     const handleSetToken = async () => {
         if (!token.trim()) {

@@ -105,7 +105,7 @@ export const useBling = () => {
 					const productionOrders = await blingService.getProductionOrders(1, 100);
 
 					// Converter pedidos do Bling para o formato interno
-					const convertedOrders: BlingOrder[] = productionOrders.data.map((order, index) => ({
+      const convertedOrders: BlingOrder[] = productionOrders.data.map((order) => ({
 						id: `bling-${order.id}`,
 						number: order.numero,
 						customer: order.cliente.nome,
