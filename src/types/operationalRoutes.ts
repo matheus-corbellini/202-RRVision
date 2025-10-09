@@ -7,6 +7,19 @@ export interface Product extends BaseEntity {
 	description: string;
 	category: string;
 	isActive: boolean;
+	// Campos adicionais do Bling
+	price?: number;
+	costPrice?: number;
+	brand?: string;
+	model?: string;
+	weight?: number;
+	dimensions?: {
+		width?: number;
+		height?: number;
+		depth?: number;
+	};
+	gtin?: string;
+	type?: 'product' | 'service';
 }
 
 export interface Step extends BaseEntity {

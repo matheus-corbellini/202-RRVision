@@ -228,7 +228,6 @@
 .info-item {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 15px;
     padding-bottom: 10px;
     border-bottom: 1px solid #e0e0e0;
 }

@@ -110,3 +110,10 @@ export type {
 	ProductItem,
 	ProductFormData
 } from './productCategories';
+
+// Re-export OAuth types
+export type { 
+	OAuthTokenResponse, 
+	OAuthTokenRequest, 
+	OAuthRefreshRequest 
+} from './oauth';

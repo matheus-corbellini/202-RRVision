@@ -1,0 +1,40 @@
+/* VirtualizedUserTable specific styles */
+.virtualized-table-container {
+	overflow: hidden;
+}
+
+.virtualized-container {
+	overflow-x: auto;
+}
+
+.virtualized-container::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+
+.virtualized-container::-webkit-scrollbar-track {
+	background: #f1f1f1;
+	border-radius: 4px;
+}
+
+.virtualized-container::-webkit-scrollbar-thumb {
+	background: #c1c1c1;
+	border-radius: 4px;
+}
+
+.virtualized-container::-webkit-scrollbar-thumb:hover {
+	background: #a8a8a8;
+}
+
+/* Responsive adjustments for virtualized table */
+@media (max-width: 768px) {
+	.virtualized-container {
+		height: 400px !important;
+	}
+}
+
+@media (max-width: 480px) {
+	.virtualized-container {
+		height: 300px !important;
+	}
+}

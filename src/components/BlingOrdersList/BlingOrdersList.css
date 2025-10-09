@@ -42,11 +42,6 @@
 	text-decoration: none;
 }
 
-.btn:hover {
-	border-color: #cbd5e0;
-	background: #f7fafc;
-}
-
 .btn:disabled {
 	opacity: 0.5;
 	cursor: not-allowed;

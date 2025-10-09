@@ -1,0 +1,475 @@
+.oauth-authorization {
+    margin: 1rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 12px;
+    border: 1px solid #dee2e6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.oauth-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.oauth-header h4 {
+    margin: 0 0 0.5rem 0;
+    color: #495057;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.oauth-header p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 1rem;
+}
+
+.oauth-details {
+    margin-bottom: 1.5rem;
+}
+
+.oauth-config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.oauth-config-header h5 {
+    margin: 0;
+    color: #495057;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.config-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-edit {
+    padding: 8px 16px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-edit:hover {
+    background: #0056b3;
+}
+
+.btn-save {
+    padding: 8px 16px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-save:hover {
+    background: #1e7e34;
+}
+
+.btn-cancel {
+    padding: 8px 16px;
+    background: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-cancel:hover {
+    background: #545b62;
+}
+
+.btn-reset {
+    padding: 8px 16px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-reset:hover {
+    background: #c82333;
+}
+
+.validation-errors {
+    background: #f8d7da;
+    color: #721c24;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    margin-bottom: 1rem;
+}
+
+.validation-errors strong {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.validation-errors ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.validation-errors li {
+    margin-bottom: 0.25rem;
+}
+
+.oauth-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.info-item {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    display: flex;
+    flex-direction: column;
+    min-height: 80px;
+}
+
+.info-item strong {
+    display: block;
+    color: #495057;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+}
+
+.info-item code {
+    background: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.8rem;
+    color: #495057;
+    word-break: break-all;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.config-input {
+    width: 90%;
+    height: 36px;
+    padding: 0.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: white;
+    color: #495057;
+    margin-top: 0.25rem;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.config-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.config-input::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.oauth-url {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.oauth-url strong {
+    display: block;
+    color: #495057;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.url-display {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    overflow-x: auto;
+}
+
+.url-display code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.8rem;
+    color: #495057;
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
+.oauth-actions {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.btn-oauth {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-oauth:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(40, 167, 69, 0.4);
+}
+
+.btn-oauth:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.status-icon {
+    font-size: 1rem;
+}
+
+.status-icon.success {
+    color: #28a745;
+}
+
+.status-icon.error {
+    color: #dc3545;
+}
+
+.status-icon.loading {
+    color: #007bff;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.oauth-status {
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.oauth-status.idle {
+    background: #e9ecef;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.oauth-status.loading {
+    background: #cce7ff;
+    color: #004085;
+    border: 1px solid #b3d7ff;
+}
+
+.oauth-status.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.oauth-status.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.oauth-instructions {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.oauth-instructions h5 {
+    margin: 0 0 0.75rem 0;
+    color: #495057;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.oauth-instructions ol {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.oauth-instructions li {
+    margin-bottom: 0.5rem;
+}
+
+.oauth-debug {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    margin-top: 1rem;
+}
+
+.oauth-debug h5 {
+    margin: 0 0 0.75rem 0;
+    color: #495057;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.debug-info {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.debug-item {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+.debug-item strong {
+    display: block;
+    color: #495057;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.debug-item code {
+    background: #f8f9fa;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.8rem;
+    color: #495057;
+    word-break: break-all;
+    display: block;
+}
+
+.status-indicator {
+    font-weight: 500;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.status-indicator.loading {
+    background: #cce7ff;
+    color: #004085;
+}
+
+.status-indicator.success {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-indicator.error {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.status-indicator.idle {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+@media (max-width: 768px) {
+    .oauth-authorization {
+        padding: 1rem;
+    }
+    
+    .oauth-config-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+    
+    .config-actions {
+        justify-content: center;
+    }
+    
+    .oauth-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-item {
+        min-height: auto;
+    }
+    
+    .btn-oauth {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .url-display {
+        font-size: 0.7rem;
+    }
+    
+    .config-input {
+        font-size: 0.8rem;
+    }
+}

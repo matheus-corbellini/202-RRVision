@@ -131,7 +131,6 @@
 .search-input {
   position: relative;
   flex: 1;
-  max-width: 300px;
 }
 
 .search-icon {

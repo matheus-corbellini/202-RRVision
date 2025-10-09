@@ -1,66 +1,80 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback, lazy, Suspense } from "react";
 import { 
 	createProduct, 
 	listAllProducts, 
 	deleteProduct, 
 	updateProduct,
-	isCodeAlreadyUsed,
 	type CreateProductData,
 	type UpdateProductData 
 } from "../../services/productService";
 import Button from "../../components/Button/Button";
-import Input from "../../components/Input/Input";
 import { 
-	FaBox, 
 	FaSave, 
 	FaTimes, 
-	FaEdit, 
 	FaTrash, 
-	FaSearch,
 	FaBoxes,
-	FaTag,
-	FaFolder,
-	FaInfoCircle
+	FaExclamationTriangle
 } from "react-icons/fa";
 import type { Product } from "../../types";
+import { useProductForm } from "../../hooks/useProductForm";
+import { useProductValidation } from "../../hooks/useProductValidation";
+import { useDebounce } from "../../hooks/useDebounce";
 import "./ProductManagement.css";
 
-interface ProductFormData {
-	code: string;
-	name: string;
-	description: string;
-	category: string;
-	isActive: boolean;
-}
+// Lazy loading para componentes pesados
+const ProductTable = lazy(() => import("../../components/ProductModals/ProductTable/ProductTable"));
+const ProductForm = lazy(() => import("../../components/ProductModals/ProductForm/ProductForm"));
+const SearchBar = lazy(() => import("../../components/ProductModals/SearchBar/SearchBar"));
+const Pagination = lazy(() => import("../../components/ProductModals/Pagination/Pagination"));
+
+// Interfaces movidas para hooks personalizados
+
+type SortField = 'code' | 'name' | 'category' | 'isActive' | 'createdAt';
+type SortDirection = 'asc' | 'desc';
 
 export default function ProductManagement() {
+	// Estado principal
 	const [products, setProducts] = useState<Product[]>([]);
-	const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [categoryFilter, setCategoryFilter] = useState<string>("all");
 	const [loading, setLoading] = useState(true);
 	const [modalOpen, setModalOpen] = useState(false);
-	const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-	const [formData, setFormData] = useState<ProductFormData>({
-		code: "",
-		name: "",
-		description: "",
-		category: "",
-		isActive: true,
-	});
-	const [formLoading, setFormLoading] = useState(false);
+	const [deleteConfirmModal, setDeleteConfirmModal] = useState<{ isOpen: boolean; product: Product | null }>({ isOpen: false, product: null });
+	const [sortField, setSortField] = useState<SortField>('name');
+	const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+	const [currentPage, setCurrentPage] = useState(1);
+	const [itemsPerPage] = useState(30);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState(false);
+
+	// Hooks personalizados
+	const {
+		formData,
+		formErrors,
+		formLoading,
+		editingProduct,
+		setField,
+		clearAllErrors,
+		setLoading: setFormLoading,
+		setEditingProduct,
+		resetForm,
+		handleChange,
+	} = useProductForm();
+
+	const { validateForm } = useProductValidation();
+	
+	// Debounce para busca
+	const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
 	// Carregar produtos
 	useEffect(() => {
 		loadProducts();
 	}, []);
 
-	// Filtrar produtos
-	useEffect(() => {
+	// Filtrar e ordenar produtos com useMemo para performance
+	const filteredAndSortedProducts = useMemo(() => {
 		let filtered = products;
 
 		// Filtrar por categoria
@@ -68,21 +82,66 @@ export default function ProductManagement() {
 			filtered = filtered.filter((p) => p.category === categoryFilter);
 		}
 
-		// Filtrar por termo de busca
-		if (searchTerm.trim()) {
+		// Filtrar por termo de busca (usando debouncedSearchTerm)
+		if (debouncedSearchTerm.trim()) {
 			filtered = filtered.filter(
 				(p) =>
-					p.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-					p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-					p.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-					p.category.toLowerCase().includes(searchTerm.toLowerCase())
+					p.code.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+					p.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+					p.description.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+					p.category.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
 			);
 		}
 
-		setFilteredProducts(filtered);
-	}, [products, searchTerm, categoryFilter]);
+		// Ordenar
+		filtered.sort((a, b) => {
+			let aValue: string | number;
+			let bValue: string | number;
 
-	const loadProducts = async () => {
+			switch (sortField) {
+				case 'code':
+					aValue = a.code.toLowerCase();
+					bValue = b.code.toLowerCase();
+					break;
+				case 'name':
+					aValue = a.name.toLowerCase();
+					bValue = b.name.toLowerCase();
+					break;
+				case 'category':
+					aValue = a.category.toLowerCase();
+					bValue = b.category.toLowerCase();
+					break;
+				case 'isActive':
+					aValue = a.isActive ? 1 : 0;
+					bValue = b.isActive ? 1 : 0;
+					break;
+				case 'createdAt':
+					aValue = new Date(a.createdAt).getTime();
+					bValue = new Date(b.createdAt).getTime();
+					break;
+				default:
+					return 0;
+			}
+
+			if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+			if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+			return 0;
+		});
+
+		return filtered;
+	}, [products, debouncedSearchTerm, categoryFilter, sortField, sortDirection]);
+
+	// Paginação
+	const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage);
+	const startIndex = (currentPage - 1) * itemsPerPage;
+	const paginatedProducts = filteredAndSortedProducts.slice(startIndex, startIndex + itemsPerPage);
+
+	// Reset página quando filtros mudam
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [debouncedSearchTerm, categoryFilter, sortField, sortDirection]);
+
+	const loadProducts = useCallback(async () => {
 		try {
 			setLoading(true);
 			const productsList = await listAllProducts();
@@ -93,48 +152,28 @@ export default function ProductManagement() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
 
-	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-	) => {
-		const { name, value, type } = e.target;
-		const checked = (e.target as HTMLInputElement).checked;
+	// Funções movidas para hooks personalizados
+
+	const handleValidateForm = useCallback(async (): Promise<boolean> => {
+		const validation = await validateForm(formData, editingProduct);
 		
-		setFormData((prev) => ({ 
-			...prev, 
-			[name]: type === 'checkbox' ? checked : value 
-		}));
-		if (error) setError(null);
-	};
-
-	const validateForm = async (): Promise<boolean> => {
-		if (!formData.code || !formData.name || !formData.category) {
-			setError("Código, nome e categoria são obrigatórios");
+		if (!validation.isValid) {
+			// Set first error as main error
+			const firstError = Object.values(validation.errors)[0];
+			setError(firstError);
 			return false;
 		}
-
-		// Verificar se código já existe (apenas para novos produtos)
-		if (!editingProduct) {
-			try {
-				const codeExists = await isCodeAlreadyUsed(formData.code);
-				if (codeExists) {
-					setError("Código do produto já está em uso");
-					return false;
-				}
-			} catch (err) {
-				setError("Erro ao verificar disponibilidade do código");
-				return false;
-			}
-		}
-
+		
+		clearAllErrors();
 		return true;
-	};
+	}, [formData, editingProduct, validateForm, setError, clearAllErrors]);
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = useCallback(async (e: React.FormEvent) => {
 		e.preventDefault();
 		
-		const isValid = await validateForm();
+		const isValid = await handleValidateForm();
 		if (!isValid) return;
 
 		setFormLoading(true);
@@ -185,18 +224,23 @@ export default function ProductManagement() {
 		} finally {
 			setFormLoading(false);
 		}
-	};
+	}, [formData, editingProduct, handleValidateForm, setFormLoading, setError, setSuccess, resetForm, loadProducts]);
 
-	const handleDelete = async (productId: string) => {
-		if (!confirm("Tem certeza que deseja remover este produto?")) return;
+	const handleDeleteClick = useCallback((product: Product) => {
+		setDeleteConfirmModal({ isOpen: true, product });
+	}, []);
+
+	const handleDeleteConfirm = useCallback(async () => {
+		if (!deleteConfirmModal.product) return;
 		
 		try {
-			const result = await deleteProduct(productId);
+			const result = await deleteProduct(deleteConfirmModal.product.id);
 			
 			if (result.success) {
 				await loadProducts();
 				setSuccess(true);
 				setTimeout(() => setSuccess(false), 3000);
+				setDeleteConfirmModal({ isOpen: false, product: null });
 			} else {
 				setError(result.error || "Erro ao remover produto");
 			}
@@ -204,303 +248,220 @@ export default function ProductManagement() {
 			console.error("Erro ao remover produto:", err);
 			setError("Erro ao remover produto");
 		}
-	};
+	}, [deleteConfirmModal.product, loadProducts, setSuccess, setError]);
 
-	const handleEdit = (productToEdit: Product) => {
+	const handleDeleteCancel = useCallback(() => {
+		setDeleteConfirmModal({ isOpen: false, product: null });
+	}, []);
+
+	const handleEdit = useCallback((productToEdit: Product) => {
 		setEditingProduct(productToEdit);
-		setFormData({
-			code: productToEdit.code,
-			name: productToEdit.name,
-			description: productToEdit.description,
-			category: productToEdit.category,
-			isActive: productToEdit.isActive,
-		});
+		setField('code', productToEdit.code);
+		setField('name', productToEdit.name);
+		setField('description', productToEdit.description);
+		setField('category', productToEdit.category);
+		setField('isActive', productToEdit.isActive);
 		setModalOpen(true);
-	};
+	}, [setEditingProduct, setField]);
 
-	const resetForm = () => {
-		setFormData({
-			code: "",
-			name: "",
-			description: "",
-			category: "",
-			isActive: true,
-		});
-		setEditingProduct(null);
-		setError(null);
-		setTimeout(() => setSuccess(false), 3000);
-	};
-
-	const handleCancel = () => {
+	const handleCancel = useCallback(() => {
 		resetForm();
 		setModalOpen(false);
-	};
+	}, [resetForm]);
 
-	const openCreateModal = () => {
+	const openCreateModal = useCallback(() => {
 		resetForm();
 		setModalOpen(true);
-	};
+	}, [resetForm]);
 
-	const getStatusBadgeClass = (isActive: boolean) => {
-		switch (isActive) {
-			case true: return "status-active";
-			case false: return "status-inactive";
-			default: return "status-unknown";
+	// Funções de ordenação
+	const handleSort = useCallback((field: SortField) => {
+		if (sortField === field) {
+			setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+		} else {
+			setSortField(field);
+			setSortDirection('asc');
 		}
-	};
+	}, [sortField, sortDirection]);
 
-	const getStatusText = (isActive: boolean) => {
-		switch (isActive) {
-			case true: return "Ativo";
-			case false: return "Inativo";
-			default: return "Desconhecido";
-		}
-	};
+	// Funções de paginação
+	const goToPage = useCallback((page: number) => {
+		setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+	}, [totalPages]);
+
+	const goToPreviousPage = useCallback(() => {
+		setCurrentPage(prev => Math.max(1, prev - 1));
+	}, []);
+
+	const goToNextPage = useCallback(() => {
+		setCurrentPage(prev => Math.min(totalPages, prev + 1));
+	}, [totalPages]);
+
+	// Handlers para busca e filtros
+	const handleSearchChange = useCallback((value: string) => {
+		setSearchTerm(value);
+	}, []);
+
+	const handleFilterChange = useCallback((value: string) => {
+		setCategoryFilter(value);
+	}, []);
+
+	// Funções movidas para componentes
 
 	// Obter categorias únicas para filtro
 	const categories = Array.from(new Set(products.map(p => p.category)));
 
 	return (
 		<div className="product-management-content">
-			<div className="content-header">
-				<div className="header-content">
-					<h1>
-						<FaBoxes className="header-icon" />
-						Gerenciar Produtos
-					</h1>
-					<p>
-						Visualize, crie, edite e remova produtos do sistema
-					</p>
-				</div>
-			</div>
-
-			{error && (
-				<div className="error-message">
-					<FaTimes />
-					{error}
-				</div>
-			)}
-
-			{success && (
-				<div className="success-message">
-					<FaSave />
-					Operação realizada com sucesso!
-				</div>
-			)}
-
-			<div className="products-section">
-				<div className="search-container">
-					<div className="search-input-wrapper">
-						<FaSearch className="search-icon" />
-						<input
-							type="text"
-							placeholder="Buscar por código, nome, descrição ou categoria..."
-							value={searchTerm}
-							onChange={(e) => setSearchTerm(e.target.value)}
-							className="search-input"
-						/>
-					</div>
-					<div className="filter-wrapper">
-						<select
-							value={categoryFilter}
-							onChange={(e) => setCategoryFilter(e.target.value)}
-							className="category-filter"
-						>
-							<option value="all">Todas as categorias</option>
-							{categories.map(category => (
-								<option key={category} value={category}>{category}</option>
-							))}
-						</select>
-					</div>
-					<div className="search-actions">
-						<Button onClick={openCreateModal}>
-							<FaBox />
-							Criar Produto
-						</Button>
+			<div className="product-management-container">
+				<div className="content-header">
+					<div className="header-content">
+						<h1>
+							<FaBoxes className="header-icon" />
+							Gerenciar Produtos
+						</h1>
+						<p>
+							Visualize, crie, edite e remova produtos do sistema
+						</p>
 					</div>
 				</div>
+
+				{error && (
+					<div className="product-error-message">
+						<FaTimes />
+						{error}
+					</div>
+				)}
+
+				{success && (
+					<div className="product-success-message">
+						<FaSave />
+						Operação realizada com sucesso!
+					</div>
+				)}
+
+				<div className="products-section">
+				<Suspense fallback={<div className="product-loading-container"><div className="product-spinner"></div><p>Carregando...</p></div>}>
+					<SearchBar
+						searchTerm={searchTerm}
+						categoryFilter={categoryFilter}
+						categories={categories}
+						onSearchChange={handleSearchChange}
+						onFilterChange={handleFilterChange}
+						onCreateProduct={openCreateModal}
+					/>
+				</Suspense>
 
 				{loading ? (
-					<div className="loading-container">
-						<div className="spinner"></div>
+					<div className="product-loading-container">
+						<div className="product-spinner"></div>
 						<p>Carregando produtos...</p>
 					</div>
 				) : (
-					<div className="products-table">
-						<div className="table-header">
-							<div>Código</div>
-							<div>Nome</div>
-							<div>Descrição</div>
-							<div>Categoria</div>
-							<div>Status</div>
-							<div>Ações</div>
-						</div>
+					<Suspense fallback={<div className="product-loading-container"><div className="product-spinner"></div><p>Carregando...</p></div>}>
+						<ProductTable
+							products={paginatedProducts}
+							onEdit={handleEdit}
+							onDelete={handleDeleteClick}
+							onSort={handleSort}
+							sortField={sortField}
+							sortDirection={sortDirection}
+						/>
+					</Suspense>
+				)}
 
-						{filteredProducts.length === 0 ? (
-							<div className="empty-state">
-								<FaBoxes />
-								<p>Nenhum produto encontrado</p>
-							</div>
-						) : (
-							filteredProducts.map((p) => (
-								<div key={p.id} className="table-row">
-									<div className="product-info">
-										<div className="product-avatar">
-											{p.name?.charAt(0)?.toUpperCase() || "P"}
-										</div>
-										<div>
-											<div className="product-code">{p.code}</div>
-										</div>
-									</div>
-									<div className="name-cell">
-										<FaTag />
-										{p.name}
-									</div>
-									<div className="description-cell">
-										<FaInfoCircle />
-										{p.description || "—"}
-									</div>
-									<div className="category-cell">
-										<FaFolder />
-										{p.category}
-									</div>
-									<div className="status-cell">
-										<span className={`status-badge ${getStatusBadgeClass(p.isActive)}`}>
-											{getStatusText(p.isActive)}
-										</span>
-									</div>
-									<div className="actions-cell">
-										<button
-											className="action-btn edit-btn"
-											onClick={() => handleEdit(p)}
-											title="Editar produto"
-										>
-											<FaEdit />
-										</button>
-										<button
-											className="action-btn delete-btn"
-											onClick={() => handleDelete(p.id)}
-											title="Remover produto"
-										>
-											<FaTrash />
-										</button>
-									</div>
-								</div>
-							))
-						)}
-					</div>
+				{/* Paginação para listas com mais de 30 produtos */}
+				{totalPages > 1 && (
+					<Suspense fallback={<div></div>}>
+						<Pagination
+							currentPage={currentPage}
+							totalPages={totalPages}
+							startIndex={startIndex}
+							itemsPerPage={itemsPerPage}
+							totalItems={filteredAndSortedProducts.length}
+							onPageChange={goToPage}
+							onPreviousPage={goToPreviousPage}
+							onNextPage={goToNextPage}
+						/>
+					</Suspense>
 				)}
 			</div>
 
-			{/* Modal de Criação/Edição */}
-			{modalOpen && (
-				<div className="modal-overlay">
-					<div className="modal">
-						<div className="modal-header">
+				{/* Modal de Criação/Edição */}
+				{modalOpen && (
+					<div className="product-modal-overlay">
+						<div className="product-modal">
+							<div className="product-modal-header">
+								<h2>
+									{editingProduct ? "Editar Produto" : "Criar Novo Produto"}
+								</h2>
+								<button className="product-close-btn" onClick={handleCancel}>
+									<FaTimes />
+								</button>
+							</div>
+							<div className="product-modal-body">
+								<Suspense fallback={<div className="product-loading-container"><div className="product-spinner"></div><p>Carregando formulário...</p></div>}>
+									<ProductForm
+										formData={formData}
+										formErrors={formErrors}
+										formLoading={formLoading}
+										editingProduct={editingProduct}
+										onChange={handleChange}
+										onSubmit={handleSubmit}
+										onCancel={handleCancel}
+										onFieldChange={setField}
+									/>
+								</Suspense>
+							</div>
+					</div>
+				</div>
+			)}
+
+			{/* Modal de Confirmação de Exclusão */}
+			{deleteConfirmModal.isOpen && (
+				<div className="product-modal-overlay">
+					<div className="product-modal product-delete-confirm-modal">
+						<div className="product-modal-header">
 							<h2>
-								{editingProduct ? "Editar Produto" : "Criar Novo Produto"}
+								<FaExclamationTriangle className="header-icon" style={{ color: '#e53e3e' }} />
+								Confirmar Exclusão
 							</h2>
-							<button className="close-btn" onClick={handleCancel}>
+							<button className="product-close-btn" onClick={handleDeleteCancel}>
 								<FaTimes />
 							</button>
 						</div>
-						<div className="modal-body">
-							<form onSubmit={handleSubmit} className="product-form">
-								<div className="form-section">
-									<h3>Informações do Produto</h3>
-									<div className="form-grid">
-										<div className="form-group">
-											<label>Código *</label>
-											<Input
-												type="text"
-												name="code"
-												value={formData.code}
-												onChange={handleChange}
-												placeholder="Ex: PROD001"
-												required
-												disabled={formLoading || !!editingProduct}
-											/>
-										</div>
-
-										<div className="form-group">
-											<label>Nome *</label>
-											<Input
-												type="text"
-												name="name"
-												value={formData.name}
-												onChange={handleChange}
-												placeholder="Nome do produto"
-												required
-												disabled={formLoading}
-											/>
-										</div>
-
-										<div className="form-group">
-											<label>Categoria *</label>
-											<Input
-												type="text"
-												name="category"
-												value={formData.category}
-												onChange={handleChange}
-												placeholder="Categoria do produto"
-												required
-												disabled={formLoading}
-											/>
-										</div>
-
-										<div className="form-group">
-											<label>Status</label>
-											<select
-												name="isActive"
-												value={formData.isActive ? "true" : "false"}
-												onChange={(e) => setFormData(prev => ({ 
-													...prev, 
-													isActive: e.target.value === "true" 
-												}))}
-												disabled={formLoading}
-											>
-												<option value="true">Ativo</option>
-												<option value="false">Inativo</option>
-											</select>
-										</div>
-									</div>
-
-									<div className="form-group">
-										<label>Descrição</label>
-										<textarea
-											name="description"
-											value={formData.description}
-											onChange={handleChange}
-											placeholder="Descrição detalhada do produto"
-											rows={4}
-											disabled={formLoading}
-										/>
-									</div>
-								</div>
-
-								<div className="form-actions">
-									<Button
-										type="button"
-										variant="outline"
-										onClick={handleCancel}
-										disabled={formLoading}
-									>
-										<FaTimes />
-										Cancelar
-									</Button>
-									<Button
-										type="submit"
-										disabled={formLoading}
-									>
-										<FaSave />
-										{formLoading ? "Salvando..." : editingProduct ? "Salvar" : "Criar Produto"}
-									</Button>
-								</div>
-							</form>
+						<div className="product-modal-body">
+							<div className="product-delete-confirm-content">
+								<p>
+									Tem certeza que deseja remover o produto <strong>{deleteConfirmModal.product?.name}</strong>?
+								</p>
+								<p className="product-delete-warning">
+									Esta ação não pode ser desfeita e todos os dados do produto serão permanentemente removidos.
+								</p>
+							</div>
+							<div className="product-form-actions">
+								<Button
+									type="button"
+									variant="outline"
+									onClick={handleDeleteCancel}
+								>
+									<FaTimes />
+									Cancelar
+								</Button>
+								<button
+									type="button"
+									onClick={handleDeleteConfirm}
+									className="product-danger-btn"
+								>
+									<FaTrash />
+									Confirmar Exclusão
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
 			)}
+			</div>
 		</div>
 	);
 }

@@ -5,6 +5,7 @@ export * from "./blingDataMapper";
 export * from "./dataService";
 export * from "./attachmentService";
 export * from "./agendaService";
+export * from "./oauthService";
 
 // Exportar tipos específicos do operationalRoutesService para evitar conflitos
 export type {

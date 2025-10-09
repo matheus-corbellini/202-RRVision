@@ -1,0 +1,526 @@
+.token-exchange-header {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.token-exchange-header h4 {
+    margin: 0 0 0.5rem 0;
+    color: #856404;
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.token-exchange-header p {
+    margin: 0;
+    color: #856404;
+    font-size: 1rem;
+}
+
+.token-exchange-content {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.authorization-code-display {
+    margin-bottom: 1.5rem;
+}
+
+.authorization-code-display strong {
+    display: block;
+    color: #495057;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.code-display {
+    background: #f8f9fa;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    overflow-x: auto;
+}
+
+.code-display code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.9rem;
+    color: #495057;
+    word-break: break-all;
+}
+
+.client-secret-input {
+    margin-bottom: 1.5rem;
+}
+
+.client-secret-input label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.saved-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #28a745;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-left: auto;
+}
+
+.secret-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.secret-input-container {
+    position: relative;
+    flex: 1;
+    min-width: 200px;
+}
+
+.secret-input {
+    width: 100%;
+    padding: 0.75rem 3rem 0.75rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: white;
+    color: #495057;
+    transition: border-color 0.2s ease;
+}
+
+.secret-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.secret-input::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.secret-toggle-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    z-index: 2;
+}
+
+.secret-toggle-icon:hover {
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.btn-save {
+    padding: 0.4rem 0.6rem;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 4px rgba(40, 167, 69, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    height: 32px;
+}
+
+.btn-save:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.4);
+}
+
+.btn-clear {
+    padding: 0.4rem 0.6rem;
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 1px 4px rgba(220, 53, 69, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    height: 32px;
+}
+
+.btn-clear:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(220, 53, 69, 0.4);
+}
+
+.token-exchange-actions {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.btn-exchange {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-exchange:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(40, 167, 69, 0.4);
+}
+
+.btn-exchange:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.status-icon {
+    font-size: 1rem;
+}
+
+.status-icon.success {
+    color: #28a745;
+}
+
+.status-icon.error {
+    color: #dc3545;
+}
+
+.status-icon.loading {
+    color: #007bff;
+}
+
+.spinning {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.token-exchange-status {
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.token-exchange-status.idle {
+    background: #e9ecef;
+    color: #495057;
+    border: 1px solid #dee2e6;
+}
+
+.token-exchange-status.loading {
+    background: #cce7ff;
+    color: #004085;
+    border: 1px solid #b3d7ff;
+}
+
+.token-exchange-status.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.token-exchange-status.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.token-info h5 {
+    margin: 0 0 1rem 0;
+    color: #495057;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.refresh-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: #007bff;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.token-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.token-detail {
+    background: white;
+    padding: 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+.token-detail strong {
+    display: block;
+    color: #495057;
+    font-size: 0.85rem;
+    margin-bottom: 0.25rem;
+}
+
+.token-detail span {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.token-detail span.valid {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.token-detail span.invalid {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.token-display {
+    margin-bottom: 1rem;
+}
+
+.token-display strong {
+    display: block;
+    color: #495057;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.token-value {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.token-value code {
+    flex: 1;
+    background: #e2e8f0;
+    padding: 0.75rem;
+    border-radius: 6px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 0.8rem;
+    color: #2d3748;
+    word-break: break-all;
+    border: 1px solid #cbd5e0;
+}
+
+.token-input {
+    flex: 1;
+    padding: 0.75rem 3rem 0.75rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: white;
+    color: #495057;
+    transition: border-color 0.2s ease;
+    outline: none;
+}
+
+.token-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.token-input::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.btn-copy-token {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+    padding: 0;
+}
+
+.btn-copy-token svg {
+    width: 14px;
+    height: 14px;
+}
+
+.btn-copy-token:hover {
+    background: #0056b3;
+}
+
+.token-actions {
+    text-align: center;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-clear-tokens {
+    padding: 8px 16px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-clear-tokens:hover {
+    background: #c82333;
+}
+
+.btn-refresh-token {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+}
+
+.btn-refresh-token:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
+}
+
+.btn-refresh-token:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+@media (max-width: 768px) {
+    .token-exchange {
+        padding: 1rem;
+    }
+    
+    .token-exchange-content {
+        padding: 1rem;
+    }
+    
+    .secret-input {
+        padding: 0.75rem 2.5rem 0.75rem 0.75rem;
+    }
+    
+    .secret-toggle-icon {
+        right: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .secret-input-container {
+        min-width: 150px;
+    }
+    
+    .secret-input-wrapper {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+    }
+    
+    .btn-save,
+    .btn-clear {
+        width: 100%;
+        justify-content: center;
+        height: 36px;
+    }
+    
+    .token-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .token-value {
+        flex-direction: column;
+    }
+    
+    .btn-copy-token {
+        width: 100%;
+    }
+    
+    .token-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-refresh-token,
+    .btn-clear-tokens {
+        width: 100%;
+        justify-content: center;
+    }
+}

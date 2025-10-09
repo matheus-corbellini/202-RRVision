@@ -1,3 +1,5 @@
+import { API_CONFIG } from '../config/api';
+
 interface BlingConfig {
 	clientId: string;
 	clientSecret: string;
@@ -45,11 +47,11 @@ class BlingService {
 
 	constructor() {
 		this.config = {
-			clientId: import.meta.env.VITE_BLING_CLIENT_ID || "",
-			clientSecret: import.meta.env.VITE_BLING_CLIENT_SECRET || "",
-			baseUrl: import.meta.env.VITE_BLING_BASE_URL || "/api/bling", // Usar proxy local
+			clientId: API_CONFIG.BLING.CLIENT_ID,
+			clientSecret: API_CONFIG.BLING.CLIENT_SECRET,
+			baseUrl: API_CONFIG.BLING.BASE_URL,
 			accessToken: import.meta.env.VITE_BLING_ACCESS_TOKEN || "",
-			redirectUri: import.meta.env.VITE_BLING_REDIRECT_URI || "",
+			redirectUri: API_CONFIG.BLING.REDIRECT_URI,
 		};
 
 		if (this.config.accessToken) {
@@ -325,12 +327,19 @@ class BlingService {
 		}
 
 		const token = await this.getValidToken();
-		const apiUrl = `${this.config.baseUrl}${endpoint}`;
+		
+		// Add token as query parameter for Bling API v2
+		const separator = endpoint.includes('?') ? '&' : '?';
+		const apiUrl = `${this.config.baseUrl}${endpoint}${separator}apikey=${token}`;
+		
 		const headers = {
-			Authorization: `Bearer ${token}`,
 			"Content-Type": "application/json",
+			"Accept": "application/json",
 			...options.headers,
 		};
+
+		console.log('Making API call to:', apiUrl);
+		console.log('Headers:', headers);
 
 		return fetch(apiUrl, {
 			...options,
@@ -443,17 +452,28 @@ class BlingService {
 			if (filters?.situacao) params.append("situacao", filters.situacao);
 			if (filters?.cliente) params.append("cliente", filters.cliente);
 
-			const response = await this.makeApiCall(`/vendas?${params.toString()}`);
+			// Usar proxy do backend para evitar CORS
+			const backendUrl = API_CONFIG.BACKEND_URL;
+			const token = this.accessToken || localStorage.getItem('bling_access_token');
+			
+			const response = await fetch(`${backendUrl}/api/orders?${params.toString()}${token ? `&token=${token}` : ''}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					...(token && { 'Authorization': `Bearer ${token}` }),
+				},
+			});
 
 			if (!response.ok) {
-				throw new Error(`Erro ao buscar vendas: ${response.status}`);
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(`Erro ao buscar vendas: ${response.status} - ${errorData.message || response.statusText}`);
 			}
 
 			const result = await response.json();
 			return {
 				data: result.data || [],
-				total: result.total || 0,
-				page: result.page || page,
+				total: result.data?.length || 0,
+				page: page,
 			};
 		} catch (error) {
 			console.error("Erro ao buscar vendas:", error);
@@ -611,17 +631,57 @@ class BlingService {
 	}
 
 	/**
-	 * Busca produtos da API Bling
+	 * Busca produtos da API Bling via proxy do backend
 	 */
 	async getProducts(page: number = 1, limit: number = 50): Promise<{ data: any[]; total: number }> {
 		try {
-			const response = await this.makeApiCall(`/produtos?page=${page}&limit=${limit}`);
-
-			if (!response.ok) {
-				throw new Error(`Erro ao buscar produtos: ${response.status}`);
+			// Se estiver em modo demonstração, simular dados
+			if (this.isDemoMode()) {
+				return {
+					data: [
+						{
+							id: 1,
+							nome: "Produto Demo 1",
+							codigo: "DEMO001",
+							preco: 29.90,
+							situacao: "A",
+							tipo: "P"
+						},
+						{
+							id: 2,
+							nome: "Produto Demo 2", 
+							codigo: "DEMO002",
+							preco: 49.90,
+							situacao: "A",
+							tipo: "P"
+						}
+					],
+					total: 2
+				};
 			}
 
-			return await response.json();
+			// Usar proxy do backend para evitar CORS
+			const backendUrl = API_CONFIG.BACKEND_URL;
+			const token = this.accessToken || localStorage.getItem('bling_access_token');
+			
+			const response = await fetch(`${backendUrl}/api/products?page=${page}&limit=${limit}${token ? `&token=${token}` : ''}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					...(token && { 'Authorization': `Bearer ${token}` }),
+				},
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(`Erro ao buscar produtos: ${response.status} - ${errorData.message || response.statusText}`);
+			}
+
+			const result = await response.json();
+			return {
+				data: result.data || [],
+				total: result.data?.length || 0
+			};
 		} catch (error) {
 			console.error("Erro ao buscar produtos:", error);
 			throw error;
@@ -629,25 +689,64 @@ class BlingService {
 	}
 
 	/**
-	 * Busca clientes da API Bling
+	 * Busca clientes da API Bling via proxy do backend
 	 */
 	async getCustomers(page: number = 1, limit: number = 50): Promise<{ data: any[]; total: number }> {
 		try {
-			const response = await this.makeApiCall(`/contatos?page=${page}&limit=${limit}`);
-
-			if (!response.ok) {
-				throw new Error(`Erro ao buscar clientes: ${response.status}`);
+			// Se estiver em modo demonstração, simular dados
+			if (this.isDemoMode()) {
+				return {
+					data: [
+						{
+							id: 1,
+							nome: "Cliente Demo 1",
+							email: "cliente1@demo.com",
+							telefone: "(11) 99999-9999",
+							tipo: "F"
+						},
+						{
+							id: 2,
+							nome: "Cliente Demo 2",
+							email: "cliente2@demo.com", 
+							telefone: "(11) 88888-8888",
+							tipo: "J"
+						}
+					],
+					total: 2
+				};
 			}
 
-			return await response.json();
+			// Usar proxy do backend para evitar CORS
+			const backendUrl = API_CONFIG.BACKEND_URL;
+			const token = this.accessToken || localStorage.getItem('bling_access_token');
+			
+			const response = await fetch(`${backendUrl}/api/contacts?page=${page}&limit=${limit}${token ? `&token=${token}` : ''}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					...(token && { 'Authorization': `Bearer ${token}` }),
+				},
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(`Erro ao buscar clientes: ${response.status} - ${errorData.message || response.statusText}`);
+			}
+
+			const result = await response.json();
+			return {
+				data: result.data || [],
+				total: result.data?.length || 0
+			};
 		} catch (error) {
 			console.error("Erro ao buscar clientes:", error);
 			throw error;
 		}
 	}
 
+
 	/**
-	 * Testa a conexão com a API Bling
+	 * Testa a conexão com a API Bling via proxy do backend
 	 */
 	async testConnection(): Promise<{ success: boolean; error?: string }> {
 		// Se estiver em modo demonstração, simular sucesso
@@ -656,14 +755,39 @@ class BlingService {
 		}
 
 		try {
-			const response = await this.makeApiCall(`/contatos?page=1&limit=1`);
+			// Testar conexão via proxy do backend
+			const backendUrl = API_CONFIG.BACKEND_URL;
+			const response = await fetch(`${backendUrl}/health`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			});
 
 			if (response.ok) {
-				return { success: true };
+				// Testar também um endpoint da API Bling via proxy
+				const token = this.accessToken || localStorage.getItem('bling_access_token');
+				const productsResponse = await fetch(`${backendUrl}/api/products?page=1&limit=1${token ? `&token=${token}` : ''}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						...(token && { 'Authorization': `Bearer ${token}` }),
+					},
+				});
+
+				if (productsResponse.ok) {
+					return { success: true };
+				} else {
+					const errorData = await productsResponse.json().catch(() => ({}));
+					return {
+						success: false,
+						error: `Erro na API Bling: ${productsResponse.status} - ${errorData.message || productsResponse.statusText}`
+					};
+				}
 			} else {
 				return {
 					success: false,
-					error: `Erro ${response.status}: ${response.statusText}`
+					error: `Erro no backend: ${response.status} - ${response.statusText}`
 				};
 			}
 		} catch (error) {
@@ -675,36 +799,50 @@ class BlingService {
 	}
 
 	/**
-	 * Testa diferentes endpoints para descobrir qual funciona para vendas/pedidos
+	 * Testa diferentes endpoints para descobrir qual funciona para vendas/pedidos via proxy do backend
 	 */
 	async testEndpoints(): Promise<{ endpoint: string; status: number; success: boolean }[]> {
+		// Se estiver em modo demonstração, simular sucesso
+		if (this.isDemoMode()) {
+			return [
+				{
+					endpoint: '/api/products',
+					status: 200,
+					success: true
+				},
+				{
+					endpoint: '/api/contacts',
+					status: 200,
+					success: true
+				},
+				{
+					endpoint: '/api/orders',
+					status: 200,
+					success: true
+				}
+			];
+		}
+
 		const endpoints = [
-			'/vendas',
-			'/pedidos',
-			'/vendas/pedidos',
-			'/pedidos/vendas',
-			'/orders',
-			'/sales',
-			'/vendas?page=1&limit=1',
-			'/pedidos?page=1&limit=1',
-			'/notas-fiscais',
-			'/notas',
-			'/nfe',
-			'/vendas/notas',
-			'/pedidos/notas',
-			'/vendas/lista',
-			'/pedidos/lista',
-			'/vendas/list',
-			'/pedidos/list',
-			'/vendas/all',
-			'/pedidos/all'
+			'/api/products',
+			'/api/contacts',
+			'/api/orders',
+			'/health'
 		];
 
 		const results = [];
+		const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 		for (const endpoint of endpoints) {
 			try {
-				const response = await this.makeApiCall(endpoint);
+				const token = this.accessToken || localStorage.getItem('bling_access_token');
+				const response = await fetch(`${backendUrl}${endpoint}${token ? `?token=${token}` : ''}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						...(token && { 'Authorization': `Bearer ${token}` }),
+					},
+				});
 				results.push({
 					endpoint,
 					status: response.status,
@@ -723,33 +861,53 @@ class BlingService {
 	}
 
 	/**
-	 * Testa endpoints de listagem geral para entender a estrutura da API
+	 * Testa endpoints de listagem geral para entender a estrutura da API via proxy do backend
 	 */
 	async testApiStructure(): Promise<{ endpoint: string; status: number; success: boolean; data?: any }[]> {
+		// Se estiver em modo demonstração, simular sucesso
+		if (this.isDemoMode()) {
+			return [
+				{
+					endpoint: '/api/products',
+					status: 200,
+					success: true,
+					data: { message: 'Modo demonstração ativo' }
+				},
+				{
+					endpoint: '/api/contacts',
+					status: 200,
+					success: true,
+					data: { message: 'Modo demonstração ativo' }
+				},
+				{
+					endpoint: '/api/orders',
+					status: 200,
+					success: true,
+					data: { message: 'Modo demonstração ativo' }
+				}
+			];
+		}
+
 		const endpoints = [
-			'/',  // Root endpoint
-			'/api',
-			'/v3',
-			'/v3/',
-			'/v3/endpoints',
-			'/v3/resources',
-			'/v3/help',
-			'/v3/docs',
-			'/v3/status',
-			'/v3/info',
-			'/v2',  // Testar se v2 ainda funciona
-			'/v2/',
-			'/v2/pedidos',  // Testar endpoint v2
-			'/v2/vendas',   // Testar endpoint v2
-			'/v3/pedidos',  // Testar endpoint v3
-			'/v3/vendas'    // Testar endpoint v3
+			'/api/products',  // Endpoint de produtos
+			'/api/contacts',  // Endpoint de contatos
+			'/api/orders',    // Endpoint de pedidos
+			'/health'         // Health check
 		];
 
 		const results = [];
+		const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 		for (const endpoint of endpoints) {
 			try {
-				const response = await this.makeApiCall(endpoint);
+				const token = this.accessToken || localStorage.getItem('bling_access_token');
+				const response = await fetch(`${backendUrl}${endpoint}${token ? `?token=${token}` : ''}`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						...(token && { 'Authorization': `Bearer ${token}` }),
+					},
+				});
 				let data = null;
 
 				if (response.ok) {
@@ -770,7 +928,8 @@ class BlingService {
 				results.push({
 					endpoint,
 					status: 0,
-					success: false
+					success: false,
+					data: { error: error instanceof Error ? error.message : 'Erro desconhecido' }
 				});
 			}
 		}
@@ -786,7 +945,7 @@ class BlingService {
 		if (this.isDemoMode()) {
 			return [
 				{
-					baseUrl: '/api/bling (proxy local)',
+					baseUrl: 'Backend Proxy (http://localhost:3000)',
 					status: 200,
 					success: true,
 					data: { message: 'Modo demonstração ativo - usando proxy local' }
@@ -794,30 +953,59 @@ class BlingService {
 			];
 		}
 
-		// Para tokens reais, testar apenas o proxy local
+		// Para tokens reais, testar o proxy do backend
 		const results = [];
+		const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
 
 		try {
-			const response = await this.makeApiCall('/produtos?page=1&limit=1');
-			let data = null;
+			// Testar health check do backend
+			const healthResponse = await fetch(`${backendUrl}/health`);
+			let healthData = null;
 
-			if (response.ok) {
+			if (healthResponse.ok) {
 				try {
-					data = await response.json();
+					healthData = await healthResponse.json();
 				} catch (e) {
-					data = { message: 'Resposta não é JSON válido' };
+					healthData = { message: 'Resposta não é JSON válido' };
 				}
 			}
 
 			results.push({
-				baseUrl: '/api/bling (proxy local)',
-				status: response.status,
-				success: response.ok,
-				data
+				baseUrl: 'Backend Health Check',
+				status: healthResponse.status,
+				success: healthResponse.ok,
+				data: healthData
 			});
+
+			// Testar endpoint de produtos via proxy
+			const token = this.accessToken || localStorage.getItem('bling_access_token');
+			const productsResponse = await fetch(`${backendUrl}/api/products?page=1&limit=1${token ? `&token=${token}` : ''}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					...(token && { 'Authorization': `Bearer ${token}` }),
+				},
+			});
+			let productsData = null;
+
+			if (productsResponse.ok) {
+				try {
+					productsData = await productsResponse.json();
+				} catch (e) {
+					productsData = { message: 'Resposta não é JSON válido' };
+				}
+			}
+
+			results.push({
+				baseUrl: 'Backend Proxy - Produtos',
+				status: productsResponse.status,
+				success: productsResponse.ok,
+				data: productsData
+			});
+
 		} catch (error) {
 			results.push({
-				baseUrl: '/api/bling (proxy local)',
+				baseUrl: 'Backend Proxy',
 				status: 0,
 				success: false,
 				data: { error: error instanceof Error ? error.message : 'Erro desconhecido' }
