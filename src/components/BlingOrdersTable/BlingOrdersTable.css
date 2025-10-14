@@ -1,0 +1,312 @@
+/* Tabela de ordens de produção do Bling */
+.bling-orders-table {
+	overflow-x: auto;
+}
+
+.bling-orders-table .table-header {
+	display: grid;
+	grid-template-columns: 1.5fr 2fr 1.5fr 1fr 1fr 1fr 120px;
+	gap: 1rem;
+	padding: 1rem 1.5rem;
+	background: #f7fafc;
+	color: #4a5568;
+	font-weight: 600;
+	border-bottom: 2px solid #e2e8f0;
+	align-items: center;
+}
+
+.bling-orders-table .table-header > div:last-child {
+	text-align: center;
+	justify-self: center;
+}
+
+.bling-orders-table .sortable-header {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5rem;
+	cursor: pointer;
+	user-select: none;
+	transition: color 0.2s ease;
+}
+
+.bling-orders-table .sortable-header:hover {
+	color: #1a365d;
+}
+
+.bling-orders-table .table-row {
+	display: grid;
+	grid-template-columns: 1.5fr 2fr 1.5fr 1fr 1fr 1fr 120px;
+	gap: 1rem;
+	padding: 1rem 1.5rem;
+	border-bottom: 1px solid #e2e8f0;
+	align-items: center;
+	transition: background 0.3s ease;
+	min-height: 80px;
+}
+
+.bling-orders-table .table-row:hover {
+	background: #f7fafc;
+}
+
+/* Informações da ordem */
+.order-info {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+}
+
+.order-number {
+	font-weight: 700;
+	color: #1a365d;
+	font-size: 1.1rem;
+}
+
+/* Informações do produto */
+.product-info {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	min-width: 0;
+	overflow: hidden;
+}
+
+.product-avatar {
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #fbb040 0%, #f6ad55 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 700;
+	color: #1a365d;
+	font-size: 1.1rem;
+	flex-shrink: 0;
+}
+
+.product-details {
+	min-width: 0;
+	flex: 1;
+}
+
+.product-code {
+	font-weight: 600;
+	color: #1a365d;
+	margin-bottom: 0.25rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.product-name {
+	font-size: 0.85rem;
+	color: #718096;
+	margin-bottom: 0.25rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.product-quantity {
+	font-size: 0.75rem;
+	color: #a0aec0;
+	font-weight: 500;
+}
+
+/* Informações do cliente */
+.customer-info {
+	min-width: 0;
+	overflow: hidden;
+}
+
+.customer-name {
+	font-weight: 600;
+	color: #2d3748;
+	margin-bottom: 0.25rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.customer-email {
+	font-size: 0.8rem;
+	color: #718096;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* Status */
+.status-cell {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.status-badge {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.25rem 0.75rem;
+	border-radius: 20px;
+	font-size: 0.8rem;
+	font-weight: 600;
+	text-transform: capitalize;
+	white-space: nowrap;
+}
+
+/* Informações de data */
+.date-info {
+	text-align: center;
+	min-width: 0;
+}
+
+.order-date {
+	font-weight: 600;
+	color: #2d3748;
+	margin-bottom: 0.25rem;
+}
+
+.delivery-date {
+	font-size: 0.75rem;
+	color: #10b981;
+	font-weight: 500;
+}
+
+/* Informações de total */
+.total-info {
+	text-align: center;
+	min-width: 0;
+}
+
+.order-total {
+	font-weight: 700;
+	color: #1a365d;
+	font-size: 1rem;
+}
+
+/* Ações */
+.actions-cell {
+	display: flex;
+	gap: 0.5rem;
+	justify-content: center;
+}
+
+.action-btn {
+	width: 32px;
+	height: 32px;
+	border: none;
+	border-radius: 6px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	font-size: 0.9rem;
+}
+
+.view-btn {
+	background: #ebf8ff;
+	color: #3182ce;
+}
+
+.view-btn:hover {
+	background: #bee3f8;
+	transform: scale(1.05);
+}
+
+.edit-btn {
+	background: #fef5e7;
+	color: #dd6b20;
+}
+
+.edit-btn:hover {
+	background: #fed7aa;
+	transform: scale(1.05);
+}
+
+.delete-btn {
+	background: #fed7d7;
+	color: #c53030;
+}
+
+.delete-btn:hover {
+	background: #feb2b2;
+	transform: scale(1.05);
+}
+
+/* Estado vazio */
+.empty-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 3rem;
+	color: #718096;
+	gap: 1rem;
+}
+
+.empty-state svg {
+	font-size: 3rem;
+	color: #a0aec0;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+	.bling-orders-table .table-header,
+	.bling-orders-table .table-row {
+		grid-template-columns: 1fr;
+		gap: 0.5rem;
+		font-size: 0.85rem;
+	}
+
+	.bling-orders-table .table-header div,
+	.bling-orders-table .table-row div {
+		padding: 0.5rem 0.25rem;
+		border-bottom: 1px solid #e2e8f0;
+	}
+
+	.bling-orders-table .table-header div:before {
+		content: attr(data-label) ": ";
+		font-weight: 600;
+		color: #4a5568;
+	}
+
+	.product-info {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.5rem;
+	}
+
+	.actions-cell {
+		flex-direction: column;
+		gap: 0.25rem;
+	}
+
+	.action-btn {
+		width: 100%;
+		height: 28px;
+	}
+}
+
+@media (max-width: 480px) {
+	.bling-orders-table .table-header,
+	.bling-orders-table .table-row {
+		grid-template-columns: 1fr;
+		gap: 0.25rem;
+		font-size: 0.8rem;
+	}
+
+	.bling-orders-table .table-header div,
+	.bling-orders-table .table-row div {
+		padding: 0.25rem 0;
+	}
+
+	.product-avatar {
+		width: 32px;
+		height: 32px;
+		font-size: 0.9rem;
+	}
+}
+
+

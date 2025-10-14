@@ -10,6 +10,7 @@ export type { OAuthTokenResponse, OAuthTokenRequest, OAuthRefreshRequest };
 export class OAuthService {
     // Usar proxy do backend para evitar problemas de CORS
     private static readonly TOKEN_ENDPOINT = '/api/bling/oauth/token';
+    private static readonly REFRESH_ENDPOINT = '/api/bling/oauth/refresh';
 
     /**
      * Troca o authorization code pelos tokens de acesso
@@ -155,13 +156,13 @@ export class OAuthService {
 
         try {
             console.log('🔄 Iniciando refresh do token via proxy:', {
-                endpoint: this.TOKEN_ENDPOINT,
+                endpoint: this.REFRESH_ENDPOINT,
                 clientId: clientId,
                 refreshTokenLength: refreshToken.length
             });
 
             // Enviar dados como JSON para nosso backend proxy
-            const response = await fetch(this.TOKEN_ENDPOINT, {
+            const response = await fetch(this.REFRESH_ENDPOINT, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -170,8 +171,7 @@ export class OAuthService {
                 body: JSON.stringify({
                     clientId,
                     clientSecret,
-                    refreshToken,
-                    grantType: 'refresh_token'
+                    refreshToken
                 })
             });
 

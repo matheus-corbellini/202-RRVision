@@ -58,7 +58,9 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-align: left;
+  text-align: left;  
+  justify-content: flex-start;
+
 }
 
 .tab-button:hover {
@@ -70,6 +72,7 @@
   background: linear-gradient(135deg, #1a365d 0%, #2d3748 100%);
   color: white;
   border-right: 3px solid #4299e1;
+  justify-content: flex-start;
 }
 
 .tab-button svg {
@@ -80,7 +83,7 @@
 /* Conteúdo Principal */
 .settings-main {
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
   overflow-y: auto;
 }
 

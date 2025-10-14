@@ -589,24 +589,96 @@ class BlingService {
 	}
 
 	/**
-	 * Busca vendas específicas para produção (com status específicos)
+	 * Busca ordens de produção usando API v3 do Bling
 	 */
-	async getProductionOrders(page: number = 1, limit: number = 50): Promise<{ data: BlingOrder[]; total: number }> {
-		try {
-			// Buscar pedidos com status que indicam produção
-			const productionStatuses = ["em_aberto", "em_producao", "aguardando_producao"];
-			const allOrders: BlingOrder[] = [];
-			let total = 0;
+	async getProductionOrders(page: number = 1, limit: number = 100, idsSituacoes?: number[]): Promise<{ data: BlingOrder[]; total: number }> {
+		// Se estiver em modo demonstração, retornar dados simulados
+		if (this.isDemoMode()) {
+			return this.getDemoOrders(page, limit);
+		}
 
-			for (const status of productionStatuses) {
-				const result = await this.getOrders(page, limit, { situacao: status });
-				allOrders.push(...result.data);
-				total += result.total;
+		try {
+			const params = new URLSearchParams({
+				pagina: page.toString(),
+				limite: limit.toString(),
+			});
+
+			// Adicionar IDs das situações se fornecidos
+			if (idsSituacoes && idsSituacoes.length > 0) {
+				idsSituacoes.forEach(id => {
+					params.append('idsSituacoes[]', id.toString());
+				});
 			}
 
-			return { data: allOrders, total };
+			// Usar proxy do backend para evitar CORS
+			const backendUrl = API_CONFIG.BACKEND_URL;
+			const token = this.accessToken || localStorage.getItem('bling_access_token');
+			
+			const response = await fetch(`${backendUrl}/api/production-orders?${params.toString()}${token ? `&token=${token}` : ''}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					...(token && { 'Authorization': `Bearer ${token}` }),
+				},
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(`Erro ao buscar ordens de produção: ${response.status} - ${errorData.message || response.statusText}`);
+			}
+
+			const result = await response.json();
+			return {
+				data: result.data || [],
+				total: result.data?.length || 0,
+			};
 		} catch (error) {
-			console.error("Erro ao buscar vendas de produção:", error);
+			console.error("Erro ao buscar ordens de produção:", error);
+			throw error;
+		}
+	}
+
+	/**
+	 * Busca situações de ordens de produção
+	 */
+	async getProductionOrderSituations(): Promise<{ data: any[]; total: number }> {
+		// Se estiver em modo demonstração, retornar dados simulados
+		if (this.isDemoMode()) {
+			return {
+				data: [
+					{ id: 1, nome: "NÃO INICIADO", cor: "#6c757d" },
+					{ id: 2, nome: "EM PRODUÇÃO", cor: "#007bff" },
+					{ id: 3, nome: "FINALIZADO", cor: "#28a745" }
+				],
+				total: 3
+			};
+		}
+
+		try {
+			// Usar proxy do backend para evitar CORS
+			const backendUrl = API_CONFIG.BACKEND_URL;
+			const token = this.accessToken || localStorage.getItem('bling_access_token');
+			
+			const response = await fetch(`${backendUrl}/api/production-orders/situations${token ? `?token=${token}` : ''}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					...(token && { 'Authorization': `Bearer ${token}` }),
+				},
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json().catch(() => ({}));
+				throw new Error(`Erro ao buscar situações: ${response.status} - ${errorData.message || response.statusText}`);
+			}
+
+			const result = await response.json();
+			return {
+				data: result.data || [],
+				total: result.data?.length || 0,
+			};
+		} catch (error) {
+			console.error("Erro ao buscar situações:", error);
 			throw error;
 		}
 	}

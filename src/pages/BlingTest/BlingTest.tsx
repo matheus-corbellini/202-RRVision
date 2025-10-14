@@ -1,5 +1,4 @@
-import { FaSpinner, FaSync } from "react-icons/fa";
-import { TokenConfiguration, TestCard, TestSummary, OAuthAuthorization } from "../../components/BlingTestComponents";
+import { TestCard, TestSummary, OAuthAuthorization } from "../../components/BlingTestComponents";
 import { useBlingTest } from "../../hooks/useBlingTest";
 import "./BlingTest.css";
 
@@ -16,7 +15,7 @@ export default function BlingTest() {
         testEndpoints,
         testApiStructure,
         testApiBaseUrls,
-        runAllTests
+        testProductionOrderSituations
     } = useBlingTest();
 
     return (
@@ -27,19 +26,6 @@ export default function BlingTest() {
             </div>
 
             <OAuthAuthorization />
-
-            <TokenConfiguration />
-
-            <div className="test-controls">
-                <button
-                    className="btn btn-primary"
-                    onClick={runAllTests}
-                    disabled={isLoading}
-                >
-                    {isLoading ? <FaSpinner className="spinning" /> : <FaSync />}
-                    {isLoading ? "Testando..." : "Executar Todos os Testes"}
-                </button>
-            </div>
 
             <div className="test-results">
                 <TestCard
@@ -103,6 +89,14 @@ export default function BlingTest() {
                     icon="🏭"
                     result={testResults.productionOrders}
                     onTest={testProductionOrders}
+                    isLoading={isLoading}
+                />
+
+                <TestCard
+                    title="Teste de Situações de Ordens de Produção"
+                    icon="📋"
+                    result={testResults.productionOrders}
+                    onTest={testProductionOrderSituations}
                     isLoading={isLoading}
                 />
 

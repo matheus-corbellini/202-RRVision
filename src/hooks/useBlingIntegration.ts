@@ -1,47 +1,45 @@
 import { useState, useCallback } from 'react';
-import { BlingOrdersService, type BlingProductionOrder } from '../services/blingOrdersService';
+import { BlingToOperationalRoutesMapper } from '../services/blingToOperationalRoutesMapper';
+import type { OperationalRoute } from '../types/operationalRoutes';
 
-export interface BlingOrdersState {
-	orders: BlingProductionOrder[];
+export interface BlingIntegrationState {
 	isLoading: boolean;
 	error: string | null;
 	success: boolean;
 	message: string;
-	total: number;
+	routes: OperationalRoute[];
 	hasBlingToken: boolean;
 }
 
-export interface BlingOrdersActions {
-	loadOrders: () => Promise<void>;
+export interface BlingIntegrationActions {
+	syncWithBling: () => Promise<void>;
 	clearError: () => void;
 	clearSuccess: () => void;
 }
 
-export const useBlingOrders = (): BlingOrdersState & BlingOrdersActions => {
-	const [state, setState] = useState<BlingOrdersState>({
-		orders: [],
+export const useBlingIntegration = (): BlingIntegrationState & BlingIntegrationActions => {
+	const [state, setState] = useState<BlingIntegrationState>({
 		isLoading: false,
 		error: null,
 		success: false,
 		message: '',
-		total: 0,
+		routes: [],
 		hasBlingToken: !!localStorage.getItem('bling_access_token')
 	});
 
-	const loadOrders = useCallback(async () => {
+	const syncWithBling = useCallback(async () => {
 		setState(prev => ({ ...prev, isLoading: true, error: null, success: false }));
 
 		try {
-			const result = await BlingOrdersService.getProductionOrders(1, 100);
+			const result = await BlingToOperationalRoutesMapper.syncWithBling();
 			
 			setState(prev => ({
 				...prev,
 				isLoading: false,
 				success: result.success,
-				error: result.success ? null : result.error || 'Erro ao carregar ordens',
-				message: result.success ? `${result.total} ordens de produção carregadas` : 'Erro ao carregar ordens',
-				orders: result.data,
-				total: result.total,
+				error: result.success ? null : result.errors.join(', '),
+				message: result.message,
+				routes: result.routes,
 				hasBlingToken: !!localStorage.getItem('bling_access_token')
 			}));
 
@@ -58,9 +56,7 @@ export const useBlingOrders = (): BlingOrdersState & BlingOrdersActions => {
 				isLoading: false,
 				success: false,
 				error: errorMessage,
-				message: `Erro ao carregar ordens: ${errorMessage}`,
-				orders: [],
-				total: 0
+				message: `Erro na sincronização: ${errorMessage}`
 			}));
 		}
 	}, []);
@@ -75,8 +71,10 @@ export const useBlingOrders = (): BlingOrdersState & BlingOrdersActions => {
 
 	return {
 		...state,
-		loadOrders,
+		syncWithBling,
 		clearError,
 		clearSuccess
 	};
 };
+
+

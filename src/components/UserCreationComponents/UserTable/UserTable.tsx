@@ -118,9 +118,6 @@ const UserTable = memo<UserTableProps>(({
 			{users.map((user) => (
 				<div key={user.id} className="table-row">
 					<div className="user-info">
-						<div className="user-avatar">
-							{user.name?.charAt(0)?.toUpperCase() || "U"}
-						</div>
 						<div>
 							<div className="user-name">{user.name || user.displayName || "—"}</div>
 						</div>

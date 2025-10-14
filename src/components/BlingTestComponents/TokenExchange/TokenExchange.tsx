@@ -19,9 +19,7 @@ export const TokenExchange: React.FC<TokenExchangeProps> = ({
         isRefreshing,
         status, 
         tokenInfo, 
-        exchangeCodeForTokens, 
-        refreshToken,
-        clearTokens 
+        exchangeCodeForTokens
     } = useOAuthFlow();
     
     const { 
@@ -46,14 +44,6 @@ export const TokenExchange: React.FC<TokenExchangeProps> = ({
         console.log('Client Secret limpo com sucesso!');
     };
 
-    const handleRefreshToken = async () => {
-        const success = await refreshToken();
-        if (success) {
-            console.log('Token renovado manualmente com sucesso!');
-        } else {
-            console.log('Falha ao renovar token manualmente');
-        }
-    };
 
     const handleExchangeTokens = async () => {
         if (!authorizationCode) {
@@ -240,36 +230,6 @@ export const TokenExchange: React.FC<TokenExchangeProps> = ({
                                     <FaCopy />
                                 </button>
                             </div>
-                        </div>
-
-                        <div className="token-actions">
-                            {tokenInfo.has_refresh_token && (
-                                <button
-                                    className="btn btn-refresh-token"
-                                    onClick={handleRefreshToken}
-                                    disabled={isRefreshing}
-                                    title="Renovar token manualmente"
-                                >
-                                    {isRefreshing ? (
-                                        <>
-                                            <FaSpinner className="spinning" />
-                                            Renovando...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <FaSync />
-                                            Renovar Token
-                                        </>
-                                    )}
-                                </button>
-                            )}
-                            <button
-                                className="btn btn-clear-tokens"
-                                onClick={clearTokens}
-                                title="Limpar todos os tokens"
-                            >
-                                🗑️ Limpar Tokens
-                            </button>
                         </div>
                     </div>
                 )}

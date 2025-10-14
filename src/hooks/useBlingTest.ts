@@ -33,6 +33,7 @@ export interface UseBlingTestReturn {
     testEndpoints: () => Promise<void>;
     testApiStructure: () => Promise<void>;
     testApiBaseUrls: () => Promise<void>;
+    testProductionOrderSituations: () => Promise<void>;
     runAllTests: () => Promise<void>;
     clearResults: () => void;
 }
@@ -159,13 +160,47 @@ export const useBlingTest = (): UseBlingTestReturn => {
     const testProductionOrders = useCallback(async () => {
         setIsLoading(true);
         try {
-            const result = await blingService.getProductionOrders(1, 10);
+            // Primeiro, vamos testar sem filtros para ver todas as ordens
+            console.log('🔍 Testando ordens de produção sem filtros...');
+            const result = await blingService.getProductionOrders(1, 100);
+            
+            console.log('📊 Resultado:', result);
+            console.log('📊 Dados recebidos:', result.data);
+            console.log('📊 Total encontrado:', result.data?.length || 0);
+            
             updateTestResult('productionOrders', {
                 success: true,
                 data: result.data,
                 count: result.data?.length || 0
             });
         } catch (error) {
+            console.error('❌ Erro ao buscar ordens de produção:', error);
+            updateTestResult('productionOrders', {
+                success: false,
+                error: error instanceof Error ? error.message : "Erro desconhecido"
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    }, [updateTestResult]);
+
+    const testProductionOrderSituations = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            console.log('🔍 Testando busca de situações de ordens de produção...');
+            const result = await blingService.getProductionOrderSituations();
+            
+            console.log('📊 Situações encontradas:', result);
+            console.log('📊 Dados das situações:', result.data);
+            console.log('📊 Total de situações:', result.data?.length || 0);
+            
+            updateTestResult('productionOrders', {
+                success: true,
+                data: result.data,
+                count: result.data?.length || 0
+            });
+        } catch (error) {
+            console.error('❌ Erro ao buscar situações:', error);
             updateTestResult('productionOrders', {
                 success: false,
                 error: error instanceof Error ? error.message : "Erro desconhecido"
@@ -294,9 +329,10 @@ export const useBlingTest = (): UseBlingTestReturn => {
         testProductionOrders,
         testSync,
         testEndpoints,
-        testApiStructure,
-        testApiBaseUrls,
-        runAllTests,
+    testApiStructure,
+    testApiBaseUrls,
+    testProductionOrderSituations,
+    runAllTests,
         clearResults
     };
 };

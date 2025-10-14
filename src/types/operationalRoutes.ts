@@ -36,20 +36,32 @@ export interface Step extends BaseEntity {
 }
 
 export interface OperationalRoute extends BaseEntity {
-	productId: string;
+	productId?: string; // Opcional para roteiros criados a partir do Bling
 	productCode: string;
 	productName: string;
 	productDescription?: string;
 	productCategory?: string;
 	version: string;
-	status: "active" | "inactive" | "draft";
+	status: "active" | "inactive" | "draft" | "completed";
 	steps: Step[];
-	totalStandardTime: number;
-	totalSetupTime: number;
-	totalSteps: number;
+	setupTime: number; // Tempo de setup em minutos
+	totalStandardTime: number; // Tempo total padrão em minutos
 	// Associações com setor e operador
-	primarySectorId: string;
+	primarySectorId?: string;
 	assignedOperatorId?: string;
+	// Campos de qualidade e segurança
+	qualityStandards?: string[];
+	requiredTools?: string[];
+	safetyInstructions?: string[];
+	notes?: string;
+	// Campos específicos do Bling
+	blingOrderId?: string;
+	blingOrderNumber?: string;
+	blingCustomerName?: string;
+	blingOrderDate?: string;
+	blingStatus?: string;
+	quantity?: number;
+	observations?: string;
 }
 
 export interface RouteAssignment extends BaseEntity {

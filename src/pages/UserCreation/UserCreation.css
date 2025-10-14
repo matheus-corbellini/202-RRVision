@@ -181,7 +181,7 @@
 
 .table-header {
   display: grid;
-  grid-template-columns: 2.5fr 2fr 1.5fr 1.5fr 1.5fr 1fr;
+  grid-template-columns: 2.5fr 2.5fr 2fr 2fr 2fr 0.8fr;
   gap: 1rem;
   padding: 1rem 1.5rem;
   background: #f7fafc;
@@ -189,21 +189,31 @@
   font-weight: 600;
   border-bottom: 2px solid #e2e8f0;
   align-items: center;
+  min-height: 60px;
 }
 
+.table-header > div {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.table-header > div:nth-child(2),
+.table-header > div:nth-child(3),
+.table-header > div:nth-child(5),
 .table-header > div:last-child {
-  text-align: center;
-  justify-self: center;
+  justify-content: center;
 }
 
 .sortable-header {
   display: flex;
-  justify-content: center;
   align-items: center;
   gap: 0.5rem;
   cursor: pointer;
   user-select: none;
   transition: color 0.2s ease;
+  width: 100%;
 }
 
 .sortable-header:hover {
@@ -212,13 +222,14 @@
 
 .table-row {
   display: grid;
-  grid-template-columns: 2.5fr 2fr 1.5fr 1.5fr 1.5fr 1fr;
+  grid-template-columns: 2.5fr 2.5fr 2fr 2fr 2fr 0.8fr;
   gap: 1rem;
   padding: 1rem 1.5rem;
   border-bottom: 1px solid #e2e8f0;
   align-items: center;
   transition: background 0.3s ease;
   min-height: 60px;
+  background: white;
 }
 
 .table-row:hover {
@@ -268,7 +279,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
   color: #4a5568;
   min-width: 0;
   overflow: hidden;
@@ -276,16 +286,41 @@
   text-overflow: ellipsis;
 }
 
-.company-cell,
-.phone-cell {
+.company-cell {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
   color: #4a5568;
   min-width: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.phone-cell {
+  display: flex;
+  align-items: center;
+  color: #4a5568;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.role-cell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
 }
 
 .email-cell svg,
@@ -305,7 +340,6 @@
   font-size: 0.8rem;
   font-weight: 600;
   text-transform: capitalize;
-  margin-top: 0.5rem;
   white-space: nowrap;
   max-width: 100%;
   overflow: hidden;
@@ -337,24 +371,18 @@
   color: #4a5568;
 }
 
-.actions-cell {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: center;
-  align-items: center;
-}
-
 .action-btn {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .edit-btn {
