@@ -5,13 +5,13 @@ import { useAuth } from "../../../hooks/useAuth";
 import { useNavigation } from "../../../hooks/useNavigation";
 import { useBlingOrders } from "../../../hooks/useBlingOrders";
 import { useBlingToken } from "../../../hooks/useBlingToken";
+import { useNotificationSystem } from "../../../hooks/useNotificationSystem";
 import { path } from "../../../routes/path";
 import {
 	DashboardHeader,
 	DashboardStats,
 	OrdersSection,
 	AlertsPanel,
-	SectorsPanel,
 } from "../index";
 import BlingIntegrationStatus from "../../BlingIntegrationStatus/BlingIntegrationStatus";
 import BlingDemoData from "../../BlingDemoData/BlingDemoData";
@@ -27,6 +27,7 @@ export default function Dashboard() {
 	const { user, logout, loading } = useAuth();
 	const { goTo } = useNavigation();
 	const { hasToken, token } = useBlingToken();
+	const { createSystemNotification, createBlingNotification, createSectorNotification } = useNotificationSystem();
 
 	// Hook para dados do Bling
 	const {
@@ -51,7 +52,6 @@ export default function Dashboard() {
 
 	// Dados mockados apenas para alerts e setores (que não vêm do Bling)
 	useEffect(() => {
-
 		const mockAlerts: Alert[] = [
 			{
 				id: "1",
@@ -129,6 +129,30 @@ export default function Dashboard() {
 				recipients: [],
 			},
 		];
+
+		// Adicionar notificações ao contexto global usando o sistema
+		mockAlerts.forEach(alert => {
+			createSystemNotification(alert.title, alert.description, alert.severity);
+		});
+
+		// Adicionar notificações específicas de setores
+		createSectorNotification(
+			"Setor Montagem",
+			"Produtividade abaixo do esperado - verificar operadores",
+			"high"
+		);
+
+		createSectorNotification(
+			"Setor Qualidade",
+			"Inspeção final concluída com sucesso",
+			"low"
+		);
+
+		createSectorNotification(
+			"Setor Embalagem",
+			"Equipamento de selagem apresentando falhas",
+			"critical"
+		);
 
 		const mockSectors: Sector[] = [
 			{ id: "1", name: "Corte", code: "CORT", description: "Setor de Corte", isActive: true, createdAt: "2024-01-01", updatedAt: "2024-01-01", createdBy: "system", updatedBy: "system" },
@@ -225,6 +249,7 @@ export default function Dashboard() {
 					lastSync={blingLastSync || lastSync}
 					onImportBling={handleImportBling}
 					onLogout={handleLogout}
+					sectors={sectors}
 				/>
 
 				<DashboardStats stats={dashboardStats} />
@@ -250,8 +275,7 @@ export default function Dashboard() {
 					)}
 
 					<div className="sidebar-section">
-						<AlertsPanel alerts={alerts} />
-						<SectorsPanel sectors={sectors} />
+						{/* <AlertsPanel alerts={alerts} /> */}
 					</div>
 				</div>
 			</div>

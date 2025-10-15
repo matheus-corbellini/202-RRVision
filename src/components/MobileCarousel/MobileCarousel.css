@@ -1,0 +1,124 @@
+.mobile-carousel {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(180deg, #1a365d 0%, #2d3748 100%);
+  color: white;
+  z-index: 1000;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+  border-radius: 20px 20px 0 0;
+  padding: 1rem 0;
+}
+
+.carousel-container {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding: 0 1rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel-item {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 80px;
+  transition: all 0.3s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.carousel-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.carousel-item.active {
+  background: rgba(251, 176, 64, 0.2);
+  color: #fbb040;
+}
+
+.carousel-item.active::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
+  background: #fbb040;
+  border-radius: 0 0 3px 3px;
+}
+
+.carousel-icon-wrapper {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-icon {
+  font-size: 1.2rem;
+}
+
+.carousel-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.mobile-carousel {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .carousel-container {
+    gap: 0.75rem;
+    padding: 0 0.75rem;
+  }
+  
+  .carousel-item {
+    min-width: 70px;
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .carousel-label {
+    font-size: 0.65rem;
+  }
+  
+  .carousel-icon-wrapper {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .carousel-icon {
+    font-size: 1rem;
+  }
+}

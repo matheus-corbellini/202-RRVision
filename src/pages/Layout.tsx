@@ -2,6 +2,8 @@
 
 import { useLocation, useNavigate, Routes, Route } from "react-router-dom";
 import Sidebar from "../components/Sidebar/Sidebar";
+import MobileCarousel from "../components/MobileCarousel/MobileCarousel";
+import { NotificationProvider } from "../contexts/NotificationContext";
 import "./Layout.css";
 import Dashboard from "./Dashboard/DashboardWithSidebar";
 import OperatorSchedule from "./OperatorSchedule/OperatorSchedule";
@@ -96,13 +98,18 @@ export default function Layout() {
   };
 
   return (
-    <div className="dashboard-layout">
-      <Sidebar
-        currentPage={getCurrentPage()}
-        onPageChange={handlePageChange}
-        variant="default"
-      />
-      <div className="dashboard-main">
+    <NotificationProvider>
+      <div className="dashboard-layout">
+        <Sidebar
+          currentPage={getCurrentPage()}
+          onPageChange={handlePageChange}
+          variant="default"
+        />
+        <MobileCarousel
+          currentPage={getCurrentPage()}
+          onPageChange={handlePageChange}
+        />
+        <div className="dashboard-main">
         <Routes>
           <Route index element={<Dashboard />} />
           <Route path="schedule" element={<OperatorSchedule />} />
@@ -141,7 +148,8 @@ export default function Layout() {
           <Route path="products/wire-harness" element={<Products category="Cabos" />} />
           <Route path="products/pcb-connector" element={<Products category="PCB" />} />
         </Routes>
+        </div>
       </div>
-    </div>
+    </NotificationProvider>
   );
 }

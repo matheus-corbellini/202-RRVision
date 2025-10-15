@@ -20,3 +20,4 @@ export { useOAuthConfig, type OAuthConfig } from "./useOAuthConfig";
 export { useOAuthFlow, type UseOAuthFlowReturn } from "./useOAuthFlow";
 export { useClientSecret } from "./useClientSecret";
 export { useTokenRefresh, type UseTokenRefreshReturn } from "./useTokenRefresh";
+export { useNotificationSystem } from "./useNotificationSystem";

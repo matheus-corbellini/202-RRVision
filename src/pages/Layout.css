@@ -20,10 +20,28 @@
 @media (max-width: 768px) {
   .dashboard-main {
     margin-left: 0;
+    margin-bottom: 100px; /* Espaço para o mobile carousel */
   }
 
   .dashboard-layout:has(.sidebar:not(.sidebar-collapsed)) .dashboard-main {
     margin-left: 0;
+  }
+
+  /* Esconder sidebar em mobile */
+  .sidebar {
+    display: none;
+  }
+
+  /* Mostrar mobile carousel */
+  .mobile-carousel {
+    display: block;
+  }
+}
+
+@media (min-width: 769px) {
+  /* Esconder mobile carousel em desktop */
+  .mobile-carousel {
+    display: none;
   }
 }
 

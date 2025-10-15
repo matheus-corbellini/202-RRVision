@@ -20,6 +20,7 @@ import {
 import { useNavigation } from "../../hooks/useNavigation";
 import { useAuth } from "../../hooks/useAuth";
 import { path } from "../../routes/path";
+import NotificationBell from "../NotificationBell/NotificationBell";
 import "./Sidebar.css";
 
 interface SidebarProps {
@@ -292,19 +293,30 @@ export default function Sidebar({
 					<div className="sidebar-logo">
 						{!isCollapsed && (
 							<>
-								<span className="logo-text">RR Vision</span>
-								<span className="logo-subtitle">Brazil</span>
+								<div className="logo-title-section">
+									<span className="logo-text">RR Vision</span>
+									<span className="logo-subtitle">Brazil</span>
+								</div>
+								<NotificationBell />
 							</>
 						)}
 					</div>
-					<button
-						className="sidebar-toggle"
-						onClick={() => setIsCollapsed(!isCollapsed)}
-						title={isCollapsed ? "Expandir sidebar" : "Recolher sidebar"}
-					>
-						{isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
-					</button>
+					<div className="sidebar-header-actions">
+						<button
+							className="sidebar-toggle"
+							onClick={() => setIsCollapsed(!isCollapsed)}
+							title={isCollapsed ? "Expandir sidebar" : "Recolher sidebar"}
+						>
+							{isCollapsed ? <FaChevronRight /> : <FaChevronLeft />}
+						</button>
+					</div>
 				</div>
+
+				{isCollapsed && (
+					<div className="collapsed-notification-bell">
+						<NotificationBell />
+					</div>
+				)}
 
 				<nav className="sidebar-nav">
 					<div className="nav-section">

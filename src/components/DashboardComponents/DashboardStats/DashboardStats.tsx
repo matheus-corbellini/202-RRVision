@@ -19,10 +19,12 @@ function StatCard({ title, icon, value, change, changeType }: StatCardProps) {
   return (
     <div className="stat-card">
       <div className="stat-grid">
-        <div className="stat-title">{title}</div>
         <div className="stat-icon">{icon}</div>
-        <div className="stat-value">{value}</div>
-        <div className={`stat-change ${changeType}`}>{change}</div>
+        <div className="stat-content">
+          <div className="stat-title">{title}</div>
+          <div className="stat-value">{value}</div>
+          <div className={`stat-change ${changeType}`}>{change}</div>
+        </div>
       </div>
     </div>
   );

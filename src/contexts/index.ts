@@ -5,3 +5,8 @@ export {
 	useAuthStatus,
 	useUserData,
 } from "./AuthContext";
+
+export {
+	NotificationProvider,
+	useNotifications,
+} from "./NotificationContext";
